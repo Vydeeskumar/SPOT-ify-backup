@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPOT-ify the Paatu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --neon-purple: #B026FF;
+            --neon-blue: #0096FF;
+            --neon-pink: #FF69B4;
+            --dark-bg: #121212;
+            --darker-bg: #0a0a0a;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            background-color: var(--darker-bg);
+            padding: 15px 0;
+            box-shadow: 0 2px 15px rgba(176, 38, 255, 0.15);
+            border-bottom: 1px solid rgba(176, 38, 255, 0.1);
+        }
+
+        .navbar-brand {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--neon-purple) !important;
+            text-shadow: 0 0 10px rgba(176, 38, 255, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand i {
+            font-size: 1.2em;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-size: 1.1em;
+            padding: 8px 16px !important;
+            margin: 0 5px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover {
+            color: var(--neon-purple) !important;
+            background: rgba(176, 38, 255, 0.1);
+        }
+
+        .nav-link.active {
+            color: var(--neon-purple) !important;
+            background: rgba(176, 38, 255, 0.15);
+        }
+
+        /* Streak Badge */
+        .streak-badge {
+            background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
+            color: white;
+            font-size: 0.85em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+            box-shadow: 0 0 10px rgba(176, 38, 255, 0.3);
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 8px 16px;
+            font-size: 1.1em;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            color: var(--neon-pink);
+            background: rgba(255, 105, 180, 0.1);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            padding: 0 20px;
+        }
+
+        /* Main Content Area */
+        main {
+            flex: 1;
+            padding: 30px 0;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--darker-bg);
+            padding: 20px 0;
+            text-align: center;
+            border-top: 1px solid rgba(176, 38, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Alert Styling */
+        .alert {
+            border: none;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            background: rgba(18, 18, 18, 0.9);
+        }
+
+        .alert-success {
+            border-left: 4px solid var(--neon-blue);
+            color: white;
+        }
+
+        .alert-danger {
+            border-left: 4px solid var(--neon-pink);
+            color: white;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.3em;
+            }
+
+            .nav-link {
+                padding: 8px !important;
+                margin: 5px 0;
+            }
+
+            .container {
+                padding: 0 15px;
+            }
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {% load socialaccount %}
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-music"></i> SPOT-ify the Paatu
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
+                           href="{% url 'home' %}">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" 
+                               href="{% url 'profile' %}">
+                                <i class="fas fa-user"></i> Profile
+                                {% if user.userprofile.current_streak > 0 %}
+                                    <span class="streak-badge">
+                                        🔥 {{ user.userprofile.current_streak }}
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}" 
+                               href="{% url 'leaderboard' %}">
+                                <i class="fas fa-trophy"></i> Leaderboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <form method="post" action="{% url 'account_logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="logout-btn">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_login' %}">
+                                <i class="fab fa-google"></i> Continue with Google
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <span>© {% now "Y" %} SPOT-ify the Paatu. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+{% extends 'game/base.html' %}
+
+{% block content %}
+<div class="container">
+    <!-- User's Personal Ranking -->
+    {% if user.is_authenticated %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Your Rankings</h5>
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <div class="rank-box">
+                        <h6>Weekly Rank</h6>
+                        <p class="rank">#{{ user_weekly_rank|default:"--" }}</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="rank-box">
+                        <h6>Monthly Rank</h6>
+                        <p class="rank">#{{ user_monthly_rank|default:"--" }}</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="rank-box">
+                        <h6>All-Time Rank</h6>
+                        <p class="rank">#{{ user_all_time_rank|default:"--" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Weekly Leaderboard -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Weekly Top 10</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Player</th>
+                                    <th>Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for score in weekly_scores %}
+                                <tr {% if score.user__username == user.username %}class="table-success"{% endif %}>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ score.user__username }}</td>
+                                    <td>{{ score.total_score }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No scores yet</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Leaderboard -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">Monthly Top 10</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Player</th>
+                                    <th>Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for score in monthly_scores %}
+                                <tr {% if score.user__username == user.username %}class="table-success"{% endif %}>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ score.user__username }}</td>
+                                    <td>{{ score.total_score }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No scores yet</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- All-Time Leaderboard -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">All-Time Top 10</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Player</th>
+                                    <th>Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for score in all_time_scores %}
+                                <tr {% if score.user__username == user.username %}class="table-success"{% endif %}>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ score.user__username }}</td>
+                                    <td>{{ score.total_score }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No scores yet</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.rank-box {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+.rank {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+}
+.table-success {
+    background-color: #d4edda !important;
+}
+</style>
+{% endblock %}

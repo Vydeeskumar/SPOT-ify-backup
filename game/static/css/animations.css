@@ -1,0 +1,35 @@
+@keyframes correct-guess {
+    0% { transform: scale(1); background-color: #ffffff; }
+    50% { transform: scale(1.02); background-color: #d4edda; }
+    100% { transform: scale(1); background-color: #ffffff; }
+}
+
+@keyframes wrong-guess {
+    0% { transform: translateX(0); background-color: #ffffff; }
+    25% { transform: translateX(-10px); background-color: #f8d7da; }
+    75% { transform: translateX(10px); background-color: #f8d7da; }
+    100% { transform: translateX(0); background-color: #ffffff; }
+}
+
+.correct-animation {
+    animation: correct-guess 0.8s ease;
+}
+
+.wrong-animation {
+    animation: wrong-guess 0.5s ease;
+}
+
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background-color: #f00;
+    clip-path: polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%);
+    animation: fall 3s linear forwards;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh) rotate(360deg);
+    }
+}

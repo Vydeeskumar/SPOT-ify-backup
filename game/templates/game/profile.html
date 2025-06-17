@@ -1,0 +1,135 @@
+{% extends 'game/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ user.username }}'s Profile</h5>
+                    <div class="streak-info">
+                        <p class="streak">🔥 Current Streak: {{ profile.current_streak }}</p>
+                        <p class="best-streak">🏆 Best Streak: {{ profile.longest_streak }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Statistics</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="stat-box">
+                                <h6>Total Points</h6>
+                                <p>{{ profile.total_points }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-box">
+                                <h6>Songs Solved</h6>
+                                <p>{{ profile.total_songs_solved }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-box">
+                                <h6>Avg Time</h6>
+                                <p>{{ profile.average_time|floatformat:1 }}s</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Activity</h5>
+                    <div class="recent-scores">
+                        {% for score in recent_scores %}
+                        <div class="score-entry">
+                            <p>{{ score.song.title }} - {{ score.score }} points ({{ score.guess_time|floatformat:1 }}s)</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Sharing Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Share Your Progress</h5>
+                    <button class="btn btn-primary share-btn" onclick="shareProfile()">
+                        Share Profile
+                    </button>
+                    <button class="btn btn-success share-btn" onclick="shareStreak()">
+                        Share Streak
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.streak-info {
+    text-align: center;
+    font-size: 1.2em;
+}
+.stat-box {
+    text-align: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+.score-entry {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+.share-btn {
+    margin: 5px;
+}
+</style>
+
+<script>
+function shareProfile() {
+    const text = `Check out my SPOT-ify the Paatu stats!\n
+🎵 Songs Solved: {{ profile.total_songs_solved }}\n
+🏆 Best Streak: {{ profile.longest_streak }}\n
+⭐ Total Points: {{ profile.total_points }}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'My SPOT-ify the Paatu Profile',
+            text: text,
+            url: window.location.href
+        });
+    } else {
+        // Fallback for browsers that don't support Web Share API
+        navigator.clipboard.writeText(text);
+        alert('Stats copied to clipboard!');
+    }
+}
+
+function shareStreak() {
+    const text = `🔥 My SPOT-ify the Paatu streak: {{ profile.current_streak }} days!\n
+Can you beat my streak?`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'My SPOT-ify the Paatu Streak',
+            text: text,
+            url: window.location.href
+        });
+    } else {
+        navigator.clipboard.writeText(text);
+        alert('Streak info copied to clipboard!');
+    }
+}
+</script>
+{% endblock %}
