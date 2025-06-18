@@ -22,6 +22,23 @@
                         </a>
                     </div>
 
+                    <div class="divider my-4 position-relative">
+                        <hr>
+                        <span class="position-absolute top-50 start-50 translate-middle px-3 bg-white text-muted">or</span>
+                    </div>
+
+                    <div class="mb-4">
+                        <button onclick="showGuestLoginModal()" class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2 mx-auto" style="max-width: 300px;">
+                            <i class="fas fa-user-circle"></i>
+                            Play as Guest
+                        </button>
+                    </div>
+
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle"></i>
+                        <small>Playing as a guest? Your scores won't be saved. Sign in with Google to track your progress and compete on leaderboards!</small>
+                    </div>
+
                     <div class="features mt-5">
                         <div class="row g-4">
                             <div class="col-md-4">
@@ -47,32 +64,45 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="text-muted mt-4">
-                        <small>By continuing, you agree to our Terms of Service and Privacy Policy</small>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Guest Login Modal -->
+<div class="modal fade" id="guestLoginModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Play as Guest</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="guestLoginForm" method="post" action="{% url 'guest_login' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="guestUsername" class="form-label">Choose a username</label>
+                        <input type="text" class="form-control" id="guestUsername" name="username" required 
+                               pattern="[a-zA-Z0-9_]{3,15}" title="3-15 characters, letters, numbers and underscore only">
+                        <div class="form-text">This will be your temporary username while playing as a guest.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Start Playing</button>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle"></i>
+                    Remember: Guest scores aren't saved. Sign in with Google to save your progress!
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
-.card {
-    border: none;
-    border-radius: 15px;
-    background: linear-gradient(145deg, #ffffff, #f5f5f5);
-}
-
-.btn {
-    padding: 12px 20px;
-    font-size: 1.1em;
-    transition: all 0.3s ease;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+.divider {
+    height: 20px;
 }
 
 .feature-item {
@@ -94,4 +124,19 @@
     }
 }
 </style>
+
+<script>
+function showGuestLoginModal() {
+    const modal = new bootstrap.Modal(document.getElementById('guestLoginModal'));
+    modal.show();
+}
+
+document.getElementById('guestLoginForm')?.addEventListener('submit', function(e) {
+    const username = document.getElementById('guestUsername').value;
+    if (username.length < 3 || username.length > 15) {
+        e.preventDefault();
+        alert('Username must be between 3 and 15 characters');
+    }
+});
+</script>
 {% endblock %}

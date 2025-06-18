@@ -26,7 +26,7 @@ class SongAdmin(admin.ModelAdmin):
             'classes': ('wide',)
         }),
         ('Media', {
-            'fields': ('snippet', 'image'),
+            'fields': ('snippet', 'reveal_snippet', 'image'),  # Added reveal_snippet here
             'classes': ('wide',)
         }),
         ('Schedule', {

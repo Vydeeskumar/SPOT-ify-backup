@@ -126,6 +126,7 @@
             padding: 15px 20px;
             margin-bottom: 20px;
             background: rgba(18, 18, 18, 0.9);
+            animation: slideIn 0.5s ease-out;
         }
 
         .alert-success {
@@ -136,6 +137,25 @@
         .alert-danger {
             border-left: 4px solid var(--neon-pink);
             color: white;
+        }
+
+        #message-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            max-width: 300px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         /* Mobile Responsiveness */
@@ -151,6 +171,12 @@
 
             .container {
                 padding: 0 15px;
+            }
+
+            #message-container {
+                left: 20px;
+                right: 20px;
+                max-width: none;
             }
         }
     </style>
@@ -172,6 +198,11 @@
                         <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
                            href="{% url 'home' %}">
                             <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showRules(); return false;">
+                            <i class="fas fa-info-circle"></i> Rules
                         </a>
                     </li>
                     {% if user.is_authenticated %}
@@ -215,12 +246,14 @@
     <main>
         <div class="container">
             {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
+                <div id="message-container">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show message-alert" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
             {% endif %}
             
             {% block content %}{% endblock %}
@@ -234,5 +267,96 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messages = document.querySelectorAll('.message-alert');
+            messages.forEach(function(message) {
+                setTimeout(function() {
+                    const bsAlert = new bootstrap.Alert(message);
+                    bsAlert.close();
+                }, 5000); // Messages will disappear after 5 seconds
+            });
+        });
+    </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messages = document.querySelectorAll('.message-alert');
+            messages.forEach(function(message) {
+                setTimeout(function() {
+                    const bsAlert = new bootstrap.Alert(message);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+    </script>
+
+    <!-- Rules Modal -->
+    <div class="modal fade" id="rulesModal" tabindex="-1" aria-labelledby="rulesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background: var(--darker-bg); color: white; border: 2px solid var(--neon-purple);">
+                <div class="modal-header border-bottom" style="border-color: var(--neon-purple) !important;">
+                    <h5 class="modal-title" id="rulesModalLabel" style="color: var(--neon-purple);">
+                        <i class="fas fa-info-circle"></i> How to Play
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="rules-section mb-4">
+                        <h6 style="color: var(--neon-blue);"><i class="fas fa-play"></i> Gameplay</h6>
+                        <ul class="list-unstyled">
+                            <li>🎵 Listen to the daily song snippet</li>
+                            <li>🤔 Guess the song title</li>
+                            <li>⏱️ Faster guesses earn more points</li>
+                            <li>❌ Wrong guesses don't penalize you</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="rules-section mb-4">
+                        <h6 style="color: var(--neon-blue);"><i class="fas fa-star"></i> Points System</h6>
+                        <ul class="list-unstyled">
+                            <li>⚡ 8 points: Within 10 seconds</li>
+                            <li>⭐ 5 points: Within 20 seconds</li>
+                            <li>✨ 4 points: Within 30 seconds</li>
+                            <li>💫 3 points: Within 45 seconds</li>
+                            <li>🌟 2 points: Within 60 seconds</li>
+                            <li>⭐ 1 point: After 60 seconds</li>
+                        </ul>
+                    </div>
+
+                    <div class="rules-section">
+                        <h6 style="color: var(--neon-blue);"><i class="fas fa-fire"></i> Streaks</h6>
+                        <ul class="list-unstyled">
+                            <li>🔥 Maintain your streak by playing daily</li>
+                            <li>📊 Compare scores on the leaderboard</li>
+                            <li>🏆 Build the longest streak possible!</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer border-top" style="border-color: var(--neon-purple) !important;">
+                    <button type="button" class="btn btn-primary" style="background: var(--neon-purple); border: none;" data-bs-dismiss="modal">Got it!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to show rules
+        function showRules() {
+            const rulesModal = new bootstrap.Modal(document.getElementById('rulesModal'));
+            rulesModal.show();
+        }
+
+        // Show rules on first visit
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!localStorage.getItem('rulesShown')) {
+                setTimeout(showRules, 1000); // Show rules after 1 second
+                localStorage.setItem('rulesShown', 'true');
+            }
+        });
+    </script>
+</body>
 </body>
 </html>

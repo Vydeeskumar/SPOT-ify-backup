@@ -8,6 +8,7 @@ class Song(models.Model):
     artist = models.CharField(max_length=200)
     movie = models.CharField(max_length=200, null=True, blank=True)
     snippet = models.FileField(upload_to='song_snippets/')
+    reveal_snippet = models.FileField(upload_to='song_snippets/', null=True, blank=True)  
     image = models.ImageField(upload_to='song_images/', null=True, blank=True) 
     display_date = models.DateField(unique=True, null=True, blank=True)
     is_used = models.BooleanField(default=False)

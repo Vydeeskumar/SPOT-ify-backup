@@ -150,7 +150,7 @@
     .form-control {
         background: rgba(255, 255, 255, 0.05);
         border: 2px solid var(--neon-purple);
-        color: white;
+        color: white !important; /* Force white text */
         border-radius: 20px;
         padding: 12px 20px;
         text-align: center;
@@ -158,11 +158,25 @@
         transition: all 0.3s ease;
     }
 
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.5); /* Lighter color for placeholder */
+    }
+
     .form-control:focus {
         background: rgba(255, 255, 255, 0.1);
         border-color: var(--neon-blue);
         box-shadow: 0 0 15px rgba(176, 38, 255, 0.2);
         outline: none;
+        color: white !important;
+    }
+
+    /* Ensure text remains visible during autofill */
+    .form-control:-webkit-autofill,
+    .form-control:-webkit-autofill:hover,
+    .form-control:-webkit-autofill:focus {
+        -webkit-text-fill-color: white;
+        -webkit-box-shadow: 0 0 0px 1000px var(--dark-bg) inset;
+        transition: background-color 5000s ease-in-out 0s;
     }
 
     /* Result View */
@@ -203,6 +217,138 @@
     audio {
         display: none;
     }
+    
+    .reveal-animation {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: revealFade 1s ease forwards;
+    }
+
+    .reveal-title, .reveal-details, .reveal-image {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    .reveal-title {
+        animation: revealItem 0.5s ease forwards;
+    }
+
+    .reveal-details {
+        animation: revealItem 0.5s ease forwards 0.3s;
+    }
+
+    .reveal-image {
+        animation: revealItem 0.5s ease forwards 0.6s;
+    }
+
+    @keyframes revealFade {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes revealItem {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .reveal-player {
+        opacity: 0;
+        transform: scale(0.9);
+        animation: revealPlayer 0.5s ease forwards 1s;
+    }
+
+    @keyframes revealPlayer {
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    .support-animation {
+        animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-20px);
+        }
+        60% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .btn-support {
+        background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-support:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(176, 38, 255, 0.3);
+        color: white;
+    }
+
+    .btn-paypal {
+        background: #0070ba;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-paypal:hover {
+        background: #003087;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 112, 186, 0.3);
+        color: white;
+    }
+
+    .divider {
+        position: relative;
+        text-align: center;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 45%;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .divider::before {
+        left: 0;
+    }
+
+    .divider::after {
+        right: 0;
+    }
+
+    .divider span {
+        background: var(--darker-bg);
+        padding: 0 10px;
+    }
+
+    .payment-option {
+        padding: 15px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+
 </style>
 {% endblock %}
 
@@ -255,24 +401,101 @@
                 </form>
                 <div id="result-message" class="mt-3"></div>
             </div>
-
             <div id="result-view" class="result-container" style="display: none;">
-                {% if today_song.image %}
-                    <img src="{{ today_song.image.url }}" alt="{{ today_song.title }}" class="song-image">
-                {% endif %}
-                <div class="song-details">
-                    <div class="song-title">{{ today_song.title }}</div>
-                    <div class="song-info">{{ today_song.movie }}</div>
-                    <div class="song-info">{{ today_song.composer }}</div>
+                <div class="reveal-animation">
+                    {% if today_song.image %}
+                        <img src="{{ today_song.image.url }}" alt="{{ today_song.title }}" class="song-image reveal-image">
+                    {% endif %}
+                    <div class="song-details">
+                        <div class="song-title reveal-title">{{ today_song.title }}</div>
+                        <div class="song-info reveal-details">{{ today_song.movie }}</div>
+                        <div class="song-info reveal-details">{{ today_song.artist }}</div>
+                    </div>
+                    {% if today_song.reveal_snippet %}
+                        <audio id="reveal-snippet" src="{{ today_song.reveal_snippet.url }}" preload="auto"></audio>
+                    {% endif %}
+                    
+                    <!-- Support Button -->
+                    <button class="btn btn-support mt-4" data-bs-toggle="modal" data-bs-target="#supportModal">
+                        <i class="fas fa-candy-cane"></i> Buy me a Thaenmittai
+                    </button>
                 </div>
             </div>
-        {% endif %}
-    {% else %}
-        <div class="alert alert-info">
-            No song available for today.
+
+            <!-- Support Modal -->
+            <div class="modal fade" id="supportModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content" style="background: var(--darker-bg); border: 2px solid var(--neon-purple);">
+                        <div class="modal-header border-0">
+                            <h5 class="modal-title" style="color: var(--neon-purple);">
+                                <i class="fas fa-candy-cane"></i> Buy me a Thaenmittai
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <div class="support-animation mb-4">
+                                <i class="fas fa-candy-cane fa-3x" style="color: var(--neon-pink);"></i>
+                            </div>
+                            <p class="text-white">Enjoyed the game? Support me with a sweet Thaenmittai! 🍬</p>
+                            <div class="payment-option mb-4">
+                                <h6 class="text-white mb-3">
+                                    <i class="fas fa-mobile-alt"></i> Pay via UPI
+                                </h6>
+                                <!-- Copyable UPI ID -->
+                                <div class="upi-id-container mb-3">
+                                    <input type="text" value="rvydeeskumar-1@okhdfcbank" id="upiId" readonly 
+                                        class="form-control bg-dark text-white text-center mb-2">
+                                    <button onclick="copyUpiId()" class="btn btn-support">
+                                        <i class="fas fa-copy"></i> Copy UPI ID
+                                    </button>
+                                </div>
+                                
+                                <!-- Direct App Buttons -->
+                                <p class="text-muted mb-2">Or pay directly with:</p>
+                                <div class="upi-buttons">
+                                    <button onclick="window.location.href='gpay://upi/pay?pa=rvydeeskumar-1@okhdfcbank&pn=Vydeeskumar&am=10&cu=INR&tn=Thaenmittai'" 
+                                            class="btn btn-support me-2 mb-2">
+                                        <i class="fab fa-google-pay"></i> GPay
+                                    </button>
+                                    <button onclick="window.location.href='phonepe://pay?pa=rvydeeskumar-1@okhdfcbank&pn=Vydeeskumar&am=10&cu=INR&tn=Thaenmittai'" 
+                                            class="btn btn-support me-2 mb-2">
+                                        <i class="fas fa-mobile-alt"></i> PhonePe
+                                    </button>
+                                    <button onclick="window.location.href='paytmmp://pay?pa=rvydeeskumar-1@okhdfcbank&pn=Vydeeskumar&am=10&cu=INR&tn=Thaenmittai'" 
+                                            class="btn btn-support mb-2">
+                                        <i class="fas fa-wallet"></i> Paytm
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="divider my-4">
+                                <span class="text-muted">OR</span>
+                            </div>
+
+                            <!-- PayPal Option -->
+                            <div class="payment-option">
+                                <h6 class="text-white mb-3">
+                                    <i class="fab fa-paypal"></i> Pay via PayPal
+                                </h6>
+                                <button onclick="window.location.href='https://paypal.me/rvydeeskumar'" 
+                                        class="btn btn-paypal">
+                                    <i class="fab fa-paypal"></i> Support with PayPal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    {% endif %}
-</div>
+        {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    No song available for today.
+                </div>
+            {% endif %}
+            </div>
+
 <script>
 // Initialize variables
 let startTime = null;
@@ -347,11 +570,28 @@ function stopTimer() {
     return Math.max(0, Math.min(timeTaken, 3600));
 }
 
-// Show result view
 function showResultView() {
     document.getElementById('game-view').style.display = 'none';
-    document.getElementById('result-view').style.display = 'block';
+    const resultView = document.getElementById('result-view');
+    resultView.style.display = 'block';
+    
+    // Stop the main audio if it's playing
+    const mainAudio = document.getElementById('song-snippet');
+    if (mainAudio) {
+        mainAudio.pause();
+    }
+
+    // Play the reveal snippet automatically
+    const revealAudio = document.getElementById('reveal-snippet');
+    if (revealAudio) {
+        revealAudio.volume = 0.7;
+        revealAudio.play()
+            .catch(error => console.log('Audio playback failed:', error));
+    }
+
+    
 }
+
 
 // Initialize elements
 const audioElement = document.getElementById('song-snippet');
@@ -494,5 +734,19 @@ document.addEventListener('visibilitychange', () => {
         timerInterval = setInterval(updateTimer, 100);
     }
 });
+
+function copyUpiId() {
+    const upiId = document.getElementById('upiId');
+    upiId.select();
+    document.execCommand('copy');
+    
+    // Show feedback
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    setTimeout(() => {
+        button.innerHTML = originalText;
+    }, 2000);
+}
 </script>
 {% endblock %}

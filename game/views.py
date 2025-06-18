@@ -10,6 +10,12 @@ from .utils import calculate_points
 from fuzzywuzzy import fuzz
 import json
 from django.contrib.auth.forms import UserCreationForm
+import random
+from django.contrib.auth import authenticate,login
+from django.contrib.auth.models import User
+import string
+
+
 
 
 
@@ -66,9 +72,6 @@ def home(request):
 
         if is_correct:
             points = calculate_points(time_taken)
-            # If answer wasn't exact, reduce points slightly
-            if similarity < 100:
-                points = max(1, points - 1)  # Reduce by 1 but ensure minimum 1 point
                 
             UserScore.objects.create(
                 user=request.user,
@@ -282,3 +285,37 @@ def give_up(request):
         })
     
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def guest_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        
+        # Add a random suffix to avoid username conflicts
+        base_username = username
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}_{random.randint(1000, 9999)}"
+        
+        # Generate a random password
+        temp_password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+        
+        # Create a temporary user
+        user = User.objects.create_user(
+            username=username,
+            password=temp_password,
+            is_active=True
+        )
+        
+        # Authenticate and login the user
+        authenticated_user = authenticate(
+            request,
+            username=username,
+            password=temp_password,
+            backend='django.contrib.auth.backends.ModelBackend'
+        )
+        
+        if authenticated_user:
+            login(request, authenticated_user, backend='django.contrib.auth.backends.ModelBackend')
+            messages.success(request, f'Welcome, {username}! You are playing as a guest.')
+            return redirect('home')
+        
+    return redirect('account_login')
