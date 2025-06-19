@@ -2,6 +2,19 @@ from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.utils.html import format_html
 from .models import Song, UserScore, UserProfile
+from django import forms
+
+class SongAdminForm(forms.ModelForm):
+    spotify_search = forms.CharField(
+        required=False,
+        label='Search Spotify',
+        widget=forms.TextInput(attrs={'class': 'spotify-search'}),
+        help_text='Search for a song on Spotify to auto-fill details'
+    )
+
+    class Meta:
+        model = Song
+        fields = '__all__'
 
 # Customize Admin Site
 class SpotifyPaatuAdminSite(AdminSite):
@@ -14,6 +27,7 @@ admin_site = SpotifyPaatuAdminSite(name='spotifyadmin')
 # Song Admin
 @admin.register(Song)
 class SongAdmin(admin.ModelAdmin):
+    form = SongAdminForm 
     list_display = ('song_title_with_movie', 'artist', 'display_date', 'status_tag')
     list_filter = ('is_used', 'display_date')
     search_fields = ('title', 'movie', 'artist')
@@ -21,8 +35,13 @@ class SongAdmin(admin.ModelAdmin):
     ordering = ('-display_date',)
     list_per_page = 20
     fieldsets = (
+        ('Spotify Search', {
+            'fields': ('spotify_search',),
+            'classes': ('wide',)
+        }),
+
         ('Song Details', {
-            'fields': ('title', 'artist', 'movie'),
+            'fields': ('title', 'artist', 'movie', 'spotify_id'),
             'classes': ('wide',)
         }),
         ('Media', {
@@ -34,6 +53,12 @@ class SongAdmin(admin.ModelAdmin):
             'classes': ('wide',)
         }),
     )
+    class Media:
+        js = ('game/admin/js/spotify-search.js',)  # Update this path
+        css = {
+            'all': ('game/admin/css/spotify-search.css',)  # Update this path
+        }
+
 
     def song_title_with_movie(self, obj):
         return format_html(

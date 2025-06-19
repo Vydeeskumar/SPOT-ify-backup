@@ -205,6 +205,12 @@
                             <i class="fas fa-info-circle"></i> Rules
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'friends_list' %}active{% endif %}" 
+                        href="{% url 'friends_list' %}">
+                            <i class="fas fa-users"></i> Friends
+                        </a>
+                    </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" 

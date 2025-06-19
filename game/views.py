@@ -2,10 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from datetime import timedelta
-from django.db.models import Sum, Avg, Count
+from django.db.models import Sum, Avg, Count, Max
 from django.http import JsonResponse
 from django.contrib import messages
-from .models import Song, UserScore, UserProfile
+from .models import Song, UserScore, UserProfile, Friendship
 from .utils import calculate_points
 from fuzzywuzzy import fuzz
 import json
@@ -20,28 +20,43 @@ import string
 
 
 
+
 def get_today_song():
     today = timezone.now().date()
     return Song.objects.filter(display_date=today).first()
 
-def check_answer(guess, correct_answer):
-    # Convert both to lowercase and strip spaces
+def check_answer(guess, correct_answer, spotify_id=None, today_song=None):
+    # First check Spotify ID match if available
+    if spotify_id and today_song and hasattr(today_song, 'spotify_id'):
+        if spotify_id == today_song.spotify_id:
+            return True, 100
+    
+    # Fallback to your existing fuzzy matching
     guess = guess.lower().strip()
     correct = correct_answer.lower().strip()
+    correct_movie = today_song.movie.lower().strip()
     
-    # Direct match
-    if guess == correct:
-        return True, 100
+    # Print for debugging
+    print(f"Comparing - Guess from Spotify: '{guess}'")
+    print(f"Correct from Database: '{correct}'")
+    print(f"Movie should be: '{correct_movie}'")
     
-    # Calculate similarity ratio
+    # Check if the guess includes the correct movie name
+    if correct_movie not in guess:
+        return False, 0
+    
+    # Calculate similarity ratio only if movie matches
     ratio = fuzz.ratio(guess, correct)
     partial_ratio = fuzz.partial_ratio(guess, correct)
+    token_sort_ratio = fuzz.token_sort_ratio(guess, correct)
     
-    print(f"Guess: {guess}, Correct: {correct}, Ratio: {ratio}, Partial Ratio: {partial_ratio}")  # For testing
+    print(f"Similarity Ratios - Full: {ratio}, Partial: {partial_ratio}, Token Sort: {token_sort_ratio}")
+    if today_song:
+        print(f"Spotify IDs - Guess: {spotify_id}, Correct: {getattr(today_song, 'spotify_id', None)}")
     
-    # If either ratio is above 85%, consider it correct
-    if ratio > 85 or partial_ratio > 85:
-        return True, ratio
+    # If any ratio is above 80% AND movie matches, consider it correct
+    if ratio > 80 or partial_ratio > 80 or token_sort_ratio > 80:
+        return True, max(ratio, partial_ratio, token_sort_ratio)
     
     return False, ratio
 
@@ -64,37 +79,44 @@ def home(request):
         if user_already_played:
             return JsonResponse({'error': 'You have already played today'}, status=400)
 
-        data = json.loads(request.body)
-        guess = data.get('guess', '').lower().strip()
-        time_taken = float(data.get('time_taken', 0))
-        
-        is_correct, similarity = check_answer(guess, today_song.title)
-
-        if is_correct:
-            points = calculate_points(time_taken)
-                
-            UserScore.objects.create(
-                user=request.user,
-                song=today_song,
-                score=points,
-                guess_time=time_taken
-            )
+        try:  # Add try-except block
+            data = json.loads(request.body)
+            guess = data.get('guess', '').lower().strip()
+            spotify_id = data.get('spotify_id')  # Get Spotify ID from request
+            time_taken = float(data.get('time_taken', 0))
             
-            # Update user profile
-            profile, created = UserProfile.objects.get_or_create(user=request.user)
-            profile.update_stats(points, time_taken, timezone.now().date())
+            print("Received data:", data)  # Debug print
+            
+            is_correct, similarity = check_answer(guess, today_song.title, spotify_id, today_song)
 
-            return JsonResponse({
-                'correct': True,
-                'points': points,
-                'streak': profile.current_streak,
-                'message': f'Correct! You earned {points} points! 🔥 Streak: {profile.current_streak}'
-            })
-        else:
-            return JsonResponse({
-                'correct': False,
-                'message': 'Wrong guess, try again!'
-            })
+            if is_correct:
+                points = calculate_points(time_taken)
+                    
+                UserScore.objects.create(
+                    user=request.user,
+                    song=today_song,
+                    score=points,
+                    guess_time=time_taken
+                )    
+                
+                # Update user profile
+                profile, created = UserProfile.objects.get_or_create(user=request.user)
+                profile.update_stats(points, time_taken, timezone.now().date())
+
+                return JsonResponse({
+                    'correct': True,
+                    'points': points,
+                    'streak': profile.current_streak,
+                    'message': f'Correct! You earned {points} points! 🔥 Streak: {profile.current_streak}'
+                })
+            else:
+                return JsonResponse({
+                    'correct': False,
+                    'message': 'Wrong guess, try again!'
+                })
+        except Exception as e:
+            print("Error:", str(e))  # Debug print
+            return JsonResponse({'error': str(e)}, status=500)
 
     # Get user profile for displaying streak
     profile, created = UserProfile.objects.get_or_create(user=request.user)
@@ -319,3 +341,92 @@ def guest_login(request):
             return redirect('home')
         
     return redirect('account_login')
+
+@login_required
+def friends_list(request):
+    # Get user's friends
+    friends = Friendship.objects.filter(user=request.user).select_related('friend')
+    
+    # Get friend requests if you want to implement that
+    friend_requests = Friendship.objects.filter(friend=request.user)
+    
+    # Get friend suggestions (users with similar scores)
+    user_score = UserScore.objects.filter(user=request.user).aggregate(total=Sum('score'))['total'] or 0
+    
+    similar_users = User.objects.annotate(
+        total_score=Sum('userscore__score')
+    ).filter(
+        total_score__range=(user_score * 0.8, user_score * 1.2)
+    ).exclude(
+        id__in=friends.values_list('friend_id', flat=True)
+    ).exclude(id=request.user.id)[:5]
+
+    context = {
+        'friends': friends,
+        'friend_requests': friend_requests,
+        'suggested_friends': similar_users,
+    }
+    return render(request, 'game/friends.html', context)
+
+@login_required
+def add_friend(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        try:
+            friend = User.objects.get(username=username)
+            if friend != request.user:
+                Friendship.objects.get_or_create(user=request.user, friend=friend)
+                messages.success(request, f'Added {username} as friend!')
+            else:
+                messages.error(request, "You can't add yourself as a friend!")
+        except User.DoesNotExist:
+            messages.error(request, f'User {username} not found.')
+    return redirect('friends_list')
+
+@login_required
+def remove_friend(request, friend_id):
+    if request.method == 'POST':
+        try:
+            friendship = Friendship.objects.get(user=request.user, friend_id=friend_id)
+            friendship.delete()
+            messages.success(request, 'Friend removed.')
+        except Friendship.DoesNotExist:
+            messages.error(request, 'Friend not found.')
+    return redirect('friends_list')
+
+@login_required
+def compare_scores(request, friend_id):
+    try:
+        friend = User.objects.get(id=friend_id)
+        
+        # Get user's stats
+        user_stats = UserScore.objects.filter(user=request.user).aggregate(
+            total_score=Sum('score'),
+            avg_score=Avg('score'),
+            games_played=Count('id'),
+            best_score=Max('score')
+        )
+        
+        # Get friend's stats
+        friend_stats = UserScore.objects.filter(user=friend).aggregate(
+            total_score=Sum('score'),
+            avg_score=Avg('score'),
+            games_played=Count('id'),
+            best_score=Max('score')
+        )
+        
+        # Get recent games
+        user_recent = UserScore.objects.filter(user=request.user).order_by('-attempt_date')[:5]
+        friend_recent = UserScore.objects.filter(user=friend).order_by('-attempt_date')[:5]
+        
+        context = {
+            'friend': friend,
+            'user_stats': user_stats,
+            'friend_stats': friend_stats,
+            'user_recent': user_recent,
+            'friend_recent': friend_recent,
+        }
+        return render(request, 'game/compare_scores.html', context)
+    except User.DoesNotExist:
+        messages.error(request, 'Friend not found.')
+        return redirect('friends_list')

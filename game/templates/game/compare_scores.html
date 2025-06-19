@@ -1,0 +1,88 @@
+{% extends 'game/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Comparing scores with {{ friend.username }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Stats Comparison -->
+                <div class="col-md-6">
+                    <h6>Your Stats</h6>
+                    <div class="stats-box p-3 mb-3">
+                        <p>Total Score: {{ user_stats.total_score|default:0 }}</p>
+                        <p>Average Score: {{ user_stats.avg_score|default:0|floatformat:1 }}</p>
+                        <p>Games Played: {{ user_stats.games_played|default:0 }}</p>
+                        <p>Best Score: {{ user_stats.best_score|default:0 }}</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <h6>{{ friend.username }}'s Stats</h6>
+                    <div class="stats-box p-3 mb-3">
+                        <p>Total Score: {{ friend_stats.total_score|default:0 }}</p>
+                        <p>Average Score: {{ friend_stats.avg_score|default:0|floatformat:1 }}</p>
+                        <p>Games Played: {{ friend_stats.games_played|default:0 }}</p>
+                        <p>Best Score: {{ friend_stats.best_score|default:0 }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Games -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h6>Your Recent Games</h6>
+                    <div class="recent-games">
+                        {% for score in user_recent %}
+                            <div class="game-item p-2 mb-2">
+                                <p class="mb-0">
+                                    {{ score.song.title }} - {{ score.score }} points
+                                    <small class="text-muted">({{ score.attempt_date|date }})</small>
+                                </p>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">No recent games.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h6>{{ friend.username }}'s Recent Games</h6>
+                    <div class="recent-games">
+                        {% for score in friend_recent %}
+                            <div class="game-item p-2 mb-2">
+                                <p class="mb-0">
+                                    {{ score.song.title }} - {{ score.score }} points
+                                    <small class="text-muted">({{ score.attempt_date|date }})</small>
+                                </p>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">No recent games.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stats-box {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.game-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .stats-box {
+        margin-bottom: 20px;
+    }
+}
+</style>
+{% endblock %}

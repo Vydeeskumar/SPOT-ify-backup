@@ -12,7 +12,8 @@ class Song(models.Model):
     image = models.ImageField(upload_to='song_images/', null=True, blank=True) 
     display_date = models.DateField(unique=True, null=True, blank=True)
     is_used = models.BooleanField(default=False)
-    
+    spotify_id = models.CharField(max_length=200, null=True, blank=True) 
+
     def __str__(self):
         return f"{self.title} - {self.artist}"
 
@@ -63,3 +64,14 @@ class UserProfile(models.Model):
         self.average_time = ((self.average_time * (self.total_songs_solved - 1)) + guess_time) / self.total_songs_solved
         self.last_played_date = date
         self.save()
+
+class Friendship(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friendships')
+    friend = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friend_of')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'friend']
+        
+    def __str__(self):
+        return f"{self.user.username} -> {self.friend.username}"
