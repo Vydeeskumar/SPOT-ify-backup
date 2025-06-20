@@ -79,13 +79,13 @@ def home(request):
         if user_already_played:
             return JsonResponse({'error': 'You have already played today'}, status=400)
 
-        try:  # Add try-except block
+        try:
             data = json.loads(request.body)
             guess = data.get('guess', '').lower().strip()
-            spotify_id = data.get('spotify_id')  # Get Spotify ID from request
+            spotify_id = data.get('spotify_id')
             time_taken = float(data.get('time_taken', 0))
             
-            print("Received data:", data)  # Debug print
+            print("Received data:", data)
             
             is_correct, similarity = check_answer(guess, today_song.title, spotify_id, today_song)
 
@@ -99,7 +99,6 @@ def home(request):
                     guess_time=time_taken
                 )    
                 
-                # Update user profile
                 profile, created = UserProfile.objects.get_or_create(user=request.user)
                 profile.update_stats(points, time_taken, timezone.now().date())
 
@@ -115,18 +114,56 @@ def home(request):
                     'message': 'Wrong guess, try again!'
                 })
         except Exception as e:
-            print("Error:", str(e))  # Debug print
+            print("Error:", str(e))
             return JsonResponse({'error': str(e)}, status=500)
 
     # Get user profile for displaying streak
     profile, created = UserProfile.objects.get_or_create(user=request.user)
     
+    # Initialize context with basic data
     context = {
         'today_song': today_song,
         'user_already_played': user_already_played,
         'current_streak': profile.current_streak,
         'longest_streak': profile.longest_streak,
     }
+
+    # Add daily leaderboard data if user has played
+    if user_already_played:
+        # Get daily scores
+        daily_scores = UserScore.objects.filter(
+            song=today_song,
+            attempt_date__date=timezone.now().date()
+        ).select_related('user').order_by('-score', 'guess_time')[:10]
+
+        # Get user's score for today
+        user_score = UserScore.objects.get(
+            user=request.user,
+            song=today_song,
+            attempt_date__date=timezone.now().date()
+        )
+
+        # Get user's rank
+        user_rank = UserScore.objects.filter(
+            song=today_song,
+            attempt_date__date=timezone.now().date(),
+            score__gt=user_score.score
+        ).count() + 1
+
+        # Get total players today
+        total_players_today = UserScore.objects.filter(
+            song=today_song,
+            attempt_date__date=timezone.now().date()
+        ).count()
+
+        # Add to context
+        context.update({
+            'daily_scores': daily_scores,
+            'user_daily_rank': user_rank,
+            'user_score': user_score,
+            'total_players_today': total_players_today
+        })
+
     return render(request, 'game/home.html', context)
 
 @login_required
@@ -195,80 +232,98 @@ def profile(request):
 
 @login_required
 def leaderboard(request):
-    # Get weekly leaderboard
     today = timezone.now().date()
     week_start = today - timedelta(days=today.weekday())
-    weekly_scores = UserScore.objects.filter(
-        attempt_date__date__gte=week_start
-    ).values('user__username').annotate(
-        total_score=Sum('score'),
-        avg_time=Avg('guess_time'),
-        songs_solved=Count('id')
-    ).order_by('-total_score')[:10]
-
-    # Get monthly leaderboard
     month_start = today.replace(day=1)
-    monthly_scores = UserScore.objects.filter(
-        attempt_date__date__gte=month_start
-    ).values('user__username').annotate(
-        total_score=Sum('score'),
-        avg_time=Avg('guess_time'),
-        songs_solved=Count('id')
-    ).order_by('-total_score')[:10]
 
-    # Get all-time leaderboard
-    all_time_scores = UserScore.objects.values('user__username').annotate(
-        total_score=Sum('score'),
-        avg_time=Avg('guess_time'),
-        songs_solved=Count('id')
-    ).order_by('-total_score')[:10]
+    def get_ranked_scores(base_queryset):
+        """Helper function to get ranked scores with consistent calculation"""
+        return base_queryset.values(
+            'user', 
+            'user__username'
+        ).annotate(
+            total_score=Sum('score'),
+            avg_time=Avg('guess_time'),
+            songs_played=Count('id'),
+            avg_score=Avg('score')
+        ).order_by(
+            '-total_score',
+            'avg_time'
+        )
 
-    # Get user's rank
-    user_weekly_rank = None
-    user_monthly_rank = None
-    user_all_time_rank = None
+    # Get complete ranked lists
+    weekly_queryset = UserScore.objects.filter(attempt_date__date__gte=week_start)
+    monthly_queryset = UserScore.objects.filter(attempt_date__date__gte=month_start)
+    alltime_queryset = UserScore.objects.all()
+
+    weekly_all = get_ranked_scores(weekly_queryset)
+    monthly_all = get_ranked_scores(monthly_queryset)
+    alltime_all = get_ranked_scores(alltime_queryset)
+
+    # Get top 10 for each category
+    weekly_scores = list(weekly_all[:10])
+    monthly_scores = list(monthly_all[:10])
+    all_time_scores = list(alltime_all[:10])
+
+    # Initialize user stats
+    user_stats = {
+        'weekly': {'rank': None, 'total_score': 0, 'songs_played': 0, 'avg_score': 0},
+        'monthly': {'rank': None, 'total_score': 0, 'songs_played': 0, 'avg_score': 0},
+        'alltime': {'rank': None, 'total_score': 0, 'songs_played': 0, 'avg_score': 0}
+    }
 
     if request.user.is_authenticated:
-        # Calculate user's ranks
-        weekly_rank = list(UserScore.objects.filter(
-            attempt_date__date__gte=week_start
-        ).values('user').annotate(
-            total_score=Sum('score')
-        ).order_by('-total_score').values_list('user', flat=True))
-        
-        monthly_rank = list(UserScore.objects.filter(
-            attempt_date__date__gte=month_start
-        ).values('user').annotate(
-            total_score=Sum('score')
-        ).order_by('-total_score').values_list('user', flat=True))
-        
-        all_time_rank = list(UserScore.objects.values('user').annotate(
-            total_score=Sum('score')
-        ).order_by('-total_score').values_list('user', flat=True))
+        # Get user's stats and rank for each period
+        for index, score in enumerate(weekly_all, 1):
+            if score['user'] == request.user.id:
+                user_stats['weekly'] = {
+                    'rank': index,
+                    'total_score': score['total_score'],
+                    'songs_played': score['songs_played'],
+                    'avg_score': round(score['avg_score'], 2)
+                }
+                break
 
-        try:
-            user_weekly_rank = weekly_rank.index(request.user.id) + 1
-        except ValueError:
-            pass
+        for index, score in enumerate(monthly_all, 1):
+            if score['user'] == request.user.id:
+                user_stats['monthly'] = {
+                    'rank': index,
+                    'total_score': score['total_score'],
+                    'songs_played': score['songs_played'],
+                    'avg_score': round(score['avg_score'], 2)
+                }
+                break
 
-        try:
-            user_monthly_rank = monthly_rank.index(request.user.id) + 1
-        except ValueError:
-            pass
+        for index, score in enumerate(alltime_all, 1):
+            if score['user'] == request.user.id:
+                user_stats['alltime'] = {
+                    'rank': index,
+                    'total_score': score['total_score'],
+                    'songs_played': score['songs_played'],
+                    'avg_score': round(score['avg_score'], 2)
+                }
+                break
 
-        try:
-            user_all_time_rank = all_time_rank.index(request.user.id) + 1
-        except ValueError:
-            pass
+    # Get total players count for each period
+    total_players = {
+        'weekly': weekly_all.count(),
+        'monthly': monthly_all.count(),
+        'alltime': alltime_all.count()
+    }
 
     context = {
         'weekly_scores': weekly_scores,
         'monthly_scores': monthly_scores,
         'all_time_scores': all_time_scores,
-        'user_weekly_rank': user_weekly_rank,
-        'user_monthly_rank': user_monthly_rank,
-        'user_all_time_rank': user_all_time_rank,
+        'user_weekly_rank': user_stats['weekly']['rank'],
+        'user_monthly_rank': user_stats['monthly']['rank'],
+        'user_all_time_rank': user_stats['alltime']['rank'],
+        'user_stats': user_stats,
+        'total_players': total_players,
+        'week_start': week_start,
+        'month_start': month_start
     }
+
     return render(request, 'game/leaderboard.html', context)
 
 @login_required
@@ -430,3 +485,43 @@ def compare_scores(request, friend_id):
     except User.DoesNotExist:
         messages.error(request, 'Friend not found.')
         return redirect('friends_list')
+    
+@login_required
+def get_daily_rankings(request):
+    today_song = get_today_song()
+    
+    # Get daily scores
+    daily_scores = UserScore.objects.filter(
+        song=today_song,
+        attempt_date__date=timezone.now().date()
+    ).select_related('user').order_by('-score', 'guess_time')[:10]
+
+    # Get user's score and rank
+    user_score = UserScore.objects.get(
+        user=request.user,
+        song=today_song,
+        attempt_date__date=timezone.now().date()
+    )
+
+    user_rank = UserScore.objects.filter(
+        song=today_song,
+        attempt_date__date=timezone.now().date(),
+        score__gt=user_score.score
+    ).count() + 1
+
+    # Format scores for JSON response
+    scores_data = [{
+        'username': score.user.username,
+        'score': score.score,
+        'guessTime': f"{score.guess_time:.1f}",
+        'isCurrentUser': score.user == request.user
+    } for score in daily_scores]
+
+    return JsonResponse({
+        'scores': scores_data,
+        'userRank': user_rank,
+        'totalPlayers': UserScore.objects.filter(
+            song=today_song,
+            attempt_date__date=timezone.now().date()
+        ).count()
+    })

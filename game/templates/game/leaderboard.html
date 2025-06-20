@@ -3,34 +3,58 @@
 {% block content %}
 <div class="container">
     <!-- User's Personal Ranking -->
-    {% if user.is_authenticated %}
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Your Rankings</h5>
-            <div class="row text-center">
-                <div class="col-md-4">
-                    <div class="rank-box">
-                        <h6>Weekly Rank</h6>
-                        <p class="rank">#{{ user_weekly_rank|default:"--" }}</p>
-                    </div>
+    <!-- User's Personal Ranking -->
+{% if user.is_authenticated %}
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Your Rankings</h5>
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="rank-box">
+                    <h6>Weekly Rank</h6>
+                    <p class="rank">#{{ user_weekly_rank|default:"--" }}</p>
+                    {% if user_weekly_rank %}
+                    <small class="text-muted">
+                        Out of {{ total_players.weekly }} players
+                        <br>
+                        Score: {{ user_stats.weekly.total_score }}
+                        • Games: {{ user_stats.weekly.songs_played }}
+                    </small>
+                    {% endif %}
                 </div>
-                <div class="col-md-4">
-                    <div class="rank-box">
-                        <h6>Monthly Rank</h6>
-                        <p class="rank">#{{ user_monthly_rank|default:"--" }}</p>
-                    </div>
+            </div>
+            <div class="col-md-4">
+                <div class="rank-box">
+                    <h6>Monthly Rank</h6>
+                    <p class="rank">#{{ user_monthly_rank|default:"--" }}</p>
+                    {% if user_monthly_rank %}
+                    <small class="text-muted">
+                        Out of {{ total_players.monthly }} players
+                        <br>
+                        Score: {{ user_stats.monthly.total_score }}
+                        • Games: {{ user_stats.monthly.songs_played }}
+                    </small>
+                    {% endif %}
                 </div>
-                <div class="col-md-4">
-                    <div class="rank-box">
-                        <h6>All-Time Rank</h6>
-                        <p class="rank">#{{ user_all_time_rank|default:"--" }}</p>
-                    </div>
+            </div>
+            <div class="col-md-4">
+                <div class="rank-box">
+                    <h6>All-Time Rank</h6>
+                    <p class="rank">#{{ user_all_time_rank|default:"--" }}</p>
+                    {% if user_all_time_rank %}
+                    <small class="text-muted">
+                        Out of {{ total_players.alltime }} players
+                        <br>
+                        Score: {{ user_stats.alltime.total_score }}
+                        • Games: {{ user_stats.alltime.songs_played }}
+                    </small>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
-    {% endif %}
-
+</div>
+{% endif %}
     <div class="row">
         <!-- Weekly Leaderboard -->
         <div class="col-md-4">

@@ -11,5 +11,6 @@ urlpatterns = [
     path('friends/add/', views.add_friend, name='add_friend'),
     path('friends/remove/<int:friend_id>/', views.remove_friend, name='remove_friend'),
     path('friends/compare/<int:friend_id>/', views.compare_scores, name='compare_scores'),
+    path('get-daily-rankings/', views.get_daily_rankings, name='get_daily_rankings'),
     
 ]

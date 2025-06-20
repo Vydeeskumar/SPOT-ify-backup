@@ -502,6 +502,191 @@
         }
     }
 
+    /* Add this to your existing styles */
+.vinyl-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 20%;
+        height: 20%;
+        transform: translate(-50%, -50%);
+        background: var(--neon-purple);
+        border-radius: 50%;
+        box-shadow: 0 0 15px rgba(176, 38, 255, 0.5);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .vinyl-center i {
+        color: white;
+        font-size: 1.2em;
+        transition: all 0.3s ease;
+    }
+
+    .vinyl-center:hover {
+        background: white;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    .vinyl-center:hover i {
+        color: var(--neon-purple);
+    }
+
+    .playing .vinyl-center i {
+        opacity: 0.7;
+    }
+
+    .btn-leaderboard {
+        background: rgba(176, 38, 255, 0.1);
+        border: 2px solid var(--neon-purple);
+        color: var(--neon-purple);
+        transition: all 0.3s ease;
+    }
+
+    .btn-leaderboard:hover {
+        background: rgba(176, 38, 255, 0.2);
+    }
+
+    .leaderboard-container {
+        background: rgba(18, 18, 18, 0.95);
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 10px;
+    }
+
+    .leaderboard-item {
+        display: grid;
+        grid-template-columns: 40px 1fr auto auto;
+        gap: 10px;
+        padding: 8px;
+        border-radius: 8px;
+        margin-bottom: 5px;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .leaderboard-item:hover {
+        background: rgba(176, 38, 255, 0.1);
+    }
+
+    .leaderboard-item.highlight {
+        background: rgba(176, 38, 255, 0.2);
+        border: 1px solid var(--neon-purple);
+    }
+
+    .leaderboard-item .rank {
+        color: var(--neon-purple);
+        font-weight: bold;
+    }
+
+    .leaderboard-item .player {
+        color: white;
+    }
+
+    .leaderboard-item .score {
+        color: var(--neon-blue);
+        margin-right: 10px;
+    }
+
+    .leaderboard-item .time {
+        color: var(--neon-pink);
+        font-size: 0.9em;
+    }
+
+    #leaderboard-chevron {
+        transition: transform 0.3s ease;
+    }
+
+    .collapsed #leaderboard-chevron {
+        transform: rotate(-90deg);
+    }
+
+    .daily-leaderboard {
+        opacity: 0;
+        animation: fadeIn 0.5s ease forwards 0.9s;
+    }
+
+    @keyframes fadeIn {
+        from { 
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    #leaderboard-content {
+        transition: all 0.3s ease;
+        opacity: 1;
+        max-height: 500px;
+        overflow: hidden;
+    }
+
+    .leaderboard-item {
+        transition: background-color 0.3s ease;
+    }
+
+    .leaderboard-item:hover {
+        background: rgba(176, 38, 255, 0.2) !important;
+    }
+
+    .share-section {
+        opacity: 0;
+        animation: fadeIn 0.5s ease forwards 1.2s;
+    }
+
+    .btn-share {
+        padding: 10px 20px;
+        border-radius: 20px;
+        border: none;
+        color: white;
+        font-size: 0.9em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-share.whatsapp {
+        background: #25D366;
+    }
+
+    .btn-share.twitter {
+        background: #1DA1F2;
+    }
+
+    .btn-share.instagram {
+        background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+    }
+
+    .btn-share.copy {
+        background: var(--neon-purple);
+    }
+
+    .btn-share:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .copy-success {
+        margin-top: 10px;
+        color: var(--neon-green);
+        font-size: 0.9em;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .copy-success.show {
+        opacity: 1;
+    }
+
+    
 
 </style>
 {% endblock %}
@@ -528,23 +713,79 @@
                 </div>
 
                 <div class="countdown-section" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px; margin-top: 20px;">
-                    <h5 style="color: var(--neon-blue); margin-bottom: 15px;">Next Song In:</h5>
-                    <div class="countdown-timer" style="display: flex; justify-content: center; gap: 20px;">
-                        <div class="countdown-box" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; min-width: 80px;">
-                            <span id="countdown-hours" style="font-size: 2em; color: var(--neon-purple); font-weight: bold; display: block;">00</span>
-                            <small style="color: rgba(255, 255, 255, 0.6); text-transform: uppercase;">hours</small>
-                        </div>
-                        <div class="countdown-box" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; min-width: 80px;">
-                            <span id="countdown-minutes" style="font-size: 2em; color: var(--neon-purple); font-weight: bold; display: block;">00</span>
-                            <small style="color: rgba(255, 255, 255, 0.6); text-transform: uppercase;">minutes</small>
-                        </div>
-                        <div class="countdown-box" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; min-width: 80px;">
-                            <span id="countdown-seconds" style="font-size: 2em; color: var(--neon-purple); font-weight: bold; display: block;">00</span>
-                            <small style="color: rgba(255, 255, 255, 0.6); text-transform: uppercase;">seconds</small>
-                        </div>
-                    </div>
+    <h5 style="color: var(--neon-blue); margin-bottom: 15px;">Next Song In:</h5>
+    <div class="countdown-timer" style="display: flex; justify-content: center; gap: 20px;">
+        <div class="countdown-box" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; min-width: 80px;">
+            <span id="countdown-hours" style="font-size: 2em; color: var(--neon-purple); font-weight: bold; display: block;">00</span>
+            <small style="color: rgba(255, 255, 255, 0.6); text-transform: uppercase;">hours</small>
+        </div>
+        <div class="countdown-box" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; min-width: 80px;">
+            <span id="countdown-minutes" style="font-size: 2em; color: var(--neon-purple); font-weight: bold; display: block;">00</span>
+            <small style="color: rgba(255, 255, 255, 0.6); text-transform: uppercase;">minutes</small>
+        </div>
+        <div class="countdown-box" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; min-width: 80px;">
+            <span id="countdown-seconds" style="font-size: 2em; color: var(--neon-purple); font-weight: bold; display: block;">00</span>
+            <small style="color: rgba(255, 255, 255, 0.6); text-transform: uppercase;">seconds</small>
+        </div>
+    </div>
+</div>
+
+<!-- Daily Leaderboard Section -->
+<div class="daily-leaderboard mt-4" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px;">
+    <div class="leaderboard-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h5 style="color: var(--neon-blue); margin: 0;">
+            <i class="fas fa-trophy"></i> Today's Rankings
+        </h5>
+        <span style="color: var(--neon-purple);">
+            Your Rank: #{{ user_daily_rank }}
+        </span>
+    </div>
+    
+    <div class="leaderboard-toggle" onclick="toggleLeaderboard()" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="color: white;">View Leaderboard</span>
+        <i class="fas fa-chevron-down" id="leaderboard-chevron" style="color: var(--neon-purple); transition: transform 0.3s ease;"></i>
+    </div>
+
+    <div id="leaderboard-content" style="display: none; transition: all 0.3s ease;">
+        <div class="leaderboard-list" style="max-height: 300px; overflow-y: auto;">
+            {% for score in daily_scores %}
+            <div class="leaderboard-item" style="display: grid; grid-template-columns: auto 1fr auto auto; gap: 15px; padding: 10px; margin: 5px 0; background: rgba(176, 38, 255, 0.1); border-radius: 8px; {% if score.user == user %}border: 1px solid var(--neon-purple);{% endif %}">
+                <div style="color: var(--neon-purple); font-weight: bold;">
+                    {% if forloop.counter == 1 %}🥇
+                    {% elif forloop.counter == 2 %}🥈
+                    {% elif forloop.counter == 3 %}🥉
+                    {% else %}#{{ forloop.counter }}
+                    {% endif %}
                 </div>
+                <div style="color: white;">{{ score.user.username }}</div>
+                <div style="color: var(--neon-blue);">{{ score.score }} pts</div>
+                <div style="color: var(--neon-pink);">{{ score.guess_time|floatformat:1 }}s</div>
             </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-3" style="color: rgba(255, 255, 255, 0.6);">
+            <small>Total Players Today: {{ total_players_today }}</small>
+        </div>
+    </div>
+</div>
+
+<!-- Add this JavaScript -->
+<script>
+function toggleLeaderboard() {
+    const content = document.getElementById('leaderboard-content');
+    const chevron = document.getElementById('leaderboard-chevron');
+    
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        chevron.style.transform = 'rotate(180deg)';
+    } else {
+        content.style.display = 'none';
+        chevron.style.transform = 'rotate(0deg)';
+    }
+}
+</script>
+</div>
         {% else %}
             <!-- Game View Container -->
             <div id="game-container">
@@ -558,7 +799,9 @@
                     <div class="vinyl-player" id="vinyl-player">
                         <div class="vinyl-record">
                             <div class="vinyl-grooves"></div>
-                            <div class="vinyl-center"></div>
+                            <div class="vinyl-center" onclick="togglePlay()">
+                                <i class="fas fa-play" id="vinyl-play-icon"></i>
+                            </div>
                         </div>
                         <audio id="song-snippet" src="{{ today_song.snippet.url }}" preload="auto"></audio>
                     </div>
@@ -609,6 +852,41 @@
                     {% if today_song.reveal_snippet %}
                         <audio id="reveal-snippet" src="{{ today_song.reveal_snippet.url }}" preload="auto"></audio>
                     {% endif %}
+
+                     <!-- Add the share section RIGHT HERE, after song details but before countdown -->
+                    <div class="share-section mt-4" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px;">
+                        <h5 style="color: var(--neon-blue); margin-bottom: 15px;">
+                            <i class="fas fa-share-alt"></i> Share Your Score
+                        </h5>
+                        
+                        <div class="share-buttons" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                            <!-- WhatsApp -->
+                            <button onclick="shareToWhatsApp()" class="btn-share whatsapp">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </button>
+
+                            <!-- Twitter/X -->
+                            <button onclick="shareToTwitter()" class="btn-share twitter">
+                                <i class="fab fa-twitter"></i> Twitter
+                            </button>
+
+                            <!-- Instagram -->
+                            <button onclick="shareToInstagram()" class="btn-share instagram">
+                                <i class="fab fa-instagram"></i> Instagram
+                            </button>
+
+                            <!-- Copy Link -->
+                            <button onclick="copyShareText()" class="btn-share copy">
+                                <i class="fas fa-copy"></i> Copy Text
+                            </button>
+                        </div>
+
+                        <!-- Success message for copy -->
+                        <div id="copySuccess" class="copy-success" style="display: none;">
+                            Copied to clipboard!
+                        </div>
+                    </div>
+
 
                     <div class="countdown-section mt-4 reveal-details">
                         <h5>Next Song In:</h5>
@@ -888,7 +1166,7 @@ window.addEventListener('beforeunload', function() {
 
 function showResultView() {
     try {
-        // Hide the entire game container including header and controls
+        // Hide the game container
         document.getElementById('game-container').style.display = 'none';
         
         // Show result container
@@ -908,14 +1186,71 @@ function showResultView() {
                 .catch(error => console.log('Audio playback failed:', error));
         }
 
-        initializeCountdown();
+        // Remove any existing leaderboard
+        const existingLeaderboard = document.querySelector('.daily-leaderboard');
+        if (existingLeaderboard) {
+            existingLeaderboard.remove();
+        }
 
-        // Add cleanup listener
-        window.addEventListener('beforeunload', () => {
-            if (window.countdownInterval) {
-                clearInterval(window.countdownInterval);
-            }
-        });
+        // Fetch and display daily leaderboard immediately
+        fetch('/get-daily-rankings/')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const songDetails = document.querySelector('.song-details');
+                if (!songDetails) {
+                    throw new Error('Song details element not found');
+                }
+
+                const leaderboardHTML = `
+                    <div class="daily-leaderboard mt-4" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px; opacity: 0; animation: fadeIn 0.5s ease forwards 0.9s;">
+                        <div class="leaderboard-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h5 style="color: var(--neon-blue); margin: 0;">
+                                <i class="fas fa-trophy"></i> Today's Rankings
+                            </h5>
+                            <span style="color: var(--neon-purple);">
+                                Your Rank: #${data.userRank}
+                            </span>
+                        </div>
+                        
+                        <div class="leaderboard-toggle" onclick="toggleLeaderboard()" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: white;">View Leaderboard</span>
+                            <i class="fas fa-chevron-down" id="leaderboard-chevron" style="color: var(--neon-purple); transition: transform 0.3s ease;"></i>
+                        </div>
+
+                        <div id="leaderboard-content" style="display: none; transition: all 0.3s ease;">
+                            <div class="leaderboard-list" style="max-height: 300px; overflow-y: auto;">
+                                ${data.scores.map((score, index) => `
+                                    <div class="leaderboard-item" style="display: grid; grid-template-columns: auto 1fr auto auto; gap: 15px; padding: 10px; margin: 5px 0; background: rgba(176, 38, 255, 0.1); border-radius: 8px; ${score.isCurrentUser ? 'border: 1px solid var(--neon-purple);' : ''}">
+                                        <div style="color: var(--neon-purple); font-weight: bold;">
+                                            ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                                        </div>
+                                        <div style="color: white;">${score.username}</div>
+                                        <div style="color: var(--neon-blue);">${score.score} pts</div>
+                                        <div style="color: var(--neon-pink);">${score.guessTime}s</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <div class="text-center mt-3" style="color: rgba(255, 255, 255, 0.6);">
+                                <small>Total Players Today: ${data.totalPlayers}</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Insert after song details
+                songDetails.insertAdjacentHTML('afterend', leaderboardHTML);
+            })
+            .catch(error => {
+                console.error('Error fetching rankings:', error);
+            });
+
+        initializeCountdown();
 
         // Hide any success/error messages
         const resultMessage = document.getElementById('result-message');
@@ -926,6 +1261,7 @@ function showResultView() {
         console.error('Error in showResultView:', error);
     }
 }
+
 
 // Initialize elements
 const audioElement = document.getElementById('song-snippet');
@@ -947,6 +1283,8 @@ audioElement.addEventListener('ended', () => {
     vinylPlayer.classList.remove('playing');
     vinylPlayer.classList.add('paused');
     playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+    // Update vinyl center icon
+    document.getElementById('vinyl-play-icon').className = 'fas fa-play';
 });
 
 function updateProgress() {
@@ -968,6 +1306,7 @@ function updateProgress() {
 
 
 // Play/Pause functionality
+
 if (playPauseBtn) {
     playPauseBtn.addEventListener('click', () => {
         initAudioContext();
@@ -983,14 +1322,46 @@ if (playPauseBtn) {
             vinylPlayer.classList.add('playing');
             vinylPlayer.classList.remove('paused');
             playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            // Update vinyl center icon
+            document.getElementById('vinyl-play-icon').className = 'fas fa-pause';
             startTimer();
         } else {
             audioElement.pause();
             vinylPlayer.classList.remove('playing');
             vinylPlayer.classList.add('paused');
             playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+            // Update vinyl center icon
+            document.getElementById('vinyl-play-icon').className = 'fas fa-play';
         }
     });
+}
+
+// Add this new function right after the above code
+function togglePlay() {
+    playPauseBtn.click();
+}
+
+function toggleLeaderboard() {
+    const content = document.getElementById('leaderboard-content');
+    const chevron = document.getElementById('leaderboard-chevron');
+    
+    if (!content || !chevron) return;
+
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        // Force reflow
+        void content.offsetHeight;
+        chevron.style.transform = 'rotate(180deg)';
+        content.style.opacity = '1';
+        content.style.maxHeight = content.scrollHeight + 'px';
+    } else {
+        chevron.style.transform = 'rotate(0deg)';
+        content.style.opacity = '0';
+        content.style.maxHeight = '0';
+        setTimeout(() => {
+            content.style.display = 'none';
+        }, 300);
+    }
 }
 
 // Give Up functionality
@@ -1212,6 +1583,55 @@ document.addEventListener('click', function(e) {
 
 // Get token when page loads
 getSpotifyToken();
+
+// Share functions
+function getShareText() {
+    const score = document.querySelector('.points-value')?.textContent || '';
+    return `🎵 SPOT-ify the Paatu #${getCurrentDay()}\n` +
+           `🎯 Score: ${score} points\n` +
+           `🏆 Rank: #${document.querySelector('.leaderboard-header span')?.textContent || ''}\n\n` +
+           `Play now: https://yourwebsite.com`;
+}
+
+function getCurrentDay() {
+    // Calculate days since game launch
+    const launchDate = new Date('2024-01-01'); // Replace with your launch date
+    const today = new Date();
+    const diffTime = Math.abs(today - launchDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+}
+
+function shareToWhatsApp() {
+    const text = encodeURIComponent(getShareText());
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+
+function shareToTwitter() {
+    const text = encodeURIComponent(getShareText());
+    window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+}
+
+function shareToInstagram() {
+    // Copy text and show instructions
+    copyShareText();
+    alert('Text copied! Open Instagram and paste in your story or post.');
+}
+
+function copyShareText() {
+    const text = getShareText();
+    navigator.clipboard.writeText(text).then(() => {
+        const copySuccess = document.getElementById('copySuccess');
+        copySuccess.style.display = 'block';
+        copySuccess.classList.add('show');
+        setTimeout(() => {
+            copySuccess.classList.remove('show');
+            setTimeout(() => {
+                copySuccess.style.display = 'none';
+            }, 300);
+        }, 2000);
+    });
+}
 
 </script>
 {% endblock %}

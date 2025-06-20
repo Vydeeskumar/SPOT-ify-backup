@@ -5,13 +5,15 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card mt-5 shadow-lg">
-                <div class="card-body text-center p-5">
-                    <h2 class="card-title mb-4">Welcome to SPOT-ify the Paatu!</h2>
-                    <p class="text-muted mb-4">Test your music knowledge daily with exciting song challenges</p>
+            <div class="card mt-4 shadow-lg login-card">
+                <div class="card-body text-center p-4">
+                    <h2 class="game-title mb-3">SPOT-ify the Paatu!</h2>
+                    <p class="game-subtitle mb-4">Guess Today's Tamil Song 🎵</p>
                     
+                    <!-- Google Sign In -->
+                    <!-- Replace the current Google button with this (from your original code) -->
                     <div class="mb-4">
-                        <a href="{% provider_login_url 'google' %}" class="btn btn-light border d-flex align-items-center justify-content-center gap-2 mx-auto" style="max-width: 300px;">
+                        <a href="{% provider_login_url 'google' %}" class="btn btn-google d-flex align-items-center justify-content-center gap-2 mx-auto">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
                                 <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12	s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20	s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
                                 <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039	l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
@@ -22,44 +24,42 @@
                         </a>
                     </div>
 
-                    <div class="divider my-4 position-relative">
-                        <hr>
-                        <span class="position-absolute top-50 start-50 translate-middle px-3 bg-white text-muted">or</span>
-                    </div>
-
+                    <!-- Guest Login Button -->
                     <div class="mb-4">
-                        <button onclick="showGuestLoginModal()" class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2 mx-auto" style="max-width: 300px;">
+                        <button onclick="showGuestLoginModal()" class="btn btn-guest d-flex align-items-center justify-content-center gap-2 mx-auto">
                             <i class="fas fa-user-circle"></i>
                             Play as Guest
                         </button>
                     </div>
 
-                    <div class="alert alert-info" role="alert">
+                    <!-- Alert Info -->
+                    <div class="alert alert-custom" role="alert">
                         <i class="fas fa-info-circle"></i>
-                        <small>Playing as a guest? Your scores won't be saved. Sign in with Google to track your progress and compete on leaderboards!</small>
+                        <small>Sign in to save your progress and compete on leaderboards!</small>
                     </div>
 
-                    <div class="features mt-5">
-                        <div class="row g-4">
-                            <div class="col-md-4">
+                    <!-- Features -->
+                    <div class="features mt-4">
+                        <div class="row g-3">
+                            <div class="col-4">
                                 <div class="feature-item">
-                                    <i class="fas fa-music mb-2" style="font-size: 24px; color: #17a2b8;"></i>
-                                    <h5>Daily Songs</h5>
-                                    <small class="text-muted">New challenge every day</small>
+                                    <i class="fas fa-music mb-2"></i>
+                                    <h6>Daily Songs</h6>
+                                    <small>New Challenge</small>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-4">
                                 <div class="feature-item">
-                                    <i class="fas fa-trophy mb-2" style="font-size: 24px; color: #28a745;"></i>
-                                    <h5>Leaderboard</h5>
-                                    <small class="text-muted">Compete globally</small>
+                                    <i class="fas fa-trophy mb-2"></i>
+                                    <h6>Compete</h6>
+                                    <small>Global Ranks</small>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-4">
                                 <div class="feature-item">
-                                    <i class="fas fa-fire mb-2" style="font-size: 24px; color: #dc3545;"></i>
-                                    <h5>Streaks</h5>
-                                    <small class="text-muted">Build your streak</small>
+                                    <i class="fas fa-fire mb-2"></i>
+                                    <h6>Streaks</h6>
+                                    <small>Stay Active</small>
                                 </div>
                             </div>
                         </div>
@@ -73,8 +73,8 @@
 <!-- Guest Login Modal -->
 <div class="modal fade" id="guestLoginModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
+        <div class="modal-content modal-custom">
+            <div class="modal-header border-0">
                 <h5 class="modal-title">Play as Guest</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -84,13 +84,15 @@
                     <div class="mb-3">
                         <label for="guestUsername" class="form-label">Choose a username</label>
                         <input type="text" class="form-control" id="guestUsername" name="username" required 
-                               pattern="[a-zA-Z0-9_]{3,15}" title="3-15 characters, letters, numbers and underscore only">
-                        <div class="form-text">This will be your temporary username while playing as a guest.</div>
+                               pattern="[a-zA-Z0-9_]{3,15}" 
+                               title="3-15 characters, letters, numbers and underscore only"
+                               placeholder="Enter username">
+                        <div class="form-text">3-15 characters, letters, numbers and underscore only</div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Start Playing</button>
+                    <button type="submit" class="btn btn-primary w-100" id="guestSubmitBtn">Start Playing</button>
                 </form>
             </div>
-            <div class="modal-footer justify-content-center">
+            <div class="modal-footer border-0 justify-content-center">
                 <small class="text-muted">
                     <i class="fas fa-info-circle"></i>
                     Remember: Guest scores aren't saved. Sign in with Google to save your progress!
@@ -101,26 +103,175 @@
 </div>
 
 <style>
+.login-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 15px;
+}
+
+.game-title {
+    color: var(--neon-purple);
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(176, 38, 255, 0.3);
+}
+
+.game-subtitle {
+    color: var(--neon-blue);
+    font-size: 1.1rem;
+}
+
+.btn-google {
+    background: white;
+    color: #3c4043;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    padding: 8px 16px;
+    width: 100%;
+    max-width: 280px;
+    font-family: 'Google Sans', Roboto, Arial, sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.25px;
+    transition: all 0.2s ease;
+    height: 40px;
+}
+
+.btn-google:hover {
+    background: #f8f9fa;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    border-color: #dadce0;
+}
+
+.btn-google:active {
+    background: #f1f3f4;
+    box-shadow: none;
+}
+
+.btn-guest {
+    background: var(--neon-purple);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    width: 100%;
+    max-width: 280px;
+    transition: all 0.3s ease;
+}
+
+.btn-guest:hover {
+    background: #9517db;
+    box-shadow: 0 0 15px rgba(176, 38, 255, 0.3);
+}
+
 .divider {
     height: 20px;
 }
 
-.feature-item {
-    padding: 15px;
+.divider-line {
+    border-color: rgba(0,0,0,0.1);
+    margin: 0;
+}
+
+.divider-text {
+    background: white;
+    padding: 0 15px;
+    color: #888;
+}
+
+.alert-custom {
+    background: rgba(176, 38, 255, 0.1);
+    border: none;
     border-radius: 10px;
-    background: #fff;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    color: var(--neon-purple);
+}
+
+.feature-item {
+    padding: 12px 8px;
+    border-radius: 12px;
+    background: rgba(176, 38, 255, 0.05);
     transition: all 0.3s ease;
 }
 
+.feature-item i {
+    font-size: 22px;
+    color: var(--neon-purple);
+}
+
+.feature-item h6 {
+    color: var(--neon-purple);
+    margin: 8px 0 4px;
+    font-size: 0.9rem;
+}
+
+.feature-item small {
+    color: #666;
+    font-size: 0.75rem;
+}
+
 .feature-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transform: translateY(-3px);
+    background: rgba(176, 38, 255, 0.1);
+}
+
+/* Modal Styling */
+.modal-custom {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+}
+
+.modal-custom .form-control {
+    border-radius: 8px;
+    border: 2px solid rgba(176, 38, 255, 0.2);
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+}
+
+.modal-custom .form-control:focus {
+    border-color: var(--neon-purple);
+    box-shadow: 0 0 0 0.2rem rgba(176, 38, 255, 0.25);
+}
+
+.modal-custom .btn-primary {
+    background: var(--neon-purple);
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.modal-custom .btn-primary:hover {
+    background: #9517db;
+    box-shadow: 0 0 15px rgba(176, 38, 255, 0.3);
 }
 
 @media (max-width: 768px) {
     .card-body {
-        padding: 2rem !important;
+        padding: 1.5rem !important;
+    }
+    
+    .game-title {
+        font-size: 1.8rem;
+    }
+    
+    .game-subtitle {
+        font-size: 1rem;
+    }
+    
+    .feature-item {
+        padding: 10px 5px;
+    }
+    
+    .feature-item i {
+        font-size: 20px;
+    }
+    
+    .feature-item h6 {
+        font-size: 0.8rem;
+    }
+    
+    .feature-item small {
+        font-size: 0.7rem;
     }
 }
 </style>
@@ -133,10 +284,24 @@ function showGuestLoginModal() {
 
 document.getElementById('guestLoginForm')?.addEventListener('submit', function(e) {
     const username = document.getElementById('guestUsername').value;
+    const submitBtn = document.getElementById('guestSubmitBtn');
+    
     if (username.length < 3 || username.length > 15) {
         e.preventDefault();
         alert('Username must be between 3 and 15 characters');
+        return;
     }
+    
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+});
+
+// Clear form when modal is hidden
+document.getElementById('guestLoginModal')?.addEventListener('hidden.bs.modal', function () {
+    document.getElementById('guestLoginForm').reset();
+    document.getElementById('guestSubmitBtn').disabled = false;
+    document.getElementById('guestSubmitBtn').innerHTML = 'Start Playing';
 });
 </script>
 {% endblock %}
