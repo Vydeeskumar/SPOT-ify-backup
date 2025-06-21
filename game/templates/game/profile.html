@@ -3,37 +3,55 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-md-4">
-            <div class="card">
+        <!-- Left Column - Profile -->
+        <div class="col-md-4 mb-4">
+            <div class="glass-card">
+                <div class="card-header">
+                    <i class="fas fa-user-circle"></i>
+                    <h5 class="mb-0">{{ user.username }}'s Profile</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title">{{ user.username }}'s Profile</h5>
                     <div class="streak-info">
-                        <p class="streak">🔥 Current Streak: {{ profile.current_streak }}</p>
-                        <p class="best-streak">🏆 Best Streak: {{ profile.longest_streak }}</p>
+                        <div class="streak-item">
+                            <i class="fas fa-fire"></i>
+                            <p class="streak">Current Streak: {{ profile.current_streak }}</p>
+                        </div>
+                        <div class="streak-item">
+                            <i class="fas fa-trophy"></i>
+                            <p class="best-streak">Best Streak: {{ profile.longest_streak }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Right Column - Stats & Activity -->
         <div class="col-md-8">
-            <div class="card">
+            <!-- Stats Section -->
+            <div class="glass-card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar"></i>
+                    <h5 class="mb-0">Statistics</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title">Statistics</h5>
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-4 mb-3">
                             <div class="stat-box">
+                                <i class="fas fa-star"></i>
                                 <h6>Total Points</h6>
                                 <p>{{ profile.total_points }}</p>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-4 mb-3">
                             <div class="stat-box">
+                                <i class="fas fa-music"></i>
                                 <h6>Songs Solved</h6>
                                 <p>{{ profile.total_songs_solved }}</p>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-4 mb-3">
                             <div class="stat-box">
+                                <i class="fas fa-clock"></i>
                                 <h6>Avg Time</h6>
                                 <p>{{ profile.average_time|floatformat:1 }}s</p>
                             </div>
@@ -42,13 +60,31 @@
                 </div>
             </div>
 
-            <div class="card mt-4">
+            <!-- Recent Activity -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <i class="fas fa-history"></i>
+                    <h5 class="mb-0">Recent Activity</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title">Recent Activity</h5>
                     <div class="recent-scores">
                         {% for score in recent_scores %}
                         <div class="score-entry">
-                            <p>{{ score.song.title }} - {{ score.score }} points ({{ score.guess_time|floatformat:1 }}s)</p>
+                            <div class="score-content">
+                                <div class="song-info">
+                                    <span class="song-title">{{ score.song.title }}</span>
+                                    <small class="score-date">{{ score.attempt_date|date }}</small>
+                                </div>
+                                <div class="score-stats">
+                                    <span class="points">{{ score.score }} points</span>
+                                    <span class="time">{{ score.guess_time|floatformat:1 }}s</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="empty-state">
+                            <i class="fas fa-music"></i>
+                            <p>No recent activity</p>
                         </div>
                         {% endfor %}
                     </div>
@@ -57,18 +93,25 @@
         </div>
     </div>
 
-    <!-- Social Sharing Section -->
+    <!-- Share Section -->
     <div class="row mt-4">
         <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Share Your Progress</h5>
-                    <button class="btn btn-primary share-btn" onclick="shareProfile()">
-                        Share Profile
-                    </button>
-                    <button class="btn btn-success share-btn" onclick="shareStreak()">
-                        Share Streak
-                    </button>
+            <div class="glass-card">
+                <div class="card-header">
+                    <i class="fas fa-share-alt"></i>
+                    <h5 class="mb-0">Share Your Progress</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="share-buttons">
+                        <button class="btn-share" onclick="shareProfile()">
+                            <i class="fas fa-share-alt"></i>
+                            Share Profile
+                        </button>
+                        <button class="btn-share" onclick="shareStreak()">
+                            <i class="fas fa-fire"></i>
+                            Share Streak
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -76,60 +119,356 @@
 </div>
 
 <style>
+.glass-card {
+    background: rgba(18, 18, 18, 0.95);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.card-header {
+    background: rgba(176, 38, 255, 0.1);
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-header i {
+    color: var(--neon-purple);
+    font-size: 1.2rem;
+}
+
+.card-header h5 {
+    color: white;
+    margin: 0;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Streak Info */
 .streak-info {
     text-align: center;
-    font-size: 1.2em;
 }
-.stat-box {
-    text-align: center;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
+
+.streak-item {
+    margin: 15px 0;
+}
+
+.streak-item i {
+    font-size: 1.5rem;
+    color: var(--neon-purple);
     margin-bottom: 10px;
 }
-.score-entry {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
+
+.streak, .best-streak {
+    color: white;
+    font-size: 1.2rem;
+    margin: 0;
 }
-.share-btn {
-    margin: 5px;
+
+/* Stats Boxes */
+.stat-box {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-3px);
+    background: rgba(176, 38, 255, 0.1);
+}
+
+.stat-box i {
+    color: var(--neon-purple);
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.stat-box h6 {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 5px;
+}
+
+.stat-box p {
+    color: white;
+    font-size: 1.3rem;
+    margin: 0;
+    font-weight: bold;
+}
+
+/* Recent Activity */
+.score-entry {
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.score-entry:hover {
+    background: rgba(176, 38, 255, 0.1);
+}
+
+.score-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.song-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.song-title {
+    color: white;
+    font-size: 1rem;
+}
+
+.score-date {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+}
+
+.score-stats {
+    text-align: right;
+}
+
+.points {
+    color: var(--neon-purple);
+    margin-right: 15px;
+}
+
+.time {
+    color: var(--neon-blue);
+}
+
+/* Share Buttons */
+.share-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-share {
+    background: rgba(176, 38, 255, 0.1);
+    border: 2px solid var(--neon-purple);
+    color: var(--neon-purple);
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-share:hover {
+    background: var(--neon-purple);
+    color: white;
+}
+
+.btn-share[onclick="shareProfile()"] {
+    background: rgba(0, 150, 255, 0.1);
+    border: 2px solid var(--neon-blue);
+    color: var(--neon-blue);
+}
+
+.btn-share[onclick="shareProfile()"]:hover {
+    background: var(--neon-blue);
+    color: white;
+    box-shadow: 0 0 15px rgba(0, 150, 255, 0.3);
+}
+
+
+.btn-share[onclick="shareStreak()"] {
+    background: rgba(255, 105, 180, 0.1);
+    border: 2px solid var(--neon-pink);
+    color: var(--neon-pink);
+}
+
+.btn-share[onclick="shareStreak()"]:hover {
+    background: var(--neon-pink);
+    color: white;
+    box-shadow: 0 0 15px rgba(255, 105, 180, 0.3);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 30px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.empty-state i {
+    font-size: 2rem;
+    color: var(--neon-purple);
+    margin-bottom: 10px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    .glass-card {
+        margin-bottom: 15px;
+    }
+
+    .score-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .score-stats {
+        text-align: center;
+    }
+
+    .share-buttons {
+        flex-direction: column;
+    }
+
+    .btn-share {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .stat-box {
+        height: 100%;
+    }
+
+    .streak-info {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .streak-item {
+        flex: 1;
+        padding: 10px;
+    }
 }
 </style>
 
+<!-- Keep your existing script -->
 <script>
+    // Your existing shareProfile and shareStreak functions
+</script>
+
+
+<script>
+
 function shareProfile() {
-    const text = `Check out my SPOT-ify the Paatu stats!\n
-🎵 Songs Solved: {{ profile.total_songs_solved }}\n
-🏆 Best Streak: {{ profile.longest_streak }}\n
-⭐ Total Points: {{ profile.total_points }}`;
-    
+    // Get stats directly from the stat boxes using more specific selectors
+    const totalPoints = document.querySelector('.stat-box:has(i.fa-star) p').textContent;
+    const songsSolved = document.querySelector('.stat-box:has(i.fa-music) p').textContent;
+    const avgTime = document.querySelector('.stat-box:has(i.fa-clock) p').textContent;
+
+    const text = `🎮 Check out my SPOT-ify the Paatu stats!\n
+🎵 Songs Solved: ${songsSolved}\n
+⭐ Total Points: ${totalPoints}\n
+⚡ Avg Time: ${avgTime}\n
+Come play with me!`;
+
     if (navigator.share) {
+        // For mobile devices - uses native share dialog
         navigator.share({
             title: 'My SPOT-ify the Paatu Profile',
             text: text,
             url: window.location.href
+        }).catch(err => {
+            // Fallback if share fails
+            copyToClipboard(text);
         });
     } else {
-        // Fallback for browsers that don't support Web Share API
-        navigator.clipboard.writeText(text);
-        alert('Stats copied to clipboard!');
+        // For desktop - copy to clipboard
+        copyToClipboard(text);
     }
 }
 
 function shareStreak() {
-    const text = `🔥 My SPOT-ify the Paatu streak: {{ profile.current_streak }} days!\n
-Can you beat my streak?`;
-    
+    const currentStreak = document.querySelector('.streak').textContent.match(/\d+/)[0];
+    const text = `🔥 My SPOT-ify the Paatu streak: ${currentStreak} days!\n
+Can you beat my streak? Come play with me!`;
+
     if (navigator.share) {
+        // For mobile devices - uses native share dialog
         navigator.share({
             title: 'My SPOT-ify the Paatu Streak',
             text: text,
             url: window.location.href
+        }).catch(err => {
+            // Fallback if share fails
+            copyToClipboard(text);
         });
     } else {
-        navigator.clipboard.writeText(text);
-        alert('Streak info copied to clipboard!');
+        // For desktop - copy to clipboard
+        copyToClipboard(text);
     }
 }
+
+// Helper function to copy text to clipboard
+function copyToClipboard(text) {
+    // Create temporary textarea
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    
+    // Select and copy
+    textarea.select();
+    document.execCommand('copy');
+    
+    // Cleanup
+    document.body.removeChild(textarea);
+    
+    // Show feedback
+    showToast('Copied to clipboard!');
+}
+
+// Add this toast notification
+function showToast(message) {
+    // Create toast element if it doesn't exist
+    let toast = document.getElementById('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        document.body.appendChild(toast);
+    }
+    
+    // Add toast styles
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(176, 38, 255, 0.9);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        z-index: 1000;
+        transition: opacity 0.3s ease;
+    `;
+    
+    // Show message
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    
+    // Hide after 2 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 2000);
+}
+
 </script>
 {% endblock %}

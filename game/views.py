@@ -124,6 +124,12 @@ def home(request):
     context = {
         'today_song': today_song,
         'user_already_played': user_already_played,
+        'user_score': UserScore.objects.filter(
+            user=request.user,
+            song=today_song,
+            attempt_date__date=timezone.now().date()
+        ).first() if user_already_played else None,
+        'give_up': False, 
         'current_streak': profile.current_streak,
         'longest_streak': profile.longest_streak,
     }
@@ -358,7 +364,8 @@ def give_up(request):
             'message': f'The song was "{today_song.title}" from "{today_song.movie}"',
             'title': today_song.title,
             'movie': today_song.movie,
-            'artist': today_song.artist
+            'artist': today_song.artist,
+            'give_up': True  
         })
     
     return JsonResponse({'error': 'Invalid request'}, status=400)

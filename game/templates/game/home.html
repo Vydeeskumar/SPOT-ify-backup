@@ -1,8 +1,236 @@
 {% extends 'game/base.html' %}
 {% load static %}
+{% load i18n %}
 
 {% block extra_head %}
 <style>
+
+    /* Add these new styles at the beginning of your CSS section */
+
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: rgba(0, 0, 0, 0.25);
+    --primary-glow: rgba(176, 38, 255, 0.5);
+    --secondary-glow: rgba(0, 150, 255, 0.3);
+    }
+
+    .glassmorphism {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px var(--glass-shadow);
+    }
+
+    /* Enhanced Game Container */
+    .game-container {
+    background: linear-gradient(135deg, rgba(18, 18, 18, 0.95), rgba(28, 28, 28, 0.95));
+    border: 1px solid var(--glass-border);
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: 
+        0 4px 30px var(--primary-glow),
+        inset 0 0 60px var(--secondary-glow);
+    max-width: 800px;
+    margin: 30px auto;
+    position: relative;
+    overflow: hidden;
+    }
+
+    /* Add dynamic background elements */
+    .game-container::before,
+    .game-container::after {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    animation: floatGlow 8s infinite alternate;
+    }
+
+    .game-container::before {
+    background: var(--primary-glow);
+    top: -100px;
+    left: -100px;
+    }
+
+    .game-container::after {
+    background: var(--secondary-glow);
+    bottom: -100px;
+    right: -100px;
+    }
+
+    @keyframes floatGlow {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(20px, 20px); }
+    }
+
+    /* Enhanced Vinyl Player */
+    .vinyl-player {
+    width: 320px;
+    height: 320px;
+    margin: 40px auto;
+    position: relative;
+    border-radius: 50%;
+    background: #1a1a1a;
+    box-shadow: 
+        0 0 60px var(--primary-glow),
+        inset 0 0 30px rgba(0, 0, 0, 0.8);
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .vinyl-player:hover {
+    transform: scale(1.02);
+    }
+
+    .vinyl-record {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    width: 90%;
+    height: 90%;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #1a1a1a, #333);
+    animation: rotate 20s linear infinite;
+    transform-origin: center;
+    box-shadow: 
+        0 0 20px rgba(0, 0, 0, 0.5),
+        inset 0 0 50px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Enhanced Progress Bar */
+    .progress-container {
+    max-width: 320px;
+    margin: 20px auto;
+    padding: 10px;
+    background: var(--glass-bg);
+    border-radius: 15px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .progress-bar {
+    height: 6px;
+    background: rgba(176, 38, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    }
+
+    .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-purple), var(--neon-blue));
+    width: 0%;
+    transition: width 0.1s linear;
+    position: relative;
+    box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    /* Enhanced Buttons */
+    .btn {
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 1.1em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+    }
+
+    .btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+    }
+
+    .btn:hover::before {
+    width: 300px;
+    height: 300px;
+    }
+
+    /* Enhanced Input Field */
+    .form-control {
+    background: var(--glass-bg);
+    border: 2px solid var(--glass-border);
+    color: white;
+    border-radius: 25px;
+    padding: 15px 25px;
+    font-size: 1.1em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-control:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--neon-purple);
+    box-shadow: 
+        0 0 20px var(--primary-glow),
+        inset 0 2px 5px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+    }
+
+    /* Add these new animation styles */
+
+    @keyframes pulseGlow {
+    0% { box-shadow: 0 0 20px var(--primary-glow); }
+    50% { box-shadow: 0 0 40px var(--primary-glow); }
+    100% { box-shadow: 0 0 20px var(--primary-glow); }
+    }
+
+    @keyframes floatIn {
+    0% { 
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+    }
+
+    .float-in {
+    animation: floatIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    /* Enhanced Vinyl Animation */
+    @keyframes vinylSpin {
+    0% { transform: rotate(0deg) scale(1); }
+    100% { transform: rotate(360deg) scale(1.02); }
+    }
+
+    .playing .vinyl-record {
+    animation: vinylSpin 20s linear infinite;
+    }
+
+    /* Score Animation */
+    @keyframes scoreReveal {
+    0% { 
+        transform: scale(0.8) translateY(20px);
+        opacity: 0;
+    }
+    50% { 
+        transform: scale(1.1) translateY(0);
+    }
+    100% { 
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+    }
+
+    .score-reveal {
+    animation: scoreReveal 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
     /* Game Container */
     .game-container {
         background: rgba(18, 18, 18, 0.95);
@@ -686,6 +914,91 @@
         opacity: 1;
     }
 
+    .reveal-header {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: revealItem 0.5s ease forwards;
+    }
+
+    .reveal-header h4 {
+        font-size: 1.2rem;
+        line-height: 1.5;
+        margin: 0;
+        padding: 15px;
+        background: rgba(176, 38, 255, 0.1);
+        border-radius: 10px;
+        text-shadow: 0 0 10px rgba(176, 38, 255, 0.3);
+    }
+
+    @media (max-width: 768px) {
+        .reveal-header h4 {
+            font-size: 1rem;
+            padding: 10px;
+        }
+    }
+
+    .highlight-points {
+        color: #FFD700;  /* Gold color */
+        font-weight: bold;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        padding: 2px 8px;
+        background: rgba(255, 215, 0, 0.1);
+        border-radius: 10px;
+        margin: 0 2px;
+    }
+
+    .btn-share-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: none;
+        color: white;
+        font-size: 1.2em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .btn-share-icon.whatsapp { 
+        background: #25D366; 
+    }
+
+    .btn-share-icon.twitter { 
+        background: #1DA1F2; 
+    }
+
+    .btn-share-icon.instagram { 
+        background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+    }
+
+    .btn-share-icon.copy { 
+        background: var(--neon-purple); 
+    }
+
+    .btn-share-icon:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .btn-share-icon:active {
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 768px) {
+        .btn-share-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.1em;
+        }
+        
+        .share-buttons {
+            gap: 15px;
+        }
+    }
+
     
 
 </style>
@@ -839,8 +1152,16 @@ function toggleLeaderboard() {
             </div>
 
             <!-- Result View Container (Initially Hidden) -->
+            <!-- Result View Container (Initially Hidden) -->
             <div id="result-container" class="result-container" style="display: none;">
                 <div class="reveal-animation">
+                    <!-- Success/Score Message -->
+                    <div class="reveal-header mb-4" style="background: rgba(176, 38, 255, 0.1); padding: 20px; border-radius: 15px;">
+                        <h4 style="color: var(--neon-purple); margin: 0; font-size: 1.2rem;" id="score-message">
+                            <!-- This will be populated by JavaScript -->
+                        </h4>
+                    </div>
+                    <!-- Song Details -->
                     {% if today_song.image %}
                         <img src="{{ today_song.image.url }}" alt="{{ today_song.title }}" class="song-image reveal-image">
                     {% endif %}
@@ -849,6 +1170,8 @@ function toggleLeaderboard() {
                         <div class="song-info reveal-details">{{ today_song.movie }}</div>
                         <div class="song-info reveal-details">{{ today_song.artist }}</div>
                     </div>
+
+                    <!-- Rest of your existing code -->
                     {% if today_song.reveal_snippet %}
                         <audio id="reveal-snippet" src="{{ today_song.reveal_snippet.url }}" preload="auto"></audio>
                     {% endif %}
@@ -859,25 +1182,18 @@ function toggleLeaderboard() {
                             <i class="fas fa-share-alt"></i> Share Your Score
                         </h5>
                         
-                        <div class="share-buttons" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-                            <!-- WhatsApp -->
-                            <button onclick="shareToWhatsApp()" class="btn-share whatsapp">
-                                <i class="fab fa-whatsapp"></i> WhatsApp
+                        <div class="share-buttons" style="display: flex; justify-content: center; gap: 20px;">
+                            <button onclick="shareToWhatsApp()" class="btn-share-icon whatsapp" title="Share to WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
                             </button>
-
-                            <!-- Twitter/X -->
-                            <button onclick="shareToTwitter()" class="btn-share twitter">
-                                <i class="fab fa-twitter"></i> Twitter
+                            <button onclick="shareToTwitter()" class="btn-share-icon twitter" title="Share to Twitter">
+                                <i class="fab fa-twitter"></i>
                             </button>
-
-                            <!-- Instagram -->
-                            <button onclick="shareToInstagram()" class="btn-share instagram">
-                                <i class="fab fa-instagram"></i> Instagram
+                            <button onclick="shareToInstagram()" class="btn-share-icon instagram" title="Share to Instagram">
+                                <i class="fab fa-instagram"></i>
                             </button>
-
-                            <!-- Copy Link -->
-                            <button onclick="copyShareText()" class="btn-share copy">
-                                <i class="fas fa-copy"></i> Copy Text
+                            <button onclick="copyShareText()" class="btn-share-icon copy" title="Copy to Clipboard">
+                                <i class="fas fa-copy"></i>
                             </button>
                         </div>
 
@@ -1171,6 +1487,26 @@ function showResultView() {
         
         // Show result container
         document.getElementById('result-container').style.display = 'block';
+
+        // Get current points and update score message
+        const points = document.querySelector('.points-value')?.textContent || '0';
+        const scoreMessage = document.getElementById('score-message');
+        
+        if (scoreMessage) {
+            const pointsNum = parseInt(points);
+            let messageHTML;
+
+            if (pointsNum >= 8) {
+                messageHTML = `🎯 Mass Performance! <span class="highlight-points">${points} Points</span> • Are you Anirudh in disguise?`;
+            } else if (pointsNum >= 5) {
+                messageHTML = `🎶 Semma Speed! <span class="highlight-points">${points} Points</span> • You're on fire mamey!`;
+            } else if (pointsNum >= 3) {
+                messageHTML = `🎧 Took Your Sweet Time! <span class="highlight-points">${points} Points</span> • Style-ah Solve Pannita!`;
+            } else {
+                messageHTML = `✨ Finally! <span class="highlight-points">${points} Points</span> • Even Ilayaraja started somewhere!`;
+            }
+            scoreMessage.innerHTML = messageHTML;
+        }
         
         // Stop the main audio if it's playing
         const mainAudio = document.getElementById('song-snippet');
@@ -1631,6 +1967,34 @@ function copyShareText() {
             }, 300);
         }, 2000);
     });
+}
+
+// Add these new interaction functions
+
+function addRippleEffect(event) {
+  const button = event.currentTarget;
+  const ripple = document.createElement('span');
+  const rect = button.getBoundingClientRect();
+  
+  ripple.className = 'ripple';
+  ripple.style.left = `${event.clientX - rect.left}px`;
+  ripple.style.top = `${event.clientY - rect.top}px`;
+  
+  button.appendChild(ripple);
+  
+  setTimeout(() => ripple.remove(), 600);
+}
+
+function animateVinylPlayer() {
+  const vinyl = document.querySelector('.vinyl-player');
+  vinyl.classList.add('animate-hover');
+  setTimeout(() => vinyl.classList.remove('animate-hover'), 300);
+}
+
+// Add smooth scroll to leaderboard
+function scrollToLeaderboard() {
+  const leaderboard = document.querySelector('.daily-leaderboard');
+  leaderboard.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 </script>

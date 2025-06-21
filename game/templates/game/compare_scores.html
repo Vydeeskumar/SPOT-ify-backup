@@ -1,67 +1,164 @@
 {% extends 'game/base.html' %}
 
 {% block content %}
-<div class="container">
-    <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">Comparing scores with {{ friend.username }}</h5>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <!-- Stats Comparison -->
-                <div class="col-md-6">
-                    <h6>Your Stats</h6>
-                    <div class="stats-box p-3 mb-3">
-                        <p>Total Score: {{ user_stats.total_score|default:0 }}</p>
-                        <p>Average Score: {{ user_stats.avg_score|default:0|floatformat:1 }}</p>
-                        <p>Games Played: {{ user_stats.games_played|default:0 }}</p>
-                        <p>Best Score: {{ user_stats.best_score|default:0 }}</p>
+<div class="compare-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <a href="{% url 'friends_list' %}" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1 class="neon-text">Score Battle</h1>
+        <div class="vs-badge">VS</div>
+    </div>
+
+    <!-- Players Cards -->
+    <div class="players-comparison">
+        <!-- Your Stats -->
+        <div class="player-card your-stats">
+            <div class="player-header">
+                <div class="player-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h2>Your Stats</h2>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-item total-score">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Score</h3>
+                        <span class="stat-value">{{ user_stats.total_score|default:0 }}</span>
                     </div>
                 </div>
-                
-                <div class="col-md-6">
-                    <h6>{{ friend.username }}'s Stats</h6>
-                    <div class="stats-box p-3 mb-3">
-                        <p>Total Score: {{ friend_stats.total_score|default:0 }}</p>
-                        <p>Average Score: {{ friend_stats.avg_score|default:0|floatformat:1 }}</p>
-                        <p>Games Played: {{ friend_stats.games_played|default:0 }}</p>
-                        <p>Best Score: {{ friend_stats.best_score|default:0 }}</p>
+
+                <div class="stat-item avg-score">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Average Time</h3>
+                        <span class="stat-value">{{ user_stats.avg_score|default:0|floatformat:1 }}</span>
+                    </div>
+                </div>
+
+                <div class="stat-item games">
+                    <div class="stat-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Games</h3>
+                        <span class="stat-value">{{ user_stats.games_played|default:0 }}</span>
+                    </div>
+                </div>
+
+                <div class="stat-item best-score">
+                    <div class="stat-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Best Score</h3>
+                        <span class="stat-value">{{ user_stats.best_score|default:0 }}</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Games -->
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <h6>Your Recent Games</h6>
-                    <div class="recent-games">
-                        {% for score in user_recent %}
-                            <div class="game-item p-2 mb-2">
-                                <p class="mb-0">
-                                    {{ score.song.title }} - {{ score.score }} points
-                                    <small class="text-muted">({{ score.attempt_date|date }})</small>
-                                </p>
+            <div class="recent-games-section">
+                <h3>Recent Games</h3>
+                <div class="games-list">
+                    {% for score in user_recent %}
+                        <div class="game-item {% if score.score >= 8 %}perfect{% elif score.score >= 5 %}good{% elif score.score >= 3 %}average{% endif %}">
+                            <div class="game-info">
+                                <span class="game-title">{{ score.song.title }}</span>
+                                <span class="game-date">{{ score.attempt_date|date }}</span>
                             </div>
-                        {% empty %}
-                            <p class="text-muted">No recent games.</p>
-                        {% endfor %}
+                            <div class="game-score">
+                                <span class="points">{{ score.score }}</span>
+                                <small>points</small>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="empty-games">
+                            <i class="fas fa-music"></i>
+                            <p>No recent games</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Friend's Stats -->
+        <div class="player-card friend-stats">
+            <div class="player-header">
+                <div class="player-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h2>{{ friend.username }}</h2>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-item total-score">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Score</h3>
+                        <span class="stat-value">{{ friend_stats.total_score|default:0 }}</span>
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <h6>{{ friend.username }}'s Recent Games</h6>
-                    <div class="recent-games">
-                        {% for score in friend_recent %}
-                            <div class="game-item p-2 mb-2">
-                                <p class="mb-0">
-                                    {{ score.song.title }} - {{ score.score }} points
-                                    <small class="text-muted">({{ score.attempt_date|date }})</small>
-                                </p>
-                            </div>
-                        {% empty %}
-                            <p class="text-muted">No recent games.</p>
-                        {% endfor %}
+                <div class="stat-item avg-score">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
                     </div>
+                    <div class="stat-info">
+                        <h3>Average Time</h3>
+                        <span class="stat-value">{{ friend_stats.avg_score|default:0|floatformat:1 }}</span>
+                    </div>
+                </div>
+
+                <div class="stat-item games">
+                    <div class="stat-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Games</h3>
+                        <span class="stat-value">{{ friend_stats.games_played|default:0 }}</span>
+                    </div>
+                </div>
+
+                <div class="stat-item best-score">
+                    <div class="stat-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Best Score</h3>
+                        <span class="stat-value">{{ friend_stats.best_score|default:0 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-games-section">
+                <h3>Recent Games</h3>
+                <div class="games-list">
+                    {% for score in friend_recent %}
+                        <div class="game-item {% if score.score >= 8 %}perfect{% elif score.score >= 5 %}good{% elif score.score >= 3 %}average{% endif %}">
+                            <div class="game-info">
+                                <span class="game-title">{{ score.song.title }}</span>
+                                <span class="game-date">{{ score.attempt_date|date }}</span>
+                            </div>
+                            <div class="game-score">
+                                <span class="points">{{ score.score }}</span>
+                                <small>points</small>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="empty-games">
+                            <i class="fas fa-music"></i>
+                            <p>No recent games</p>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -69,20 +166,307 @@
 </div>
 
 <style>
-.stats-box {
+/* Main Container */
+.compare-container {
+    padding: 20px;
+    min-height: 100vh;
+    background: var(--darker-bg);
+    color: white;
+}
+
+/* Page Header */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+    position: relative;
+    padding: 20px 0; 
+}
+
+.back-button {
+    position: absolute;
+    left: 0;
+    color: var(--neon-purple);
+    font-size: 1.2rem;
+    padding: 10px;
+    border-radius: 50%;
+    background: rgba(176, 38, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    transform: translateX(-5px);
+    background: rgba(176, 38, 255, 0.2);
+    color: var(--neon-purple);
+}
+
+.neon-text {
+    color: var(--neon-purple);
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(176, 38, 255, 0.5);
+    margin: 0;
+    z-index: 2; 
+}
+
+.vs-badge {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--neon-pink);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+    z-index: 2;
+}
+
+/* Players Comparison Layout */
+.players-comparison {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* Player Cards */
+.player-card {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.player-card:hover {
+    transform: translateY(-5px);
+}
+
+.player-header {
+    background: rgba(176, 38, 255, 0.1);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.player-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(176, 38, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-avatar i {
+    font-size: 1.8rem;
+    color: var(--neon-purple);
+}
+
+.player-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: white;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px;
+}
+
+.stat-item {
     background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    background: rgba(176, 38, 255, 0.1);
+    transform: translateY(-3px);
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
     border-radius: 10px;
+    background: rgba(176, 38, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon i {
+    color: var(--neon-purple);
+    font-size: 1.2rem;
+}
+
+.stat-info h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.stat-value {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--neon-purple);
+}
+
+/* Recent Games Section */
+.recent-games-section {
+    padding: 20px;
+}
+
+.recent-games-section h3 {
+    color: white;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.games-list {
+    display: grid;
+    gap: 10px;
 }
 
 .game-item {
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
 }
 
+.game-item:hover {
+    transform: translateX(5px);
+}
+
+.game-item.perfect { border-left: 3px solid #FFD700; }
+.game-item.good { border-left: 3px solid var(--neon-blue); }
+.game-item.average { border-left: 3px solid var(--neon-purple); }
+
+.game-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.game-title {
+    color: white;
+    font-size: 0.9rem;
+}
+
+.game-date {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+}
+
+.game-score {
+    text-align: right;
+}
+
+.points {
+    color: var(--neon-purple);
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.empty-games {
+    text-align: center;
+    padding: 30px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.empty-games i {
+    font-size: 2rem;
+    color: var(--neon-purple);
+    margin-bottom: 10px;
+}
+
+/* Mobile Responsiveness */
 @media (max-width: 768px) {
-    .stats-box {
-        margin-bottom: 20px;
+    .players-comparison {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .vs-badge {
+        display: none;
+        top: 0;  /* Changed position for mobile */
+        transform: translate(-50%, -50%);
+        font-size: 1rem;
+        padding: 3px 10px;
+    }
+
+    .neon-text {
+        font-size: 1.8rem;
+        margin-left: 20px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .stat-item {
+        padding: 12px;
+    }
+
+    .game-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .game-score {
+        text-align: center;
+    }
+
+    .back-button {
+        position: relative;
+        margin-right: 15px;
+    }
+
+    .page-header {
+        justify-content: flex-start;
+        padding: 30px 0;
     }
 }
+
+/* Animations */
+@keyframes glow {
+    0%, 100% { text-shadow: 0 0 10px rgba(176, 38, 255, 0.5); }
+    50% { text-shadow: 0 0 20px rgba(176, 38, 255, 0.8); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Add smooth transitions */
+* {
+    transition: all 0.3s ease;
+}
 </style>
+</div>
 {% endblock %}
+

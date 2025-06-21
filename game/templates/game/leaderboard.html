@@ -1,182 +1,464 @@
 {% extends 'game/base.html' %}
 
 {% block content %}
-<div class="container">
-    <!-- User's Personal Ranking -->
-    <!-- User's Personal Ranking -->
-{% if user.is_authenticated %}
-<div class="card mb-4">
-    <div class="card-body">
-        <h5 class="card-title">Your Rankings</h5>
-        <div class="row text-center">
-            <div class="col-md-4">
-                <div class="rank-box">
-                    <h6>Weekly Rank</h6>
-                    <p class="rank">#{{ user_weekly_rank|default:"--" }}</p>
-                    {% if user_weekly_rank %}
-                    <small class="text-muted">
-                        Out of {{ total_players.weekly }} players
-                        <br>
-                        Score: {{ user_stats.weekly.total_score }}
-                        • Games: {{ user_stats.weekly.songs_played }}
-                    </small>
-                    {% endif %}
+<div class="leaderboard-container">
+    <!-- Animated Header -->
+    <div class="page-header">
+        <h1 class="neon-text">Leaderboard</h1>
+        <div class="header-underline"></div>
+    </div>
+
+    {% if user.is_authenticated %}
+    <!-- User's Personal Stats Card -->
+    <div class="stats-container">
+        <div class="stats-card">
+            <div class="stats-grid">
+                <!-- Weekly Stats -->
+                <div class="stat-box weekly">
+                    <div class="stat-content">
+                        <div class="stat-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Weekly</h3>
+                        </div>
+                        <div class="rank-display">
+                            <span class="rank-number">#{{ user_weekly_rank|default:"--" }}</span>
+                            {% if user_weekly_rank %}
+                            <div class="rank-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-users"></i>
+                                    <span>{{ total_players.weekly }} Players</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>{{ user_stats.weekly.total_score }} Points</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-music"></i>
+                                    <span>{{ user_stats.weekly.songs_played }} Songs</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="rank-box">
-                    <h6>Monthly Rank</h6>
-                    <p class="rank">#{{ user_monthly_rank|default:"--" }}</p>
-                    {% if user_monthly_rank %}
-                    <small class="text-muted">
-                        Out of {{ total_players.monthly }} players
-                        <br>
-                        Score: {{ user_stats.monthly.total_score }}
-                        • Games: {{ user_stats.monthly.songs_played }}
-                    </small>
-                    {% endif %}
+
+                <!-- Monthly Stats -->
+                <div class="stat-box monthly">
+                    <div class="stat-content">
+                        <div class="stat-header">
+                            <i class="fas fa-calendar"></i>
+                            <h3>Monthly</h3>
+                        </div>
+                        <div class="rank-display">
+                            <span class="rank-number">#{{ user_monthly_rank|default:"--" }}</span>
+                            {% if user_monthly_rank %}
+                            <div class="rank-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-users"></i>
+                                    <span>{{ total_players.monthly }} Players</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>{{ user_stats.monthly.total_score }} Points</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-music"></i>
+                                    <span>{{ user_stats.monthly.songs_played }} Songs</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="rank-box">
-                    <h6>All-Time Rank</h6>
-                    <p class="rank">#{{ user_all_time_rank|default:"--" }}</p>
-                    {% if user_all_time_rank %}
-                    <small class="text-muted">
-                        Out of {{ total_players.alltime }} players
-                        <br>
-                        Score: {{ user_stats.alltime.total_score }}
-                        • Games: {{ user_stats.alltime.songs_played }}
-                    </small>
-                    {% endif %}
+
+                <!-- All-Time Stats -->
+                <div class="stat-box alltime">
+                    <div class="stat-content">
+                        <div class="stat-header">
+                            <i class="fas fa-trophy"></i>
+                            <h3>All-Time</h3>
+                        </div>
+                        <div class="rank-display">
+                            <span class="rank-number">#{{ user_all_time_rank|default:"--" }}</span>
+                            {% if user_all_time_rank %}
+                            <div class="rank-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-users"></i>
+                                    <span>{{ total_players.alltime }} Players</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>{{ user_stats.alltime.total_score }} Points</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-music"></i>
+                                    <span>{{ user_stats.alltime.songs_played }} Songs</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-{% endif %}
-    <div class="row">
+    {% endif %}
+
+    <!-- Leaderboards Grid -->
+    <div class="leaderboards-grid">
         <!-- Weekly Leaderboard -->
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Weekly Top 10</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Player</th>
-                                    <th>Points</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for score in weekly_scores %}
-                                <tr {% if score.user__username == user.username %}class="table-success"{% endif %}>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ score.user__username }}</td>
-                                    <td>{{ score.total_score }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="3" class="text-center">No scores yet</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+        <div class="leaderboard-card weekly">
+            <div class="card-header">
+                <i class="fas fa-chart-line"></i>
+                <h2>Weekly Top 10</h2>
+            </div>
+            <div class="leaderboard-content">
+                {% for score in weekly_scores %}
+                <div class="leaderboard-item {% if score.user__username == user.username %}highlight{% endif %} {% if forloop.counter <= 3 %}top-{{ forloop.counter }}{% endif %}">
+                    <div class="rank">
+                        {% if forloop.counter == 1 %}
+                        🥇
+                        {% elif forloop.counter == 2 %}
+                        🥈
+                        {% elif forloop.counter == 3 %}
+                        🥉
+                        {% else %}
+                        #{{ forloop.counter }}
+                        {% endif %}
                     </div>
+                    <div class="player">{{ score.user__username }}</div>
+                    <div class="score">{{ score.total_score }}</div>
                 </div>
+                {% empty %}
+                <div class="no-scores">No scores yet</div>
+                {% endfor %}
             </div>
         </div>
 
         <!-- Monthly Leaderboard -->
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h5 class="card-title mb-0">Monthly Top 10</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Player</th>
-                                    <th>Points</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for score in monthly_scores %}
-                                <tr {% if score.user__username == user.username %}class="table-success"{% endif %}>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ score.user__username }}</td>
-                                    <td>{{ score.total_score }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="3" class="text-center">No scores yet</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+        <div class="leaderboard-card monthly">
+            <div class="card-header">
+                <i class="fas fa-calendar"></i>
+                <h2>Monthly Top 10</h2>
+            </div>
+            <div class="leaderboard-content">
+                {% for score in monthly_scores %}
+                <div class="leaderboard-item {% if score.user__username == user.username %}highlight{% endif %} {% if forloop.counter <= 3 %}top-{{ forloop.counter }}{% endif %}">
+                    <div class="rank">
+                        {% if forloop.counter == 1 %}
+                        🥇
+                        {% elif forloop.counter == 2 %}
+                        🥈
+                        {% elif forloop.counter == 3 %}
+                        🥉
+                        {% else %}
+                        #{{ forloop.counter }}
+                        {% endif %}
                     </div>
+                    <div class="player">{{ score.user__username }}</div>
+                    <div class="score">{{ score.total_score }}</div>
                 </div>
+                {% empty %}
+                <div class="no-scores">No scores yet</div>
+                {% endfor %}
             </div>
         </div>
 
         <!-- All-Time Leaderboard -->
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h5 class="card-title mb-0">All-Time Top 10</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Player</th>
-                                    <th>Points</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for score in all_time_scores %}
-                                <tr {% if score.user__username == user.username %}class="table-success"{% endif %}>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ score.user__username }}</td>
-                                    <td>{{ score.total_score }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="3" class="text-center">No scores yet</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+        <div class="leaderboard-card alltime">
+            <div class="card-header">
+                <i class="fas fa-trophy"></i>
+                <h2>All-Time Top 10</h2>
+            </div>
+            <div class="leaderboard-content">
+                {% for score in all_time_scores %}
+                <div class="leaderboard-item {% if score.user__username == user.username %}highlight{% endif %} {% if forloop.counter <= 3 %}top-{{ forloop.counter }}{% endif %}">
+                    <div class="rank">
+                        {% if forloop.counter == 1 %}
+                        🥇
+                        {% elif forloop.counter == 2 %}
+                        🥈
+                        {% elif forloop.counter == 3 %}
+                        🥉
+                        {% else %}
+                        #{{ forloop.counter }}
+                        {% endif %}
                     </div>
+                    <div class="player">{{ score.user__username }}</div>
+                    <div class="score">{{ score.total_score }}</div>
                 </div>
+                {% empty %}
+                <div class="no-scores">No scores yet</div>
+                {% endfor %}
             </div>
         </div>
     </div>
 </div>
 
 <style>
-.rank-box {
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
+/* Main Container */
+.leaderboard-container {
+    padding: 20px;
+    min-height: 100vh;
+    background: var(--darker-bg);
+}
+
+/* Page Header */
+.page-header {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.neon-text {
+    color: var(--neon-purple);
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(176, 38, 255, 0.5);
     margin-bottom: 10px;
 }
-.rank {
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0;
+
+.header-underline {
+    width: 100px;
+    height: 3px;
+    background: var(--neon-purple);
+    margin: 0 auto;
+    box-shadow: 0 0 10px rgba(176, 38, 255, 0.5);
 }
-.table-success {
-    background-color: #d4edda !important;
+
+/* Stats Container */
+.stats-container {
+    margin-bottom: 40px;
+}
+
+.stats-card {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+/* Stat Boxes */
+.stat-box {
+    background: rgba(18, 18, 18, 0.95);
+    border-radius: 15px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+}
+
+.stat-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+}
+
+.stat-box.weekly::before { background: var(--neon-blue); }
+.stat-box.monthly::before { background: var(--neon-purple); }
+.stat-box.alltime::before { background: var(--neon-pink); }
+
+.stat-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.stat-header i {
+    font-size: 1.2rem;
+    color: var(--neon-purple);
+}
+
+.stat-header h3 {
+    color: white;
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.rank-display {
+    text-align: center;
+}
+
+.rank-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--neon-purple);
+    text-shadow: 0 0 10px rgba(176, 38, 255, 0.5);
+    display: block;
+    margin-bottom: 10px;
+}
+
+.rank-details {
+    display: grid;
+    gap: 8px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+.detail-item i {
+    color: var(--neon-purple);
+    font-size: 0.8rem;
+}
+
+/* Leaderboards Grid */
+.leaderboards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.leaderboard-card {
+    background: rgba(18, 18, 18, 0.95);
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-header {
+    background: rgba(176, 38, 255, 0.1);
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-header i {
+    color: var(--neon-purple);
+    font-size: 1.2rem;
+}
+
+.card-header h2 {
+    color: white;
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.leaderboard-content {
+    padding: 15px;
+}
+
+.leaderboard-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 15px;
+    padding: 12px 15px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    transition: transform 0.3s ease;
+}
+
+.leaderboard-item:hover {
+    transform: translateX(5px);
+    background: rgba(176, 38, 255, 0.1);
+}
+
+.leaderboard-item.highlight {
+    background: rgba(176, 38, 255, 0.15);
+    border: 1px solid var(--neon-purple);
+}
+
+.leaderboard-item .rank {
+    color: var(--neon-purple);
+    font-weight: bold;
+    min-width: 30px;
+}
+
+.leaderboard-item .player {
+    color: white;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.leaderboard-item .score {
+    color: var(--neon-blue);
+    font-weight: bold;
+}
+
+/* Top 3 Styling */
+.top-1 { background: rgba(255, 215, 0, 0.1); }
+.top-2 { background: rgba(192, 192, 192, 0.1); }
+.top-3 { background: rgba(205, 127, 50, 0.1); }
+
+.no-scores {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .stats-grid,
+    .leaderboards-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .neon-text {
+        font-size: 2rem;
+    }
+
+    .stat-box {
+        padding: 15px;
+    }
+
+    .rank-number {
+        font-size: 2rem;
+    }
+
+    .detail-item {
+        font-size: 0.8rem;
+    }
+
+    .leaderboard-item {
+        padding: 10px;
+        gap: 10px;
+        font-size: 0.9rem;
+    }
+
+    .card-header h2 {
+        font-size: 1.1rem;
+    }
+}
+
+/* Animations */
+@keyframes glow {
+    0%, 100% { text-shadow: 0 0 10px rgba(176, 38, 255, 0.5); }
+    50% { text-shadow: 0 0 20px rgba(176, 38, 255, 0.8); }
+}
+
+@keyframes borderGlow {
+    0%, 100% { border-color: rgba(176, 38, 255, 0.5); }
+    50% { border-color: rgba(176, 38, 255, 0.8); }
+}
+
+/* Add smooth transitions */
+* {
+    transition: all 0.3s ease;
 }
 </style>
 {% endblock %}
+

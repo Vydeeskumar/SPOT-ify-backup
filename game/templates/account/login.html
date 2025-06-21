@@ -1,66 +1,87 @@
+
+
 {% extends 'game/base.html' %}
 {% load socialaccount %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card mt-4 shadow-lg login-card">
-                <div class="card-body text-center p-4">
-                    <h2 class="game-title mb-3">SPOT-ify the Paatu!</h2>
-                    <p class="game-subtitle mb-4">Guess Today's Tamil Song 🎵</p>
-                    
-                    <!-- Google Sign In -->
-                    <!-- Replace the current Google button with this (from your original code) -->
-                    <div class="mb-4">
-                        <a href="{% provider_login_url 'google' %}" class="btn btn-google d-flex align-items-center justify-content-center gap-2 mx-auto">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
-                                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12	s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20	s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
-                                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039	l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
-                                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36	c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
-                                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571	c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
-                            </svg>
-                            Continue with Google
-                        </a>
-                    </div>
-
-                    <!-- Guest Login Button -->
-                    <div class="mb-4">
-                        <button onclick="showGuestLoginModal()" class="btn btn-guest d-flex align-items-center justify-content-center gap-2 mx-auto">
-                            <i class="fas fa-user-circle"></i>
-                            Play as Guest
-                        </button>
-                    </div>
-
-                    <!-- Alert Info -->
-                    <div class="alert alert-custom" role="alert">
-                        <i class="fas fa-info-circle"></i>
-                        <small>Sign in to save your progress and compete on leaderboards!</small>
-                    </div>
-
-                    <!-- Features -->
-                    <div class="features mt-4">
-                        <div class="row g-3">
-                            <div class="col-4">
-                                <div class="feature-item">
-                                    <i class="fas fa-music mb-2"></i>
-                                    <h6>Daily Songs</h6>
-                                    <small>New Challenge</small>
+<div class="login-container">
+    <div class="particles" id="particles-js"></div>
+    <div class="container position-relative">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="login-card">
+                    <div class="card-body text-center p-4">
+                        <!-- Animated Logo -->
+                        <div class="logo-container mb-4">
+                            <div class="neon-treble"></div>
+                            <h2 class="game-title">SPOT-ify the Paatu!</h2>
+                            <div class="neon-underline"></div>
+                        </div>
+                        
+                        <p class="game-subtitle mb-4">
+                            <span class="typing-text">Guess Today's Tamil Song</span>
+                            <span class="music-note">🎵</span>
+                        </p>
+                        
+                        <!-- Google Sign In -->
+                        <div class="auth-buttons">
+                            <a href="{% provider_login_url 'google' %}" class="btn-google">
+                                <div class="btn-content">
+                                    <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
+                                        <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                                        <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                                        <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                                        <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+                                    </svg>
+                                    <span>Continue with Google</span>
                                 </div>
+                                <div class="btn-glow"></div>
+                            </a>
+
+                            <button onclick="showGuestLoginModal()" class="btn-guest">
+                                <div class="btn-content">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>Play as Guest</span>
+                                </div>
+                                <div class="btn-glow"></div>
+                            </button>
+                        </div>
+
+                        <!-- Alert Info -->
+                        <div class="alert-custom">
+                            <div class="alert-icon">
+                                <i class="fas fa-info-circle pulse"></i>
                             </div>
-                            <div class="col-4">
-                                <div class="feature-item">
-                                    <i class="fas fa-trophy mb-2"></i>
-                                    <h6>Compete</h6>
-                                    <small>Global Ranks</small>
+                            <p>Sign in to save your progress and compete on leaderboards!</p>
+                        </div>
+
+                        <!-- Features Grid -->
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-music"></i>
                                 </div>
+                                <h6>Daily Songs</h6>
+                                <small>New Challenge</small>
+                                <div class="card-glow"></div>
                             </div>
-                            <div class="col-4">
-                                <div class="feature-item">
-                                    <i class="fas fa-fire mb-2"></i>
-                                    <h6>Streaks</h6>
-                                    <small>Stay Active</small>
+
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-trophy"></i>
                                 </div>
+                                <h6>Compete</h6>
+                                <small>Global Ranks</small>
+                                <div class="card-glow"></div>
+                            </div>
+
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-fire"></i>
+                                </div>
+                                <h6>Streaks</h6>
+                                <small>Stay Active</small>
+                                <div class="card-glow"></div>
                             </div>
                         </div>
                     </div>
@@ -73,215 +94,453 @@
 <!-- Guest Login Modal -->
 <div class="modal fade" id="guestLoginModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content modal-custom">
-            <div class="modal-header border-0">
-                <h5 class="modal-title">Play as Guest</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-circle"></i> Play as Guest
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body text-center">
+                <div class="guest-animation">
+                    <i class="fas fa-gamepad"></i>
+                </div>
                 <form id="guestLoginForm" method="post" action="{% url 'guest_login' %}">
                     {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="guestUsername" class="form-label">Choose a username</label>
-                        <input type="text" class="form-control" id="guestUsername" name="username" required 
-                               pattern="[a-zA-Z0-9_]{3,15}" 
-                               title="3-15 characters, letters, numbers and underscore only"
-                               placeholder="Enter username">
-                        <div class="form-text">3-15 characters, letters, numbers and underscore only</div>
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <input type="text" 
+                                   class="form-control neon-input" 
+                                   id="guestUsername" 
+                                   name="username" 
+                                   required 
+                                   pattern="[a-zA-Z0-9_]{3,15}" 
+                                   placeholder="Enter username (3-15 characters)">
+                            <div class="input-glow"></div>
+                        </div>
+                        <small class="form-text">
+                            <i class="fas fa-info-circle"></i>
+                            Use 3-15 characters, letters, numbers and underscore only
+                        </small>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100" id="guestSubmitBtn">Start Playing</button>
+                    <button type="submit" class="btn-submit" id="guestSubmitBtn">
+                        <span class="btn-content">
+                            <i class="fas fa-play"></i>
+                            Start Playing
+                        </span>
+                        <div class="btn-glow"></div>
+                    </button>
                 </form>
             </div>
-            <div class="modal-footer border-0 justify-content-center">
-                <small class="text-muted">
-                    <i class="fas fa-info-circle"></i>
-                    Remember: Guest scores aren't saved. Sign in with Google to save your progress!
-                </small>
+            <div class="modal-footer">
+                <div class="guest-note">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Guest scores aren't saved. Sign in with Google to save your progress!</span>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <style>
+/* Base Styles and Variables */
+:root {
+    --neon-purple: #B026FF;
+    --neon-blue: #0096FF;
+    --neon-pink: #FF69B4;
+    --dark-bg: #121212;
+    --darker-bg: rgba(18, 18, 18, 0.95);
+    --glow-purple: 0 0 10px rgba(176, 38, 255, 0.3);
+    --glow-blue: 0 0 10px rgba(0, 150, 255, 0.3);
+}
+
+/* Main Container */
+.login-container {
+    min-height: 100vh;
+    background: var(--dark-bg);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Particles Background */
+.particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Main Card */
 .login-card {
-    background: rgba(255, 255, 255, 0.95);
-    border: none;
-    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 2;
+    margin-top: 50px;
+    overflow: hidden;
+}
+
+/* Logo and Title */
+.logo-container {
+    position: relative;
+    padding: 20px 0;
+}
+
+.neon-treble {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-5deg);
+    font-size: 100px;
+    color: var(--neon-purple);
+    text-shadow: 0 0 20px var(--neon-purple),
+                 0 0 40px var(--neon-purple),
+                 0 0 60px var(--neon-purple);
+    opacity: 0.3;
+    z-index: -1;
+    animation: trebleGlow 2s infinite alternate;
 }
 
 .game-title {
-    color: var(--neon-purple);
-    font-size: 2rem;
+    color: white;
+    font-size: 2.5rem;
     font-weight: bold;
-    text-shadow: 0 0 10px rgba(176, 38, 255, 0.3);
+    margin: 0;
+    position: relative;
+    text-shadow: 0 0 10px var(--neon-purple);
+    animation: textGlow 2s infinite alternate;
 }
 
+.neon-underline {
+    width: 50%;
+    height: 2px;
+    background: var(--neon-purple);
+    margin: 10px auto;
+    position: relative;
+    animation: lineGlow 2s infinite alternate;
+}
+
+/* Subtitle */
 .game-subtitle {
     color: var(--neon-blue);
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.typing-text {
+    border-right: 2px solid var(--neon-blue);
+    animation: typing 3.5s steps(30, end), blink-caret .75s step-end infinite;
+}
+
+.music-note {
+    display: inline-block;
+    animation: bounce 1s infinite;
+}
+
+/* Buttons */
+.auth-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.btn-google, .btn-guest {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .btn-google {
     background: white;
-    color: #3c4043;
-    border: 1px solid #dadce0;
-    border-radius: 4px;
-    padding: 8px 16px;
-    width: 100%;
-    max-width: 280px;
-    font-family: 'Google Sans', Roboto, Arial, sans-serif;
-    font-weight: 500;
-    font-size: 14px;
-    letter-spacing: 0.25px;
-    transition: all 0.2s ease;
-    height: 40px;
-}
-
-.btn-google:hover {
-    background: #f8f9fa;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    border-color: #dadce0;
-}
-
-.btn-google:active {
-    background: #f1f3f4;
-    box-shadow: none;
 }
 
 .btn-guest {
     background: var(--neon-purple);
+}
+
+.btn-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #333;
+}
+
+.btn-guest .btn-content {
     color: white;
-    border: none;
-    border-radius: 25px;
-    padding: 10px 20px;
+}
+
+.btn-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    max-width: 280px;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: 0.5s;
+}
+
+.btn-google:hover .btn-glow,
+.btn-guest:hover .btn-glow {
+    transform: translateX(100%);
+}
+
+/* Features Grid */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
     transition: all 0.3s ease;
 }
 
-.btn-guest:hover {
-    background: #9517db;
-    box-shadow: 0 0 15px rgba(176, 38, 255, 0.3);
-}
-
-.divider {
-    height: 20px;
-}
-
-.divider-line {
-    border-color: rgba(0,0,0,0.1);
-    margin: 0;
-}
-
-.divider-text {
-    background: white;
-    padding: 0 15px;
-    color: #888;
-}
-
-.alert-custom {
-    background: rgba(176, 38, 255, 0.1);
-    border: none;
-    border-radius: 10px;
+.feature-icon {
+    font-size: 24px;
     color: var(--neon-purple);
+    margin-bottom: 10px;
 }
 
-.feature-item {
-    padding: 12px 8px;
-    border-radius: 12px;
-    background: rgba(176, 38, 255, 0.05);
-    transition: all 0.3s ease;
+.feature-card h6 {
+    color: white;
+    margin: 10px 0 5px;
 }
 
-.feature-item i {
-    font-size: 22px;
-    color: var(--neon-purple);
+.feature-card small {
+    color: rgba(255, 255, 255, 0.6);
 }
 
-.feature-item h6 {
-    color: var(--neon-purple);
-    margin: 8px 0 4px;
-    font-size: 0.9rem;
+.card-glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(176, 38, 255, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: 0.3s;
 }
 
-.feature-item small {
-    color: #666;
-    font-size: 0.75rem;
+.feature-card:hover {
+    transform: translateY(-5px);
 }
 
-.feature-item:hover {
-    transform: translateY(-3px);
-    background: rgba(176, 38, 255, 0.1);
+.feature-card:hover .card-glow {
+    opacity: 1;
 }
 
 /* Modal Styling */
-.modal-custom {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
+.modal-content {
+    background: var(--darker-bg);
+    border: 2px solid var(--neon-purple);
+    border-radius: 20px;
 }
 
-.modal-custom .form-control {
-    border-radius: 8px;
-    border: 2px solid rgba(176, 38, 255, 0.2);
-    padding: 10px 15px;
-    transition: all 0.3s ease;
-}
-
-.modal-custom .form-control:focus {
-    border-color: var(--neon-purple);
-    box-shadow: 0 0 0 0.2rem rgba(176, 38, 255, 0.25);
-}
-
-.modal-custom .btn-primary {
-    background: var(--neon-purple);
+.modal-header {
     border: none;
-    border-radius: 25px;
-    padding: 10px 20px;
+    padding: 20px;
+}
+
+.modal-title {
+    color: var(--neon-purple);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.guest-animation {
+    font-size: 3rem;
+    color: var(--neon-pink);
+    margin: 20px 0;
+    animation: float 3s ease-in-out infinite;
+}
+
+.input-wrapper {
+    position: relative;
+    margin: 20px 0;
+}
+
+.neon-input {
+    width: 100%;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--neon-purple);
+    border-radius: 10px;
+    color: white;
     transition: all 0.3s ease;
 }
 
-.modal-custom .btn-primary:hover {
-    background: #9517db;
-    box-shadow: 0 0 15px rgba(176, 38, 255, 0.3);
+.input-glow {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 12px;
+    background: var(--neon-purple);
+    opacity: 0;
+    transition: 0.3s;
+    z-index: -1;
 }
 
-@media (max-width: 768px) {
-    .card-body {
-        padding: 1.5rem !important;
+.neon-input:focus + .input-glow {
+    opacity: 0.2;
+}
+
+.guest-note {
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    padding: 15px;
+    background: rgba(176, 38, 255, 0.1);
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+/* Animations */
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 20px var(--neon-purple); }
+    50% { box-shadow: 0 0 40px var(--neon-purple); }
+}
+
+@keyframes textGlow {
+    from { text-shadow: 0 0 10px var(--neon-purple); }
+    to { text-shadow: 0 0 20px var(--neon-purple), 0 0 30px var(--neon-purple); }
+}
+
+@keyframes lineGlow {
+    from { box-shadow: 0 0 10px var(--neon-purple); }
+    to { box-shadow: 0 0 20px var(--neon-purple), 0 0 30px var(--neon-purple); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+@keyframes trebleGlow {
+    from {
+        text-shadow: 0 0 20px var(--neon-purple),
+                     0 0 40px var(--neon-purple);
+        opacity: 0.2;
     }
-    
+    to {
+        text-shadow: 0 0 30px var(--neon-purple),
+                     0 0 50px var(--neon-purple),
+                     0 0 70px var(--neon-purple);
+        opacity: 0.4;
+    }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
     .game-title {
-        font-size: 1.8rem;
+        font-size: 2rem;
     }
     
     .game-subtitle {
         font-size: 1rem;
     }
     
-    .feature-item {
-        padding: 10px 5px;
+    .features-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
     }
     
-    .feature-item i {
+    .feature-card {
+        padding: 15px 10px;
+    }
+    
+    .feature-icon {
         font-size: 20px;
     }
     
-    .feature-item h6 {
+    .feature-card h6 {
         font-size: 0.8rem;
     }
     
-    .feature-item small {
+    .feature-card small {
         font-size: 0.7rem;
     }
 }
 </style>
 
 <script>
+// Initialize particles
+document.addEventListener('DOMContentLoaded', function() {
+    particlesJS('particles-js', {
+        particles: {
+            number: { value: 80, density: { enable: true, value_area: 800 } },
+            color: { value: '#b026ff' },
+            shape: { type: 'circle' },
+            opacity: { value: 0.5, random: false },
+            size: { value: 3, random: true },
+            line_linked: {
+                enable: true,
+                distance: 150,
+                color: '#b026ff',
+                opacity: 0.4,
+                width: 1
+            },
+            move: {
+                enable: true,
+                speed: 2,
+                direction: 'none',
+                random: false,
+                straight: false,
+                out_mode: 'out',
+                bounce: false,
+            }
+        },
+        interactivity: {
+            detect_on: 'canvas',
+            events: {
+                onhover: { enable: true, mode: 'repulse' },
+                onclick: { enable: true, mode: 'push' },
+                resize: true
+            }
+        },
+        retina_detect: true
+    });
+});
+
+// Guest Login Modal
 function showGuestLoginModal() {
     const modal = new bootstrap.Modal(document.getElementById('guestLoginModal'));
     modal.show();
 }
 
+// Form Handling
 document.getElementById('guestLoginForm')?.addEventListener('submit', function(e) {
     const username = document.getElementById('guestUsername').value;
     const submitBtn = document.getElementById('guestSubmitBtn');
@@ -292,16 +551,17 @@ document.getElementById('guestLoginForm')?.addEventListener('submit', function(e
         return;
     }
     
-    // Show loading state
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
 });
 
-// Clear form when modal is hidden
+// Modal Reset
 document.getElementById('guestLoginModal')?.addEventListener('hidden.bs.modal', function () {
     document.getElementById('guestLoginForm').reset();
-    document.getElementById('guestSubmitBtn').disabled = false;
-    document.getElementById('guestSubmitBtn').innerHTML = 'Start Playing';
+    const submitBtn = document.getElementById('guestSubmitBtn');
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<span class="btn-content"><i class="fas fa-play"></i>Start Playing</span>';
 });
 </script>
-{% endblock %}
+</div>
+{% endblock content %}
