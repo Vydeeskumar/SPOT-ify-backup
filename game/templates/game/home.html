@@ -731,7 +731,7 @@
     }
 
     /* Add this to your existing styles */
-.vinyl-center {
+    .vinyl-center {
         position: absolute;
         top: 50%;
         left: 50%;
@@ -988,16 +988,342 @@
     }
 
     @media (max-width: 768px) {
-        .btn-share-icon {
-            width: 40px;
-            height: 40px;
-            font-size: 1.1em;
-        }
-        
-        .share-buttons {
-            gap: 15px;
-        }
+    /* Game Container */
+    .game-container {
+        padding: 15px;
+        margin: 10px;
+        border-radius: 15px;
     }
+
+    /* Header */
+    .game-header {
+        margin-bottom: 20px;
+    }
+
+    .game-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .timer {
+        font-size: 1.6rem;
+    }
+
+    .points-indicator {
+        font-size: 1.1rem;
+        margin-top: 10px;
+    }
+
+    /* Vinyl Player */
+    .vinyl-player {
+        width: 220px;
+        height: 220px;
+        margin: 20px auto;
+    }
+
+    .vinyl-center {
+        width: 25%;
+        height: 25%;
+    }
+
+    /* Controls */
+    .game-controls {
+        flex-direction: row;
+        gap: 10px;
+        margin: 15px 0;
+    }
+
+    .btn {
+        padding: 12px 20px;
+        min-height: 44px;
+        font-size: 0.9rem;
+        flex: 1;
+        justify-content: center;
+    }
+
+    /* Form */
+    .guess-form {
+        padding: 0 10px;
+    }
+
+    .form-control {
+        padding: 12px 15px;
+        font-size: 16px;
+        height: 44px;
+    }
+
+    /* Result View */
+    .result-container {
+        padding: 15px;
+        margin: 10px;
+    }
+
+    .reveal-header h4 {
+        font-size: 0.95rem;
+        padding: 12px;
+        line-height: 1.4;
+    }
+
+    .song-image {
+        width: 160px;
+        height: 160px;
+        margin: 15px auto;
+    }
+
+    .song-details {
+        margin: 15px 0;
+    }
+
+    .song-title {
+        font-size: 1.2rem;
+    }
+
+    .song-info {
+        font-size: 0.9rem;
+        margin: 3px 0;
+    }
+
+    /* Leaderboard */
+    .leaderboard-container {
+        padding: 15px;
+        margin-top: 15px;
+    }
+
+    .leaderboard-item {
+        grid-template-columns: 30px 1fr auto;
+        padding: 10px;
+        gap: 8px;
+        font-size: 0.85rem;
+    }
+
+    .leaderboard-item .time {
+        display: none;
+    }
+
+    .leaderboard-item .score {
+        min-width: 50px;
+        text-align: right;
+    }
+
+    /* Share Section */
+    .share-section {
+        padding: 15px;
+        margin-top: 15px;
+    }
+
+    .share-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        padding: 0;
+    }
+
+    .btn-share-icon {
+        width: 100%;
+        height: 40px;
+        border-radius: 8px;
+        font-size: 1.1rem;
+    }
+
+    /* Countdown */
+    .countdown-section {
+        padding: 12px;
+        margin: 15px 0;
+    }
+
+    .countdown-timer {
+        gap: 8px;
+    }
+
+    .countdown-box {
+        min-width: 60px;
+        padding: 8px 5px;
+    }
+
+    .countdown-box span {
+        font-size: 1.2rem;
+    }
+
+    .countdown-box small {
+        font-size: 0.7rem;
+    }
+
+    /* Support Modal */
+    .modal-dialog {
+        margin: 10px;
+    }
+
+    .modal-content {
+        padding: 15px;
+        border-radius: 15px;
+    }
+
+    .upi-buttons {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .payment-option {
+        padding: 12px;
+    }
+
+    /* Suggestions */
+    .suggestions-container {
+        max-height: 180px;
+    }
+
+    .suggestion-item {
+        padding: 10px;
+        gap: 8px;
+    }
+
+    .suggestion-item img {
+        width: 35px;
+        height: 35px;
+    }
+
+    .suggestion-title {
+        font-size: 0.85rem;
+    }
+
+    .suggestion-artist {
+        font-size: 0.75rem;
+    }
+
+    @media (max-width: 768px) {
+    /* Enhanced Touch Targets */
+    .btn, .btn-share-icon, .vinyl-center, .leaderboard-toggle {
+        min-height: 48px; /* Standard touch target size */
+        padding: 12px 20px;
+    }
+
+    /* Game Container Adjustments */
+    .game-container {
+        margin: 10px;
+        padding: 15px;
+        border-radius: 15px;
+    }
+
+    /* Vinyl Player Mobile Optimization */
+    .vinyl-player {
+        width: 240px;
+        height: 240px;
+        margin: 20px auto;
+    }
+
+    .vinyl-center {
+        width: 30%;
+        height: 30%;
+        background: rgba(176, 38, 255, 0.9);
+    }
+
+    /* Enhanced Leaderboard Mobile Layout */
+    .leaderboard-item {
+        grid-template-columns: 35px 1fr auto;
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .leaderboard-item .time {
+        display: none; /* Hide time on mobile */
+    }
+
+    .leaderboard-item .score {
+        font-weight: bold;
+        min-width: 60px;
+        text-align: right;
+    }
+
+    /* Improved Countdown Display */
+    .countdown-section {
+        margin: 15px -5px;
+        padding: 15px 10px;
+    }
+
+    .countdown-timer {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .countdown-box {
+        padding: 10px 5px;
+        background: rgba(176, 38, 255, 0.15);
+        border-radius: 10px;
+    }
+
+    /* Share Section Enhancement */
+    .share-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        padding: 0 10px;
+    }
+
+    .btn-share-icon {
+        width: 100%;
+        border-radius: 12px;
+        font-size: 1.1rem;
+    }
+
+    /* Pull to Refresh Indicator */
+    .pull-indicator {
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--neon-purple);
+        font-size: 0.9rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .pulling .pull-indicator {
+        opacity: 1;
+    }
+
+    /* Toast Notification */
+    .toast-notification {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: rgba(176, 38, 255, 0.9);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        z-index: 1000;
+        transition: transform 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .toast-notification.show {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    /* State Transitions */
+    .fade-in {
+        animation: fadeIn 0.3s ease forwards;
+    }
+
+    .fade-out {
+        animation: fadeOut 0.3s ease forwards;
+    }
+
+    /* Pull to Refresh */
+    .pull-indicator {
+        text-align: center;
+        padding: 10px;
+        color: var(--neon-purple);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .pulling .pull-indicator {
+        opacity: 1;
+    }
+}
+}
 
     
 
@@ -1493,17 +1819,22 @@ function showResultView() {
         const scoreMessage = document.getElementById('score-message');
         
         if (scoreMessage) {
-            const pointsNum = parseInt(points);
             let messageHTML;
 
-            if (pointsNum >= 8) {
-                messageHTML = `🎯 Mass Performance! <span class="highlight-points">${points} Points</span> • Are you Anirudh in disguise?`;
-            } else if (pointsNum >= 5) {
-                messageHTML = `🎶 Semma Speed! <span class="highlight-points">${points} Points</span> • You're on fire mamey!`;
-            } else if (pointsNum >= 3) {
-                messageHTML = `🎧 Took Your Sweet Time! <span class="highlight-points">${points} Points</span> • Style-ah Solve Pannita!`;
+            // Check if user gave up using the window flag
+            if (window.isGaveUp) {
+                messageHTML = `😅 Better Luck Next Time! <span class="highlight-points">0 Points</span> • Even ARR had tough days!`;
             } else {
-                messageHTML = `✨ Finally! <span class="highlight-points">${points} Points</span> • Even Ilayaraja started somewhere!`;
+                const pointsNum = parseInt(points);
+                if (pointsNum >= 8) {
+                    messageHTML = `🎯 Mass Performance! <span class="highlight-points">${points} Points</span> • Are you Anirudh in disguise?`;
+                } else if (pointsNum >= 5) {
+                    messageHTML = `🎶 Semma Speed! <span class="highlight-points">${points} Points</span> • You're on fire mamey!`;
+                } else if (pointsNum >= 3) {
+                    messageHTML = `🎧 Took Your Sweet Time! <span class="highlight-points">${points} Points</span> • Style-ah Solve Pannita!`;
+                } else {
+                    messageHTML = `✨ Finally! <span class="highlight-points">${points} Points</span> • Even Ilayaraja started somewhere!`;
+                }
             }
             scoreMessage.innerHTML = messageHTML;
         }
@@ -1719,13 +2050,18 @@ if (giveUpBtn) {
                     // Stop audio and animations
                     audioElement.pause();
                     
-                    // Show result view
+                    // Set points to 0 for give up
+                    const pointsValue = document.querySelector('.points-value');
+                    if (pointsValue) {
+                        pointsValue.textContent = '0';
+                    }
+
+                    // Set a flag to indicate give-up
+                    window.isGaveUp = true;
+                    
+                    // Show result view (this should now show the give-up message)
                     showResultView();
                     
-                    // Show message
-                    document.getElementById('result-message').innerHTML = 
-                        `<div class="alert alert-info">${data.message}</div>`;
-                        
                     // Clear timer
                     clearInterval(timerInterval);
                     localStorage.removeItem('songTimer');
@@ -1995,6 +2331,102 @@ function animateVinylPlayer() {
 function scrollToLeaderboard() {
   const leaderboard = document.querySelector('.daily-leaderboard');
   leaderboard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Pull to Refresh
+let touchStart = 0;
+let pullStarted = false;
+
+document.addEventListener('touchstart', (e) => {
+    touchStart = e.touches[0].clientY;
+});
+
+document.addEventListener('touchmove', (e) => {
+    if (window.scrollY === 0) {
+        const pull = e.touches[0].clientY - touchStart;
+        if (pull > 50 && !pullStarted) {
+            pullStarted = true;
+            document.body.classList.add('pulling');
+            // Trigger haptic feedback
+            if (navigator.vibrate) {
+                navigator.vibrate(10);
+            }
+        }
+    }
+});
+
+document.addEventListener('touchend', () => {
+    if (pullStarted) {
+        pullStarted = false;
+        document.body.classList.remove('pulling');
+        // Reload the page
+        location.reload();
+    }
+});
+
+// Haptic Feedback for Interactions
+function addHapticFeedback(elements, duration = 10) {
+    elements.forEach(selector => {
+        document.querySelectorAll(selector).forEach(element => {
+            element.addEventListener('click', () => {
+                if (navigator.vibrate) {
+                    navigator.vibrate(duration);
+                }
+            });
+        });
+    });
+}
+
+// Add haptic feedback to interactive elements
+addHapticFeedback([
+    '.btn',
+    '.btn-share-icon',
+    '.vinyl-center',
+    '.leaderboard-toggle'
+]);
+
+// Smooth State Transitions
+function addTransitionClass(element, className, duration = 300) {
+    element.classList.add(className);
+    setTimeout(() => element.classList.remove(className), duration);
+}
+
+// Enhanced Share Functionality
+function shareContent(platform) {
+    const shareText = getShareText();
+    
+    switch(platform) {
+        case 'whatsapp':
+            window.open(`whatsapp://send?text=${encodeURIComponent(shareText)}`);
+            break;
+        case 'twitter':
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`);
+            break;
+        case 'copy':
+            navigator.clipboard.writeText(shareText).then(() => {
+                showToast('Copied to clipboard!');
+                if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
+            });
+            break;
+    }
+}
+
+// Toast Notification
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('show');
+        if (navigator.vibrate) navigator.vibrate(10);
+    }, 100);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
 }
 
 </script>

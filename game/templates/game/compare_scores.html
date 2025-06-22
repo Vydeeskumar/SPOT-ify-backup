@@ -401,67 +401,234 @@
 }
 
 /* Mobile Responsiveness */
+/* Mobile Responsiveness */
 @media (max-width: 768px) {
     .players-comparison {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .vs-badge {
-        display: none;
-        top: 0;  /* Changed position for mobile */
-        transform: translate(-50%, -50%);
-        font-size: 1rem;
-        padding: 3px 10px;
-    }
-
-    .neon-text {
-        font-size: 1.8rem;
-        margin-left: 20px;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-
-    .stat-item {
-        padding: 12px;
-    }
-
-    .game-item {
-        flex-direction: column;
-        text-align: center;
+        display: flex;
+        flex-direction: row;
         gap: 10px;
+        overflow-x: auto;
+        padding: 10px 0;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -20px; /* Compensate for container padding */
+        padding: 0 20px; /* Add padding back to sides */
+        scroll-padding: 0 20px; /* Account for padding in snap points */
     }
 
-    .game-score {
-        text-align: center;
+    .player-card {
+        min-width: 85%;
+        flex: 0 0 85%;
+        scroll-snap-align: center;
+        margin-right: 15px; /* Space between cards */
+        transform: none; /* Remove hover transform on mobile */
+    }
+
+    .player-card:last-child {
+        margin-right: 0; /* Remove margin from last card */
+    }
+
+    /* Add scroll indicators */
+    .players-comparison::before,
+    .players-comparison::after {
+        content: '';
+        position: fixed;
+        top: 50%;
+        width: 30px;
+        height: 60px;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .players-comparison::before {
+        left: 0;
+        background: linear-gradient(to right, var(--darker-bg), transparent);
+    }
+
+    .players-comparison::after {
+        right: 0;
+        background: linear-gradient(to left, var(--darker-bg), transparent);
+    }
+
+    /* Header adjustments */
+    .page-header {
+        justify-content: flex-start;
+        padding: 20px 0;
+        margin-bottom: 20px;
+        position: sticky;
+        top: 0;
+        background: var(--darker-bg);
+        z-index: 10;
     }
 
     .back-button {
         position: relative;
         margin-right: 15px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .page-header {
-        justify-content: flex-start;
-        padding: 30px 0;
+    .neon-text {
+        font-size: 1.8rem;
+        margin-left: 10px;
+    }
+
+    .vs-badge {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        left: auto;
+        transform: none;
+        font-size: 0.9rem;
+        padding: 3px 12px;
+        display: block;
+        z-index: 11;
+    }
+
+    /* Stats Grid adjustments */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        padding: 15px;
+    }
+
+    .stat-item {
+        padding: 12px;
+        min-height: 80px;
+    }
+
+    .stat-icon {
+        width: 35px;
+        height: 35px;
+    }
+
+    .stat-info h3 {
+        font-size: 0.8rem;
+    }
+
+    .stat-value {
+        font-size: 1.1rem;
+    }
+
+    /* Recent Games adjustments */
+    .recent-games-section {
+        padding: 15px;
+    }
+
+    .recent-games-section h3 {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+
+    .games-list {
+        gap: 8px;
+    }
+
+    .game-item {
+        padding: 12px;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .game-info {
+        text-align: left;
+    }
+
+    .game-title {
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .game-date {
+        font-size: 0.75rem;
+    }
+
+    .game-score {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .points {
+        font-size: 1.1rem;
+    }
+
+    /* Empty state adjustments */
+    .empty-games {
+        padding: 20px;
+    }
+
+    .empty-games i {
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+    }
+
+    .empty-games p {
+        font-size: 0.9rem;
+    }
+
+    /* Add pull-to-refresh indicator */
+    .players-comparison {
+        position: relative;
+    }
+
+    .players-comparison::after {
+        content: '';
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 2px;
+        background: var(--neon-purple);
+        border-radius: 2px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .players-comparison:active::after {
+        opacity: 1;
     }
 }
 
-/* Animations */
+/* Enhance scrollbar for webkit browsers */
+.players-comparison::-webkit-scrollbar {
+    height: 4px;
+}
+
+.players-comparison::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 2px;
+}
+
+.players-comparison::-webkit-scrollbar-thumb {
+    background: var(--neon-purple);
+    border-radius: 2px;
+}
+
+/* Maintain smooth transitions */
+* {
+    transition: all 0.3s ease;
+}
+
+/* Keep existing animations */
 @keyframes glow {
     0%, 100% { text-shadow: 0 0 10px rgba(176, 38, 255, 0.5); }
     50% { text-shadow: 0 0 20px rgba(176, 38, 255, 0.8); }
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); }
+    0%, 100% { transform: scale(1); }
     50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
 }
-
 /* Add smooth transitions */
 * {
     transition: all 0.3s ease;
