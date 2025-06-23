@@ -182,6 +182,16 @@
         }
     </style>
     {% block extra_head %}{% endblock %}
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-02L1MCM4TK"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-02L1MCM4TK');
+    </script>
+
 </head>
 <body>
     {% load socialaccount %}
