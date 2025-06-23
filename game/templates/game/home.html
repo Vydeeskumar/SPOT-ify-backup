@@ -1631,7 +1631,23 @@
                 letter-spacing: 0.5px;
             }
         }
-    
+    @media (max-width: 768px) {
+        .result-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9999;
+            background: var(--darker-bg);
+            overflow-y: auto;
+        }
+
+        .result-content {
+            padding: 20px;
+            min-height: 100vh;
+        }
+    }
 
 }
 }
@@ -1790,7 +1806,7 @@ function toggleLeaderboard() {
             <!-- Result View Container (Initially Hidden) -->
             <!-- Result View Container (Initially Hidden) -->
             <div id="result-container" class="result-container" style="display: none;">
-                <div class="reveal-animation">
+                <div class="result content">
                     <!-- Success/Score Message -->
                     <div class="reveal-header mb-4" style="background: rgba(176, 38, 255, 0.1); padding: 20px; border-radius: 15px;">
                         <h4 style="color: var(--neon-purple); margin: 0; font-size: 1.2rem;" id="score-message">
@@ -1803,9 +1819,9 @@ function toggleLeaderboard() {
                     {% endif %}
                    
                     <div class="song-details">
-                        <div class="song-title reveal-title">{{ today_song.title }}</div>
-                        <div class="song-info song-movie reveal-details">{{ today_song.movie }}</div>
-                        <div class="song-info song-artist reveal-details">{{ today_song.artist }}</div>
+                        <div class="song-title">{{ today_song.title }}</div>
+                        <div class="song-info">{{ today_song.movie }}</div>
+                        <div class="song-info">{{ today_song.artist }}</div>
                     </div>
 
                     <!-- Rest of your existing code -->
