@@ -1322,6 +1322,192 @@
     .pulling .pull-indicator {
         opacity: 1;
     }
+
+    /* Result Container Mobile Styles */
+    @media (max-width: 768px) {
+        .result-container {
+            padding: 15px;
+            margin: 10px;
+        }
+
+        /* Score Message Header */
+        .reveal-header {
+            margin-bottom: 20px !important;
+        }
+
+        .reveal-header h4 {
+            font-size: 1rem !important;
+            line-height: 1.4;
+            padding: 15px !important;
+            text-align: center;
+            letter-spacing: 0.2px;
+        }
+
+        /* Song Image */
+        .song-image {
+            width: 160px;
+            height: 160px;
+            margin: 15px auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(176, 38, 255, 0.2);
+        }
+
+        /* Song Details */
+        .song-details {
+            text-align: center;
+            margin: 20px 0;
+            padding: 0 10px;
+        }
+
+        .song-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--neon-purple);
+            text-shadow: 0 0 10px rgba(176, 38, 255, 0.3);
+        }
+
+        .song-info {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 4px 0;
+        }
+
+        /* Share Section */
+        .share-section {
+            margin: 20px 0 !important;
+            padding: 15px !important;
+            border-radius: 12px !important;
+        }
+
+        .share-section h5 {
+            font-size: 0.95rem !important;
+            text-align: center;
+            margin-bottom: 12px !important;
+        }
+
+        .share-buttons {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 10px !important;
+            padding: 0 10px;
+        }
+
+        .btn-share-icon {
+            width: 100% !important;
+            height: 40px !important;
+            border-radius: 10px !important;
+            font-size: 1.1rem;
+        }
+
+        /* Countdown Section */
+        .countdown-section {
+            margin: 20px 0 !important;
+            padding: 15px !important;
+            border-radius: 12px;
+            background: rgba(176, 38, 255, 0.08) !important;
+        }
+
+        .countdown-section h5 {
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            color: var(--neon-blue);
+            text-align: center;
+        }
+
+        .countdown-timer {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .countdown-box {
+            background: rgba(176, 38, 255, 0.1);
+            padding: 10px 5px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .countdown-box span {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--neon-purple);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .countdown-box small {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Support Button */
+        .btn-support {
+            width: 100%;
+            margin-top: 20px !important;
+            padding: 12px;
+            font-size: 0.95rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* Animations */
+        .reveal-animation {
+            animation: slideUpFade 0.5s ease-out;
+        }
+
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Daily Leaderboard */
+        .daily-leaderboard {
+            margin: 20px 0 !important;
+            padding: 15px !important;
+            border-radius: 12px;
+        }
+
+        .leaderboard-header {
+            margin-bottom: 12px !important;
+        }
+
+        .leaderboard-header h5 {
+            font-size: 0.95rem !important;
+        }
+
+        .leaderboard-toggle {
+            padding: 12px !important;
+            border-radius: 10px !important;
+            font-size: 0.9rem;
+        }
+
+        .leaderboard-item {
+            padding: 10px !important;
+            gap: 10px !important;
+            font-size: 0.85rem;
+        }
+
+        /* Highlight Points */
+        .highlight-points {
+            font-size: 0.95rem;
+            padding: 2px 6px;
+        }
+    }
+
+    
+
 }
 }
 
