@@ -1191,274 +1191,395 @@
 
     @media (max-width: 768px) {
     /* Enhanced Touch Targets */
-    .btn, .btn-share-icon, .vinyl-center, .leaderboard-toggle {
-        min-height: 48px; /* Standard touch target size */
-        padding: 12px 20px;
-    }
+        .btn, .btn-share-icon, .vinyl-center, .leaderboard-toggle {
+            min-height: 48px; /* Standard touch target size */
+            padding: 12px 20px;
+        }
 
-    /* Game Container Adjustments */
-    .game-container {
-        margin: 10px;
-        padding: 15px;
-        border-radius: 15px;
-    }
-
-    /* Vinyl Player Mobile Optimization */
-    .vinyl-player {
-        width: 240px;
-        height: 240px;
-        margin: 20px auto;
-    }
-
-    .vinyl-center {
-        width: 30%;
-        height: 30%;
-        background: rgba(176, 38, 255, 0.9);
-    }
-
-    /* Enhanced Leaderboard Mobile Layout */
-    .leaderboard-item {
-        grid-template-columns: 35px 1fr auto;
-        padding: 12px;
-        gap: 10px;
-    }
-
-    .leaderboard-item .time {
-        display: none; /* Hide time on mobile */
-    }
-
-    .leaderboard-item .score {
-        font-weight: bold;
-        min-width: 60px;
-        text-align: right;
-    }
-
-    /* Improved Countdown Display */
-    .countdown-section {
-        margin: 15px -5px;
-        padding: 15px 10px;
-    }
-
-    .countdown-timer {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-    }
-
-    .countdown-box {
-        padding: 10px 5px;
-        background: rgba(176, 38, 255, 0.15);
-        border-radius: 10px;
-    }
-
-    /* Share Section Enhancement */
-    .share-buttons {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-        padding: 0 10px;
-    }
-
-    .btn-share-icon {
-        width: 100%;
-        border-radius: 12px;
-        font-size: 1.1rem;
-    }
-
-    /* Pull to Refresh Indicator */
-    .pull-indicator {
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--neon-purple);
-        font-size: 0.9rem;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .pulling .pull-indicator {
-        opacity: 1;
-    }
-
-    /* Toast Notification */
-    .toast-notification {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%) translateY(100px);
-        background: rgba(176, 38, 255, 0.9);
-        color: white;
-        padding: 12px 24px;
-        border-radius: 25px;
-        font-size: 0.9rem;
-        z-index: 1000;
-        transition: transform 0.3s ease;
-        backdrop-filter: blur(10px);
-    }
-
-    .toast-notification.show {
-        transform: translateX(-50%) translateY(0);
-    }
-
-    /* State Transitions */
-    .fade-in {
-        animation: fadeIn 0.3s ease forwards;
-    }
-
-    .fade-out {
-        animation: fadeOut 0.3s ease forwards;
-    }
-
-    /* Pull to Refresh */
-    .pull-indicator {
-        text-align: center;
-        padding: 10px;
-        color: var(--neon-purple);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .pulling .pull-indicator {
-        opacity: 1;
-    }
-
-    /* Result Container Mobile Styles */
-    @media (max-width: 768px) {
-        .result-container {
-            padding: 15px;
+        /* Game Container Adjustments */
+        .game-container {
             margin: 10px;
+            padding: 15px;
+            border-radius: 15px;
         }
 
-        /* Score Message Header */
-        .reveal-header {
-            margin-bottom: 20px !important;
+        /* Vinyl Player Mobile Optimization */
+        .vinyl-player {
+            width: 240px;
+            height: 240px;
+            margin: 20px auto;
         }
 
-        .reveal-header h4 {
-            font-size: 1rem !important;
-            line-height: 1.4;
-            padding: 15px !important;
-            text-align: center;
-            letter-spacing: 0.2px;
+        .vinyl-center {
+            width: 30%;
+            height: 30%;
+            background: rgba(176, 38, 255, 0.9);
         }
 
-        /* Song Image */
-        .song-image {
-            width: 160px;
-            height: 160px;
-            margin: 15px auto;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(176, 38, 255, 0.2);
+        /* Enhanced Leaderboard Mobile Layout */
+        .leaderboard-item {
+            grid-template-columns: 35px 1fr auto;
+            padding: 12px;
+            gap: 10px;
         }
 
-        /* Song Details */
-        .song-details {
-            text-align: center;
-            margin: 20px 0;
-            padding: 0 10px;
+        .leaderboard-item .time {
+            display: none; /* Hide time on mobile */
         }
 
-        .song-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--neon-purple);
-            text-shadow: 0 0 10px rgba(176, 38, 255, 0.3);
+        .leaderboard-item .score {
+            font-weight: bold;
+            min-width: 60px;
+            text-align: right;
         }
 
-        .song-info {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.8);
-            margin: 4px 0;
-        }
-
-        /* Share Section */
-        .share-section {
-            margin: 20px 0 !important;
-            padding: 15px !important;
-            border-radius: 12px !important;
-        }
-
-        .share-section h5 {
-            font-size: 0.95rem !important;
-            text-align: center;
-            margin-bottom: 12px !important;
-        }
-
-        .share-buttons {
-            display: grid !important;
-            grid-template-columns: repeat(4, 1fr) !important;
-            gap: 10px !important;
-            padding: 0 10px;
-        }
-
-        .btn-share-icon {
-            width: 100% !important;
-            height: 40px !important;
-            border-radius: 10px !important;
-            font-size: 1.1rem;
-        }
-
-        /* Countdown Section */
+        /* Improved Countdown Display */
         .countdown-section {
-            margin: 20px 0 !important;
-            padding: 15px !important;
-            border-radius: 12px;
-            background: rgba(176, 38, 255, 0.08) !important;
-        }
-
-        .countdown-section h5 {
-            font-size: 0.95rem;
-            margin-bottom: 12px;
-            color: var(--neon-blue);
-            text-align: center;
+            margin: 15px -5px;
+            padding: 15px 10px;
         }
 
         .countdown-timer {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-
-        .countdown-box {
-            background: rgba(176, 38, 255, 0.1);
-            padding: 10px 5px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .countdown-box span {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--neon-purple);
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        .countdown-box small {
-            font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.6);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Support Button */
-        .btn-support {
-            width: 100%;
-            margin-top: 20px !important;
-            padding: 12px;
-            font-size: 0.95rem;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             gap: 8px;
         }
 
-        /* Animations */
-        .reveal-animation {
-            animation: slideUpFade 0.5s ease-out;
+        .countdown-box {
+            padding: 10px 5px;
+            background: rgba(176, 38, 255, 0.15);
+            border-radius: 10px;
+        }
+
+        /* Share Section Enhancement */
+        .share-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 0 10px;
+        }
+
+        .btn-share-icon {
+            width: 100%;
+            border-radius: 12px;
+            font-size: 1.1rem;
+        }
+
+        /* Pull to Refresh Indicator */
+        .pull-indicator {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--neon-purple);
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .pulling .pull-indicator {
+            opacity: 1;
+        }
+
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(176, 38, 255, 0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* State Transitions */
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .fade-out {
+            animation: fadeOut 0.3s ease forwards;
+        }
+
+        /* Pull to Refresh */
+        .pull-indicator {
+            text-align: center;
+            padding: 10px;
+            color: var(--neon-purple);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .pulling .pull-indicator {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            /* Enhanced Touch Targets */
+            .btn, .btn-share-icon, .vinyl-center, .leaderboard-toggle {
+                min-height: 48px;
+                padding: 12px 20px;
+            }
+
+            /* Game Container */
+            .game-container {
+                margin: 10px;
+                padding: 15px;
+                border-radius: 15px;
+            }
+
+            /* Result Container */
+            .result-container {
+                padding: 15px;
+                margin: 10px;
+            }
+
+            /* Score Message Header */
+            .reveal-header {
+                margin-bottom: 20px !important;
+            }
+
+            .reveal-header h4 {
+                font-size: 1rem !important;
+                line-height: 1.4;
+                padding: 15px !important;
+                text-align: center;
+                letter-spacing: 0.2px;
+            }
+
+            /* Vinyl Player */
+            .vinyl-player {
+                width: 240px;
+                height: 240px;
+                margin: 20px auto;
+            }
+
+            .vinyl-center {
+                width: 30%;
+                height: 30%;
+                background: rgba(176, 38, 255, 0.9);
+            }
+
+            /* Song Image */
+            .song-image {
+                width: 160px;
+                height: 160px;
+                margin: 15px auto;
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(176, 38, 255, 0.2);
+            }
+
+            /* Song Details Section */
+            .song-details {
+                text-align: center;
+                margin: 20px 0;
+                padding: 0 10px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .song-title {
+                font-size: 1.2rem;
+                font-weight: 600;
+                margin-bottom: 8px;
+                color: var(--neon-purple);
+                text-shadow: 0 0 10px rgba(176, 38, 255, 0.3);
+                opacity: 1 !important;
+            }
+
+            /* Movie/Album Name */
+            .song-movie {
+                font-size: 0.9rem;
+                color: var(--neon-blue);
+                font-style: italic;
+                position: relative;
+                padding-bottom: 12px;
+                opacity: 1 !important;
+                display: block !important;
+            }
+
+            .song-movie::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 30px;
+                height: 2px;
+                background: rgba(176, 38, 255, 0.2);
+                border-radius: 1px;
+            }
+
+            /* Artist Name */
+            .song-artist {
+                font-size: 0.85rem;
+                color: var(--neon-pink);
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+                font-weight: 500;
+                opacity: 1 !important;
+                display: block !important;
+            }
+
+            /* Share Section */
+            .share-section {
+                margin: 20px 0 !important;
+                padding: 15px !important;
+                border-radius: 12px !important;
+            }
+
+            .share-section h5 {
+                font-size: 0.95rem !important;
+                text-align: center;
+                margin-bottom: 12px !important;
+            }
+
+            .share-buttons {
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 10px !important;
+                padding: 0 10px;
+            }
+
+            .btn-share-icon {
+                width: 100% !important;
+                height: 40px !important;
+                border-radius: 10px !important;
+                font-size: 1.1rem;
+            }
+
+            /* Countdown Section */
+            .countdown-section {
+                margin: 20px 0 !important;
+                padding: 15px !important;
+                border-radius: 12px;
+                background: rgba(176, 38, 255, 0.08) !important;
+            }
+
+            .countdown-section h5 {
+                font-size: 0.95rem;
+                margin-bottom: 12px;
+                color: var(--neon-blue);
+                text-align: center;
+            }
+
+            .countdown-timer {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .countdown-box {
+                background: rgba(176, 38, 255, 0.1);
+                padding: 10px 5px;
+                border-radius: 10px;
+                text-align: center;
+            }
+
+            .countdown-box span {
+                font-size: 1.3rem;
+                font-weight: bold;
+                color: var(--neon-purple);
+                display: block;
+                margin-bottom: 2px;
+            }
+
+            .countdown-box small {
+                font-size: 0.7rem;
+                color: rgba(255, 255, 255, 0.6);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            /* Daily Leaderboard */
+            .leaderboard-item {
+                grid-template-columns: 35px 1fr auto;
+                padding: 12px;
+                gap: 10px;
+            }
+
+            .leaderboard-item .time {
+                display: none;
+            }
+
+            .leaderboard-item .score {
+                font-weight: bold;
+                min-width: 60px;
+                text-align: right;
+            }
+
+            .daily-leaderboard {
+                margin: 20px 0 !important;
+                padding: 15px !important;
+                border-radius: 12px;
+            }
+
+            .leaderboard-header {
+                margin-bottom: 12px !important;
+            }
+
+            .leaderboard-header h5 {
+                font-size: 0.95rem !important;
+            }
+
+            .leaderboard-toggle {
+                padding: 12px !important;
+                border-radius: 10px !important;
+                font-size: 0.9rem;
+            }
+
+            /* Support Button */
+            .btn-support {
+                width: 100%;
+                margin-top: 20px !important;
+                padding: 12px;
+                font-size: 0.95rem;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            /* Animations */
+            .reveal-animation {
+                animation: slideUpFade 0.5s ease-out;
+            }
+
+            .reveal-title, .reveal-details {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+
+            /* Toast Notification */
+            .toast-notification {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%) translateY(100px);
+                background: rgba(176, 38, 255, 0.9);
+                color: white;
+                padding: 12px 24px;
+                border-radius: 25px;
+                font-size: 0.9rem;
+                z-index: 1000;
+                transition: transform 0.3s ease;
+                backdrop-filter: blur(10px);
+            }
+
+            .toast-notification.show {
+                transform: translateX(-50%) translateY(0);
+            }
         }
 
         @keyframes slideUpFade {
@@ -1472,107 +1593,49 @@
             }
         }
 
-        /* Daily Leaderboard */
-        .daily-leaderboard {
-            margin: 20px 0 !important;
-            padding: 15px !important;
-            border-radius: 12px;
-        }
+        @media (max-width: 768px) {
+            /* Song Details Section */
+            .song-details {
+                text-align: center;
+                margin: 20px 0;
+                padding: 0 10px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
 
-        .leaderboard-header {
-            margin-bottom: 12px !important;
-        }
+            .song-title {
+                font-size: 1.2rem;
+                font-weight: 600;
+                margin-bottom: 8px;
+                color: var(--neon-purple);
+                text-shadow: 0 0 10px rgba(176, 38, 255, 0.3);
+            }
 
-        .leaderboard-header h5 {
-            font-size: 0.95rem !important;
-        }
+            .song-info {
+                display: block;
+                margin: 4px 0;
+            }
 
-        .leaderboard-toggle {
-            padding: 12px !important;
-            border-radius: 10px !important;
-            font-size: 0.9rem;
-        }
+            .song-movie {
+                font-size: 0.9rem;
+                color: var(--neon-blue);
+                font-style: italic;
+                margin-bottom: 10px;
+            }
 
-        .leaderboard-item {
-            padding: 10px !important;
-            gap: 10px !important;
-            font-size: 0.85rem;
+            .song-artist {
+                font-size: 0.85rem;
+                color: var(--neon-pink);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
         }
-
-        /* Highlight Points */
-        .highlight-points {
-            font-size: 0.95rem;
-            padding: 2px 6px;
-        }
-    }
-
-    @media (max-width: 768px) {
-        /* Song Details Section */
-        .song-details {
-            text-align: center;
-            margin: 20px 0;
-            padding: 0 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .song-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--neon-purple);
-            text-shadow: 0 0 10px rgba(176, 38, 255, 0.3);
-        }
-
-        /* Album Name */
-        .song-info:nth-child(2) {
-            font-size: 0.9rem;
-            color: var(--neon-blue);
-            font-style: italic;
-            position: relative;
-            padding-bottom: 12px;
-        }
-
-        /* Add separator between album and artist */
-        .song-info:nth-child(2)::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 2px;
-            background: rgba(176, 38, 255, 0.2);
-            border-radius: 1px;
-        }
-
-        /* Artist/Composer Name */
-        .song-info:nth-child(3) {
-            font-size: 0.85rem;
-            color: var(--neon-pink);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-
-        /* Optional: Add hover effects */
-        .song-info {
-            transition: all 0.3s ease;
-        }
-
-        .song-info:hover {
-            transform: translateY(-1px);
-            text-shadow: 0 0 8px rgba(176, 38, 255, 0.2);
-        }
-    }
-
     
 
 }
 }
-
-    
+  
 
 </style>
 {% endblock %}
@@ -1738,10 +1801,11 @@ function toggleLeaderboard() {
                     {% if today_song.image %}
                         <img src="{{ today_song.image.url }}" alt="{{ today_song.title }}" class="song-image reveal-image">
                     {% endif %}
+                   
                     <div class="song-details">
                         <div class="song-title reveal-title">{{ today_song.title }}</div>
-                        <div class="song-info reveal-details">{{ today_song.movie }}</div>
-                        <div class="song-info reveal-details">{{ today_song.artist }}</div>
+                        <div class="song-info song-movie reveal-details">{{ today_song.movie }}</div>
+                        <div class="song-info song-artist reveal-details">{{ today_song.artist }}</div>
                     </div>
 
                     <!-- Rest of your existing code -->
