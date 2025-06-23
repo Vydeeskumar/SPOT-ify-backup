@@ -1506,6 +1506,67 @@
         }
     }
 
+    @media (max-width: 768px) {
+        /* Song Details Section */
+        .song-details {
+            text-align: center;
+            margin: 20px 0;
+            padding: 0 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .song-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--neon-purple);
+            text-shadow: 0 0 10px rgba(176, 38, 255, 0.3);
+        }
+
+        /* Album Name */
+        .song-info:nth-child(2) {
+            font-size: 0.9rem;
+            color: var(--neon-blue);
+            font-style: italic;
+            position: relative;
+            padding-bottom: 12px;
+        }
+
+        /* Add separator between album and artist */
+        .song-info:nth-child(2)::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 2px;
+            background: rgba(176, 38, 255, 0.2);
+            border-radius: 1px;
+        }
+
+        /* Artist/Composer Name */
+        .song-info:nth-child(3) {
+            font-size: 0.85rem;
+            color: var(--neon-pink);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        /* Optional: Add hover effects */
+        .song-info {
+            transition: all 0.3s ease;
+        }
+
+        .song-info:hover {
+            transform: translateY(-1px);
+            text-shadow: 0 0 8px rgba(176, 38, 255, 0.2);
+        }
+    }
+
     
 
 }
