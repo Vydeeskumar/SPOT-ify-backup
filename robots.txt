@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://webzombies.pythonanywhere.com/sitemap.xml
