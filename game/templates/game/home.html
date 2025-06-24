@@ -2809,6 +2809,8 @@ async function searchSpotify(query) {
     if (!query) return;
     
     try {
+        // Add more search parameters and operators
+        const searchQuery = `${query} OR lyrics:${query} OR track:${query}`;
         const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&market=IN&limit=20&include_external=audio`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
