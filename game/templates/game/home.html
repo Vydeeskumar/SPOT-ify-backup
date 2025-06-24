@@ -2228,21 +2228,24 @@ function toggleLeaderboard() {
                     <!-- Direct App Buttons -->
                     <p class="text-muted mb-2">Or pay directly with:</p>
                     <div class="upi-buttons">
-                        <button onclick="window.location.href='upi://pay?pa=rvydeeskumar-1@okhdfcbank&pn=Vydeeskumar&tn=Thaenmittai Support'" 
+                        <!-- Google Pay -->
+                        <button onclick="window.location.href='tez://upi/pay?pa=rvydeeskumar-1@okhdfcbank&pn=Vydeeskumar&tr=SPOTPAATU001&tn=Thaenmittai Support&am=10&cu=INR&mode=02'" 
                                 class="btn btn-support me-2 mb-2">
                             <i class="fab fa-google-pay"></i> GPay
                         </button>
 
-                        <button onclick="window.location.href='upi://pay?pa=rvydeeskumar-1@okhdfcbank&pn=Vydeeskumar&tn=Thaenmittai Support'" 
+                        <!-- PhonePe -->
+                        <button onclick="window.location.href='phonepe://pay?pa=rvydeeskumar-1@okhdfcbank&pn=Vydeeskumar&tn=Thaenmittai Support&am=10&cu=INR'" 
                                 class="btn btn-support me-2 mb-2">
                             <i class="fas fa-mobile-alt"></i> PhonePe
                         </button>
 
-                        <button onclick="window.location.href='upi://pay?pa=rvydeeskumar-1@okhdfcbank&pn=Vydeeskumar&tn=Thaenmittai Support'" 
+                        <!-- Paytm -->
+                        <button onclick="window.location.href='paytmmp://pay?pa=rvydeeskumar-1@okhdfcbank&pn=Vydeeskumar&tn=Thaenmittai Support&am=10&cu=INR'" 
                                 class="btn btn-support mb-2">
                             <i class="fas fa-wallet"></i> Paytm
                         </button>
-                    </div> 
+                    </div>
    
                 </div>
 
