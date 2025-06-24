@@ -1848,17 +1848,17 @@
     }
 }
 
-    .persistent-support {
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
+   
+    .result-container {
+        position: relative;
+        width: 100%;
     }
 
-    /* Ensure modal button stays visible */
-    .result-container .btn-support {
-        position: relative;
-        z-index: 10;
+    .reveal-animation {
+        opacity: 1;
+        visibility: visible;
     }
+
 
     /* Scrollbar styling */
     .suggestions-container::-webkit-scrollbar {
@@ -2182,7 +2182,7 @@ function toggleLeaderboard() {
                         </div>
                     </div>
 
-                    <button class="btn btn-support persistent-support mt-4" data-bs-toggle="modal" data-bs-target="#supportModal">
+                    <button class="btn btn-support mt-4" data-bs-toggle="modal" data-bs-target="#supportModal">
                         <i class="fas fa-candy-cane"></i> Buy me a Thaenmittai
                     </button>
                 </div>
@@ -2445,11 +2445,17 @@ window.addEventListener('beforeunload', function() {
 
 function showResultView() {
     try {
-        // Hide the game container
-        document.getElementById('game-container').style.display = 'none';
+
+        const gameContainer = document.getElementById('game-container');
+        const resultContainer = document.getElementById('result-container');
         
-        // Show result container
-        document.getElementById('result-container').style.display = 'block';
+        if (gameContainer) gameContainer.style.display = 'none';
+        if (resultContainer) {
+            resultContainer.style.display = 'block';
+            resultContainer.style.opacity = '1';
+            resultContainer.style.visibility = 'visible';
+        }
+        
 
         // Get current points and update score message
         const points = document.querySelector('.points-value')?.textContent || '0';
@@ -2476,13 +2482,7 @@ function showResultView() {
             scoreMessage.innerHTML = messageHTML;
         }
         
-        // Ensure support button is visible
-        const supportButton = document.querySelector('.persistent-support');
-        if (supportButton) {
-            supportButton.style.display = 'block';
-            supportButton.style.visibility = 'visible';
-            supportButton.style.opacity = '1';
-        }
+        
         // Stop the main audio if it's playing
         const mainAudio = document.getElementById('song-snippet');
         if (mainAudio) {
