@@ -544,3 +544,8 @@ def get_daily_rankings(request):
             attempt_date__date=timezone.now().date()
         ).count()
     })
+
+
+def robots_txt(request):
+    content = "User-agent: *\nAllow: /\nSitemap: https://webzombies.pythonanywhere.com/sitemap.xml"
+    return HttpResponse(content, content_type="text/plain")
