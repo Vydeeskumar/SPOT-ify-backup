@@ -52,6 +52,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'allauth.account.middleware.AccountMiddleware',
+    'game.middleware.WWWRedirectMiddleware',
 ]
 
 ROOT_URLCONF = "spotify_paatu.urls"
