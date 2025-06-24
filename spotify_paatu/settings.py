@@ -160,3 +160,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 GOOGLE_ANALYTICS_ID = 'G-02L1MCM4TK'
+
+
+SECURE_SSL_REDIRECT = True
+PREPEND_WWW = False  # Choose False if you prefer non-www version

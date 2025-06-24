@@ -12,12 +12,31 @@
         gtag('config', 'G-02L1MCM4TK');
     </script>
 
+    <script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "SPOT-ify the Paatu",
+    "description": "Daily Tamil song guessing game",
+    "url": "https://webzombies.pythonanywhere.com",
+    "applicationCategory": "Game",
+    "genre": "Music Quiz",
+    "operatingSystem": "Any",
+    "offers": {
+        "@type": "Offer",
+        "price": "0"
+    }
+    }
+    </script>
+
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPOT-ify the Paatu</title>
     <link rel="canonical" href="https://webzombies.pythonanywhere.com{{ request.path }}">
     <meta name="description" content="Play the daily Tamil song guessing game! Listen to song snippets, make your guess, and compete with friends. New challenges every day with SPOT-ify the Paatu.">
-    <meta property="og:title" content="SPOT-ify the Paatu - Daily Tamil Song Guessing Game">
+    <meta property="og:title" content="Spot-ify the Paatu - Daily Tamil Song Guessing Game">
     <meta property="og:description" content="Play the daily Tamil song guessing game! Listen to song snippets, make your guess, and compete with friends. New challenges every day!">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://webzombies.pythonanywhere.com/">
@@ -286,6 +305,13 @@
 
     <footer class="footer">
         <div class="container">
+             <div class="footer-links mb-3">
+                <a href="{% url 'home' %}" class="me-3">Home</a>
+                <a href="{% url 'leaderboard' %}" class="me-3">Leaderboard</a>
+                <a href="{% url 'friends_list' %}" class="me-3">Friends</a>
+                <a href="{% url 'profile' %}" class="me-3">Profile</a>
+                
+            </div>
             <span>© {% now "Y" %} SPOT-ify the Paatu. All rights reserved.</span>
         </div>
     </footer>
