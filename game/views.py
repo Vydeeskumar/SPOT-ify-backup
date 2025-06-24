@@ -22,6 +22,15 @@ def google_site_verification(request):
         content_type="text/plain"
     )
 
+from django.http import FileResponse
+import os
+from django.conf import settings
+
+def sitemap_view(request):
+    filepath = os.path.join(settings.BASE_DIR, 'sitemap.xml')
+    return FileResponse(open(filepath, 'rb'), content_type='application/xml')
+
+
 
 
 def get_today_song():
