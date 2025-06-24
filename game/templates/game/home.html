@@ -885,14 +885,18 @@
         background: #25D366;
     }
 
-    .btn-share.twitter {
-        background: #1DA1F2;
+    .btn-share-icon.twitter { 
+        background: #000000;  /* X's black background */
     }
 
     .btn-share.instagram {
         background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
     }
 
+    .btn-share-icon.twitter:hover {
+        background: #141414;  /* Slightly lighter black on hover */
+    }
+    
     .btn-share.copy {
         background: var(--neon-purple);
     }
@@ -1844,6 +1848,18 @@
     }
 }
 
+    .persistent-support {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Ensure modal button stays visible */
+    .result-container .btn-support {
+        position: relative;
+        z-index: 10;
+    }
+
     /* Scrollbar styling */
     .suggestions-container::-webkit-scrollbar {
         width: 6px;
@@ -2095,7 +2111,7 @@ function toggleLeaderboard() {
             <!-- Result View Container (Initially Hidden) -->
             <!-- Result View Container (Initially Hidden) -->
             <div id="result-container" class="result-container" style="display: none;">
-                <div class="result content">
+                <div class="reveal-animation">
                     <!-- Success/Score Message -->
                     <div class="reveal-header mb-4" style="background: rgba(176, 38, 255, 0.1); padding: 20px; border-radius: 15px;">
                         <h4 style="color: var(--neon-purple); margin: 0; font-size: 1.2rem;" id="score-message">
@@ -2166,7 +2182,7 @@ function toggleLeaderboard() {
                         </div>
                     </div>
 
-                    <button class="btn btn-support mt-4" data-bs-toggle="modal" data-bs-target="#supportModal">
+                    <button class="btn btn-support persistent-support mt-4" data-bs-toggle="modal" data-bs-target="#supportModal">
                         <i class="fas fa-candy-cane"></i> Buy me a Thaenmittai
                     </button>
                 </div>
@@ -2212,22 +2228,22 @@ function toggleLeaderboard() {
                     <!-- Direct App Buttons -->
                     <p class="text-muted mb-2">Or pay directly with:</p>
                     <div class="upi-buttons">
-                        <!-- Remove amount parameter and add proper UPI details -->
-                        <button onclick="window.location.href='upi://pay?pa=rvydeeskumar-1@okhdfcbank&pn=Vydeeskumar&tn=Thaenmittai'" 
+                        <button onclick="window.location.href='upi://pay?pa=rvydeeskumar-1@okhdfcbank&pn=Vydeeskumar&tn=Thaenmittai Support'" 
                                 class="btn btn-support me-2 mb-2">
                             <i class="fab fa-google-pay"></i> GPay
                         </button>
 
-                        <button onclick="window.location.href='phonepe://pay?pa=rvydeeskumar-1@okhdfcbank&pn=Vydeeskumar&tn=Thaenmittai'" 
+                        <button onclick="window.location.href='upi://pay?pa=rvydeeskumar-1@okhdfcbank&pn=Vydeeskumar&tn=Thaenmittai Support'" 
                                 class="btn btn-support me-2 mb-2">
                             <i class="fas fa-mobile-alt"></i> PhonePe
                         </button>
 
-                        <button onclick="window.location.href='paytmmp://pay?pa=rvydeeskumar-1@okhdfcbank&pn=Vydeeskumar&tn=Thaenmittai'" 
+                        <button onclick="window.location.href='upi://pay?pa=rvydeeskumar-1@okhdfcbank&pn=Vydeeskumar&tn=Thaenmittai Support'" 
                                 class="btn btn-support mb-2">
                             <i class="fas fa-wallet"></i> Paytm
                         </button>
-                    </div>
+                    </div> 
+   
                 </div>
 
                 <!-- Divider -->
@@ -2460,9 +2476,12 @@ function showResultView() {
             scoreMessage.innerHTML = messageHTML;
         }
         
-        const supportButton = document.querySelector('.btn-support');
+        // Ensure support button is visible
+        const supportButton = document.querySelector('.persistent-support');
         if (supportButton) {
             supportButton.style.display = 'block';
+            supportButton.style.visibility = 'visible';
+            supportButton.style.opacity = '1';
         }
         // Stop the main audio if it's playing
         const mainAudio = document.getElementById('song-snippet');
