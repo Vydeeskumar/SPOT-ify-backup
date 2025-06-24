@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-&7rqj-v5sv87!)*4-l9u74@rotd3miv!3s-8!-z!79andr3p&&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['webzombies.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [

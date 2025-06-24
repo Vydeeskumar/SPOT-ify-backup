@@ -14,10 +14,13 @@ import random
 from django.contrib.auth import authenticate,login
 from django.contrib.auth.models import User
 import string
+from django.http import HttpResponse
 
-
-
-
+def google_site_verification(request):
+    return HttpResponse(
+        "google-site-verification: googled2c2d6345bb867a9.html",
+        content_type="text/plain"
+    )
 
 
 
