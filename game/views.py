@@ -34,14 +34,8 @@ def sitemap_view(request):
 
 
 def get_today_song():
-    # Get current time in IST
-    ist_now = timezone.localtime(timezone.now())
-    ist_date = ist_now.date()
-    
-    # Get song for current IST date
-    song = Song.objects.filter(display_date=ist_date).first()
-    
-    return song
+    today = timezone.now().date()
+    return Song.objects.filter(display_date=today).first()
 
 def check_answer(guess, correct_answer, spotify_id=None, today_song=None):
     # First check Spotify ID match if available
