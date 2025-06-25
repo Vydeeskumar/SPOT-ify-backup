@@ -34,8 +34,14 @@ def sitemap_view(request):
 
 
 def get_today_song():
-    today = timezone.now().date()
-    return Song.objects.filter(display_date=today).first()
+    # Get current time in IST
+    ist_now = timezone.localtime(timezone.now())
+    ist_date = ist_now.date()
+    
+    # Get song for current IST date
+    song = Song.objects.filter(display_date=ist_date).first()
+    
+    return song
 
 def check_answer(guess, correct_answer, spotify_id=None, today_song=None):
     # First check Spotify ID match if available
@@ -76,6 +82,10 @@ def check_answer(guess, correct_answer, spotify_id=None, today_song=None):
 def home(request):
     today_song = get_today_song()
     user_already_played = False
+
+    current_time = timezone.localtime(timezone.now())
+    print(f"Current IST time: {current_time}")
+    print(f"Current IST date: {current_time.date()}")
     
     if not today_song:
         messages.warning(request, "No song is available for today. Please check back later!")
