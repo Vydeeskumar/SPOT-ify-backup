@@ -519,24 +519,33 @@ def compare_scores(request, friend_id):
 def get_daily_rankings(request):
     today_song = get_today_song()
     
-    # Get daily scores
+    # Get current IST date
+    ist_now = timezone.localtime(timezone.now())
+    ist_date = ist_now.date()
+    
+    # Get daily scores using IST date
     daily_scores = UserScore.objects.filter(
         song=today_song,
-        attempt_date__date=timezone.now().date()
+        attempt_date__date=ist_date
     ).select_related('user').order_by('-score', 'guess_time')[:10]
 
-    # Get user's score and rank
-    user_score = UserScore.objects.get(
-        user=request.user,
-        song=today_song,
-        attempt_date__date=timezone.now().date()
-    )
+    try:
+        # Get user's score
+        user_score = UserScore.objects.get(
+            user=request.user,
+            song=today_song,
+            attempt_date__date=ist_date
+        )
 
-    user_rank = UserScore.objects.filter(
-        song=today_song,
-        attempt_date__date=timezone.now().date(),
-        score__gt=user_score.score
-    ).count() + 1
+        # Calculate user's rank
+        user_rank = UserScore.objects.filter(
+            song=today_song,
+            attempt_date__date=ist_date,
+            score__gt=user_score.score
+        ).count() + 1
+
+    except UserScore.DoesNotExist:
+        user_rank = "-"  # Handle case where user hasn't played yet
 
     # Format scores for JSON response
     scores_data = [{
@@ -551,7 +560,7 @@ def get_daily_rankings(request):
         'userRank': user_rank,
         'totalPlayers': UserScore.objects.filter(
             song=today_song,
-            attempt_date__date=timezone.now().date()
+            attempt_date__date=ist_date
         ).count()
     })
 
