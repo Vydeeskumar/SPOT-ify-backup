@@ -462,6 +462,17 @@ def add_friend(request):
     return redirect('friends_list')
 
 @login_required
+def remove_friend(request, friend_id):
+    if request.method == 'POST':
+        try:
+            friendship = Friendship.objects.get(user=request.user, friend_id=friend_id)
+            friendship.delete()
+            messages.success(request, 'Friend removed.')
+        except Friendship.DoesNotExist:
+            messages.error(request, 'Friend not found.')
+    return redirect('friends_list')
+
+@login_required
 def compare_scores(request, friend_id):
     try:
         friend = User.objects.get(id=friend_id)
