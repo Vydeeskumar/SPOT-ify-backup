@@ -180,7 +180,5 @@ SOCIALACCOUNT_PROVIDERS = {
 
 GOOGLE_ANALYTICS_ID = 'G-02L1MCM4TK'
 
-if DEBUG:
-    # Add a middleware to auto-login for local development
-    MIDDLEWARE.insert(0, 'game.middleware.DevAuthMiddleware')
+
 
