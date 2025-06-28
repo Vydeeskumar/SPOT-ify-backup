@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from datetime import timedelta
-from django.db.models import Sum, Avg, Count, Max
+from django.db.models import Sum, Avg, Count, Max, Q
 from django.http import JsonResponse
 from django.contrib import messages
 from .models import Song, UserScore, UserProfile, Friendship
@@ -462,36 +462,45 @@ def add_friend(request):
     return redirect('friends_list')
 
 @login_required
-def remove_friend(request, friend_id):
-    if request.method == 'POST':
-        try:
-            friendship = Friendship.objects.get(user=request.user, friend_id=friend_id)
-            friendship.delete()
-            messages.success(request, 'Friend removed.')
-        except Friendship.DoesNotExist:
-            messages.error(request, 'Friend not found.')
-    return redirect('friends_list')
-
-@login_required
 def compare_scores(request, friend_id):
     try:
         friend = User.objects.get(id=friend_id)
         
+        # Get user's best time attempt (lowest time with score > 0)
+        user_best_attempt = UserScore.objects.filter(
+            user=request.user,
+            score__gt=0
+        ).order_by('guess_time').first()
+
+        # Get friend's best time attempt
+        friend_best_attempt = UserScore.objects.filter(
+            user=friend,
+            score__gt=0
+        ).order_by('guess_time').first()
+
         # Get user's stats
         user_stats = UserScore.objects.filter(user=request.user).aggregate(
             total_score=Sum('score'),
-            avg_score=Avg('score'),
+            avg_time=Avg('guess_time', filter=Q(score__gt=0)),
             games_played=Count('id'),
-            best_score=Max('score')
         )
+        
+        # Add best time and score to stats
+        user_stats['best_time'] = user_best_attempt.guess_time if user_best_attempt else 0
+        user_stats['best_time_score'] = user_best_attempt.score if user_best_attempt else 0
         
         # Get friend's stats
         friend_stats = UserScore.objects.filter(user=friend).aggregate(
             total_score=Sum('score'),
-            avg_score=Avg('score'),
+            avg_time=Avg('guess_time', filter=Q(score__gt=0)),
             games_played=Count('id'),
-            best_score=Max('score')
         )
+        
+        # Add best time and score to friend's stats
+        friend_stats['best_time'] = friend_best_attempt.guess_time if friend_best_attempt else 0
+        friend_stats['best_time_score'] = friend_best_attempt.score if friend_best_attempt else 0
+        
+    
         
         # Get recent games
         user_recent = UserScore.objects.filter(user=request.user).order_by('-attempt_date')[:5]

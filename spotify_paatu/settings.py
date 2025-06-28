@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import socket
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,9 +25,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-&7rqj-v5sv87!)*4-l9u74@rotd3miv!3s-8!-z!79andr3p&&"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
+DEVELOPMENT = DEBUG
 
-ALLOWED_HOSTS = ['webzombies.pythonanywhere.com', 'localhost', '127.0.0.1']
+
+
+if DEVELOPMENT:
+    # Development settings (local)
+    SECURE_SSL_REDIRECT = False
+    SECURE_PROXY_SSL_HEADER = None
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+else:
+    # Production settings
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+ALLOWED_HOSTS = ['webzombies.pythonanywhere.com', 'localhost', '127.0.0.1', '127.0.0.1 devsite.local']
 
 # Application definition
 INSTALLED_APPS = [
@@ -162,5 +180,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 GOOGLE_ANALYTICS_ID = 'G-02L1MCM4TK'
 
-SECURE_SSL_REDIRECT = True
+if DEBUG:
+    # Add a middleware to auto-login for local development
+    MIDDLEWARE.insert(0, 'game.middleware.DevAuthMiddleware')
 
