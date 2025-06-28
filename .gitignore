@@ -5,3 +5,6 @@ media
 .env
 staticfiles
 venv
+spotify_env/
+venv/
+env/
