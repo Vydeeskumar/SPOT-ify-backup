@@ -2385,22 +2385,28 @@ function stopTimer() {
 function updateCountdown() {
     try {
         const now = new Date();
-        const tomorrow = new Date(now);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(0, 0, 0, 0);
-        
-        const timeLeft = tomorrow - now;
-        
+
+        // Get UTC midnight of the next day
+        const utcNow = new Date(now.toUTCString());
+        const nextUTCMidnight = new Date(Date.UTC(
+            utcNow.getUTCFullYear(),
+            utcNow.getUTCMonth(),
+            utcNow.getUTCDate() + 1, // tomorrow
+            0, 0, 0, 0
+        ));
+
+        // Calculate time left until UTC midnight
+        const timeLeft = nextUTCMidnight - now;
+
         const hours = Math.floor(timeLeft / (1000 * 60 * 60));
         const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-        
-        // Get elements
+
+        // Update DOM
         const hoursElement = document.getElementById('countdown-hours');
         const minutesElement = document.getElementById('countdown-minutes');
         const secondsElement = document.getElementById('countdown-seconds');
-        
-        // Check if elements exist before updating
+
         if (hoursElement && minutesElement && secondsElement) {
             hoursElement.textContent = hours.toString().padStart(2, '0');
             minutesElement.textContent = minutes.toString().padStart(2, '0');
@@ -2410,6 +2416,7 @@ function updateCountdown() {
         console.error('Countdown update error:', error);
     }
 }
+
 
 // ADD this new function
 function initializeCountdown() {
