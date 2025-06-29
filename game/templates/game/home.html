@@ -2229,24 +2229,35 @@ function toggleLeaderboard() {
                     <p class="text-muted mb-2">Or pay directly with:</p>
                     <div class="upi-buttons">
                         <!-- Google Pay -->
-                        <button onclick="window.location.href='tez://upi/pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tr=SPOTPAATU001&tn=Thaenmittai Support&am=10&cu=INR&mode=02'" 
+                        <button onclick="window.location.href='upi://pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tn=Thaenmittai Support&cu=INR&tr=' + Date.now()" 
                                 class="btn btn-support me-2 mb-2">
                             <i class="fab fa-google-pay"></i> GPay
                         </button>
 
                         <!-- PhonePe -->
-                        <button onclick="window.location.href='phonepe://pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tn=Thaenmittai Support&am=10&cu=INR'" 
+                        <button onclick="window.location.href='upi://pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tn=Thaenmittai Support&cu=INR&tr=' + Date.now()" 
                                 class="btn btn-support me-2 mb-2">
                             <i class="fas fa-mobile-alt"></i> PhonePe
                         </button>
 
                         <!-- Paytm -->
-                        <button onclick="window.location.href='paytmmp://pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tn=Thaenmittai Support&am=10&cu=INR'" 
+                        <button onclick="window.location.href='upi://pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tn=Thaenmittai Support&cu=INR&tr=' + Date.now()" 
                                 class="btn btn-support mb-2">
                             <i class="fas fa-wallet"></i> Paytm
                         </button>
+
                     </div>
-   
+                    <!-- QR Code Fallback -->
+                    <div class="text-center mt-4">
+                        <p class="text-white">Or scan this QR with any UPI app:</p>
+                        <img src="https://chart.googleapis.com/chart?cht=qr&chl=upi://pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&cu=INR&chs=180x180" 
+                            alt="UPI QR Code" width="180" height="180" class="rounded border">
+                    </div>
+                    <p class="text-warning small mt-3">
+                    ⚠️ If GPay or any app says “limit reached”, just scan the QR above with any UPI app like PhonePe or Paytm. Works perfectly!
+                    </p>
+
+
                 </div>
 
                 <!-- Divider -->
