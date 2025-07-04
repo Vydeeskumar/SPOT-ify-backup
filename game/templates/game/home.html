@@ -1963,15 +1963,54 @@
         font-weight: 500;
     }
 
-    
+    .main-game-image-wrapper {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .glow-effect-pink {
+        border-radius: 15px;
+        box-shadow: 0 0 25px rgba(255, 0, 228, 0.6), 
+                    0 0 50px rgba(255, 0, 228, 0.4), 
+                    0 0 75px rgba(255, 0, 228, 0.2);
+        transition: transform 0.3s ease;
+        max-width: 200px;
+    }
+
+    .glow-effect-pink:hover {
+        transform: scale(1.02);
+    }
+
+
+    .reveal-glow-pink:hover {
+        transform: scale(1.05);
+    }
+
+    /* Soft pulsing pink glow — like archive green but pink */
+    @keyframes glowPulsePinkSoft {
+        0% {
+            box-shadow: 0 0 8px #ff00e4, 0 0 16px #ff00e4, 0 0 24px #ff00e4;
+        }
+        50% {
+            box-shadow: 0 0 12px #ff00e4, 0 0 24px #ff00e4, 0 0 36px #ff00e4;
+        }
+        100% {
+            box-shadow: 0 0 8px #ff00e4, 0 0 16px #ff00e4, 0 0 24px #ff00e4;
+        }
+    }
+
+    .song-image.reveal-glow-pink {
+        border-radius: 12px;
+        display: block;
+        margin: 0 auto;
+        max-width: 240px;
+        box-shadow: 0 0 12px #ff00e4, 0 0 24px #ff00e4, 0 0 36px #ff00e4;
+        animation: glowPulsePinkSoft 2s infinite ease-in-out;
+        transition: transform 0.3s ease;
+    }
 
 
 
-
-
-    
-
-    
 
 }
 }
@@ -1987,9 +2026,10 @@
             <!-- Already played view -->
             <div class="result-container">
                 <h4 style="color: var(--neon-purple); margin-bottom: 20px;">Today's Song</h4>
-                {% if today_song.image %}
-                    <img src="{{ today_song.image.url }}" alt="{{ today_song.title }}" class="song-image">
-                {% endif %}
+                <div class="main-game-image-wrapper">
+                    <img src="{{ today_song.image.url }}" alt="{{ today_song.title }}" class="song-image reveal-glow-pink">
+                </div>
+
                 <div class="song-details" style="margin: 20px 0;">
                     <div class="song-title">{{ today_song.title }}</div>
                     <div class="song-info">from {{ today_song.movie }}</div>
@@ -2139,7 +2179,13 @@ function toggleLeaderboard() {
                     </div>
                     <!-- Song Details -->
                     {% if today_song.image %}
-                        <img src="{{ today_song.image.url }}" alt="{{ today_song.title }}" class="song-image reveal-image">
+                        <div class="main-game-image-wrapper">
+                            <img src="{{ today_song.image.url }}" alt="{{ today_song.title }}"
+                                class="song-image reveal-glow-pink"
+                                style="box-shadow: 0 0 12px #ff00e4, 0 0 24px #ff00e4, 0 0 36px #ff00e4; border-radius: 12px;">
+
+                        </div>
+   
                     {% endif %}
                    
                     <div class="song-details">
