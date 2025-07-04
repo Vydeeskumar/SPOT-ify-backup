@@ -2,10 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from datetime import timedelta
-from django.db.models import Sum, Avg, Count, Max, Q
+from django.db.models import Sum, Avg, Count, Max
 from django.http import JsonResponse
 from django.contrib import messages
-from .models import Song, UserScore, UserProfile, Friendship
+from .models import Song, UserScore, UserProfile, Friendship, DailySong
 from .utils import calculate_points
 from fuzzywuzzy import fuzz
 import json
@@ -15,6 +15,17 @@ from django.contrib.auth import authenticate,login
 from django.contrib.auth.models import User
 import string
 from django.http import HttpResponse
+from allauth.socialaccount.models import SocialApp
+from django.conf import settings
+from django.db.models import Q
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.dateparse import parse_date
+
+def is_google_enabled():
+    if settings.ENVIRONMENT == "production":
+        return SocialApp.objects.filter(provider="google").exists()
+    return False
+
 
 def google_site_verification(request):
     return HttpResponse(
@@ -32,10 +43,27 @@ def sitemap_view(request):
 
 
 
-
 def get_today_song():
     today = timezone.now().date()
-    return Song.objects.filter(display_date=today).first()
+    song = Song.objects.filter(display_date=today).first()
+    
+    if song:
+        # Create or update DailySong entry for today
+        daily_song, created = DailySong.objects.get_or_create(
+            date=today,
+            defaults={'song': song}
+        )
+        
+        # Update total players if it already exists
+        if not created:
+            total_players = UserScore.objects.filter(
+                song=song,
+                attempt_date__date=today
+            ).count()
+            daily_song.total_players = total_players
+            daily_song.save()
+            
+    return song
 
 def check_answer(guess, correct_answer, spotify_id=None, today_song=None):
     # First check Spotify ID match if available
@@ -476,7 +504,7 @@ def remove_friend(request, friend_id):
 def compare_scores(request, friend_id):
     try:
         friend = User.objects.get(id=friend_id)
-        
+
         # Get user's best time attempt (lowest time with score > 0)
         user_best_attempt = UserScore.objects.filter(
             user=request.user,
@@ -488,30 +516,27 @@ def compare_scores(request, friend_id):
             user=friend,
             score__gt=0
         ).order_by('guess_time').first()
-
-        # Get user's stats
+        
+        # Get user's stats - exclude give-ups for average time
         user_stats = UserScore.objects.filter(user=request.user).aggregate(
             total_score=Sum('score'),
-            avg_time=Avg('guess_time', filter=Q(score__gt=0)),
+            avg_time=Avg('guess_time', filter=Q(score__gt=0)),  # Only include successful attempts
             games_played=Count('id'),
         )
-        
-        # Add best time and score to stats
+
         user_stats['best_time'] = user_best_attempt.guess_time if user_best_attempt else 0
         user_stats['best_time_score'] = user_best_attempt.score if user_best_attempt else 0
         
-        # Get friend's stats
+        # Get friend's stats - exclude give-ups for average time
         friend_stats = UserScore.objects.filter(user=friend).aggregate(
             total_score=Sum('score'),
-            avg_time=Avg('guess_time', filter=Q(score__gt=0)),
+            avg_time=Avg('guess_time', filter=Q(score__gt=0)),  # Only include successful attempts
             games_played=Count('id'),
+            
         )
-        
-        # Add best time and score to friend's stats
+
         friend_stats['best_time'] = friend_best_attempt.guess_time if friend_best_attempt else 0
         friend_stats['best_time_score'] = friend_best_attempt.score if friend_best_attempt else 0
-        
-    
         
         # Get recent games
         user_recent = UserScore.objects.filter(user=request.user).order_by('-attempt_date')[:5]
@@ -580,5 +605,181 @@ def get_daily_rankings(request):
 
 
 def robots_txt(request):
-    content = "User-agent: *\nAllow: /\nSitemap: https://webzombies.pythonanywhere.com/sitemap.xml"
+    domain = request.get_host()
+    content = f"User-agent: *\nAllow: /\nSitemap: https://{domain}/sitemap.xml"
     return HttpResponse(content, content_type="text/plain")
+
+
+    
+@login_required
+def archive_list(request):
+    daily_songs = DailySong.objects.all().order_by('-date')
+    return render(request, 'game/archive/list.html', {
+        'daily_songs': daily_songs
+    })
+
+
+
+
+
+
+@login_required
+def archive(request):
+    selected_date = request.GET.get('date')
+    selected_song = None
+    user_guess_result = None
+    already_guessed = False
+
+    if selected_date:
+        try:
+            selected_date = parse_date(selected_date)
+            selected_song = Song.objects.filter(display_date=selected_date).first()
+        except:
+            selected_song = None
+
+    if request.method == 'POST' and selected_song:
+        try:
+            data = json.loads(request.body)
+            guess = data.get('guess', '').lower().strip()
+            spotify_id = data.get('spotify_id')
+            time_taken = float(data.get('time_taken', 0))
+
+            is_correct, similarity = check_answer(guess, selected_song.title, spotify_id, selected_song)
+
+            if is_correct:
+                points = calculate_points(time_taken)
+
+                # Calculate hypothetical rank
+                total_players = UserScore.objects.filter(song=selected_song).count()
+                better_scores = UserScore.objects.filter(song=selected_song, score__gt=points).count()
+                rank = better_scores + 1
+
+                user_guess_result = {
+                    'correct': True,
+                    'points': points,
+                    'rank': rank,
+                    'total_players': total_players
+                }
+            else:
+                user_guess_result = {'correct': False, 'message': 'Wrong guess'}
+
+        except Exception as e:
+            print("Archive guess error:", str(e))
+            user_guess_result = {'error': str(e)}
+
+    context = {
+        'selected_date': selected_date,
+        'selected_song': selected_song,
+        'user_guess_result': user_guess_result,
+    }
+    return render(request, 'game/archive.html', context)
+
+# views.py
+from django.views.decorators.http import require_GET
+from datetime import datetime
+@login_required
+@require_GET
+def load_archive_song(request):
+    date_str = request.GET.get('date')
+    try:
+        selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return JsonResponse({'success': False, 'message': 'Invalid date format'}, status=400)
+
+    song = Song.objects.filter(display_date=selected_date).first()
+    if not song:
+        return JsonResponse({'success': False, 'message': 'No song found for that date'}, status=404)
+
+    return JsonResponse({
+        'success': True,
+        'snippet_url': song.snippet.url,
+        'reveal_url': song.reveal_snippet.url if song.reveal_snippet else '',
+        'song_id': song.spotify_id,
+        'title': song.title,
+        'movie': song.movie,
+        'artist': song.artist,
+        'image': song.image.url if song.image else '', 
+        'reveal_audio_url': song.reveal_snippet.url if song.reveal_snippet else '' 
+        
+    })
+
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+@login_required
+def archive_submit(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+    try:
+        data = json.loads(request.body)
+        user_guess = data.get('guess')
+        spotify_id = data.get('spotify_id')
+        song_id = data.get('song_id')
+        play_date = data.get('play_date')
+        time_taken = float(data.get('time_taken', 999))
+
+        song = Song.objects.get(id=song_id)
+        is_correct, _ = check_answer(user_guess, song.title, spotify_id, song)
+
+        if is_correct:
+            points = calculate_points(time_taken)
+            scores = UserScore.objects.filter(song=song).order_by('-score', 'guess_time')
+            rank = scores.filter(score__gt=points).count() + 1
+
+            return JsonResponse({
+                'correct': True,
+                'song_title': song.title,
+                'movie': song.movie,
+                'artist': song.artist,
+                'image':song.image.url if song.image else '',
+                'rank': rank,
+                'points': points,
+                'time_taken': time_taken
+            })
+        else:
+            return JsonResponse({
+                'correct': False,
+                'message': 'Wrong guess! Try again.'
+            })
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+@require_GET
+def giveup_archive(request):
+    song_id = request.GET.get('song_id')
+    try:
+        song = Song.objects.get(id=song_id)
+    except Song.DoesNotExist:
+        return JsonResponse({'error': 'Song not found'}, status=404)
+
+    points = 0  # give up → 0 points
+
+    # Rank = count of users who scored > 0 + 1
+    scores = UserScore.objects.filter(song=song).order_by('-score', 'guess_time')
+    rank = scores.filter(score__gt=points).count() + 1
+    total_players = scores.count()
+
+    return JsonResponse({
+        'song_title': song.title,
+        'movie': song.movie,
+        'artist': song.artist,
+        'image': song.image.url if song.image else '',
+        'points': points,
+        'rank': rank,
+        'time_taken': 0,
+        'total_players': total_players
+    })
+
+
+
+def calculate_points(seconds):
+    if seconds <= 10: return 8
+    elif seconds <= 20: return 5
+    elif seconds <= 30: return 4
+    elif seconds <= 45: return 3
+    elif seconds <= 60: return 2
+    else: return 1

@@ -12,5 +12,9 @@ urlpatterns = [
     path('friends/remove/<int:friend_id>/', views.remove_friend, name='remove_friend'),
     path('friends/compare/<int:friend_id>/', views.compare_scores, name='compare_scores'),
     path('get-daily-rankings/', views.get_daily_rankings, name='get_daily_rankings'),
-    
+    path('archive/', views.archive, name='archive'),
+    path('archive/submit/', views.archive_submit, name='archive_submit'),
+    path('load-archive-song/', views.load_archive_song, name='load_archive_song'),
+    path('giveup-archive/', views.giveup_archive, name='giveup_archive'),
+
 ]

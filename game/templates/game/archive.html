@@ -1,0 +1,93 @@
+{% extends 'game/base.html' %}
+{% load static %}
+
+<script>
+  const songId = {{ selected_song.id|default:"null" }};
+  const playDate = "{{ selected_song.display_date|default:'' }}";
+</script>
+
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'game/css/archive.css' %}">
+
+<div class="container mt-5">
+    {% if selected_song %}
+        <div id="game-view">
+            <div class="archive-header mb-4">
+                <a href="{% url 'archive' %}" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+                <div class="archive-date-badge">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ selected_date|date:"F j, Y" }}
+                </div>
+            </div>
+
+            <div class="game-header">
+                <div class="timer" id="timer">00:00</div>
+                <div class="points-indicator">+<span class="points-value">8</span></div>
+            </div>
+
+            <div class="archive-player text-center mb-4">
+                <!-- Song snippet audio -->
+                <audio id="song-snippet" preload="auto">
+                    {% if selected_song.snippet %}
+                        <source src="{{ selected_song.snippet.url }}" type="audio/mpeg">
+                    {% else %}
+                        Your browser does not support the audio element.
+                    {% endif %}
+                </audio>
+
+                <!-- Reveal snippet audio -->
+                <audio id="reveal-snippet" preload="auto">
+                    {% if selected_song.reveal_snippet %}
+                        <source src="{{ selected_song.reveal_snippet.url }}" type="audio/mpeg">
+                    {% endif %}
+                </audio>
+
+                <div id="vinyl-player" class="vinyl paused mt-3" onclick="togglePlay()">
+                    <i id="vinyl-play-icon" class="fas fa-play"></i>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button id="playPauseBtn" class="btn btn-play"><i class="fas fa-play"></i> Play</button>
+                    <button id="giveUpBtn" class="btn btn-giveup"><i class="fas fa-times"></i> Give Up</button>
+                </div>
+            </div>
+
+            <form id="guess-form" class="guess-form">
+                {% csrf_token %}
+                <div class="form-group position-relative">
+                    <input type="text" id="guess-input" class="form-control" placeholder="Type your guess..." autocomplete="off" data-spotify-id="">
+                    <div id="suggestions" class="suggestions-container"></div>
+                </div>
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+                <div id="result-message" class="mt-3"></div>
+            </form>
+        </div>
+
+        <div id="result-container" style="display: none;"></div>
+
+    {% else %}
+        <div class="text-center">
+            <h3 class="mb-4">Select a Date to Play Archived Song</h3>
+            {% now "Y-m-d" as today %}
+            <form method="get" class="d-flex justify-content-center">
+                <input type="date" name="date" class="form-control w-auto" max="{{ today }}" required>
+                <button type="submit" class="btn btn-primary ml-2">Load</button>
+            </form>
+        </div>
+
+    {% endif %}
+</div>
+
+<script>
+    const songId = {{ selected_song.id|default:'null' }};
+    const playDate = '{{ selected_date|default:"" }}';
+</script>
+<script src="{% static 'game/js/archive_play.js' %}"></script>
+{% endblock %}

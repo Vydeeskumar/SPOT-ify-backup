@@ -186,6 +186,16 @@
             }
         }
 
+        .custom-navbar {
+            background-color: #000000 !important;  /* or use var(--archive-dark) if it's shared */
+        }
+
+        .custom-navbar {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 10px rgba(255, 0, 228, 0.1);
+        }
+
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .navbar-brand {
@@ -206,65 +216,100 @@
                 right: 20px;
                 max-width: none;
             }
+ 
+            .custom-navbar {
+                background-color: #000 !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .streak-badge {
+                background: rgba(255, 255, 255, 0.1);
+                padding: 2px 8px;
+                border-radius: 10px;
+                font-size: 0.8rem;
+                display: inline-block;
+            }
+
+            .logout-btn {
+                background: none;
+                border: none;
+                color: #fff;
+                cursor: pointer;
+            }
+
+            .logout-btn:hover {
+                text-decoration: underline;
+            }
+
         }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
     {% load socialaccount %}
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark custom-navbar px-3">
+        <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'home' %}">
                 <i class="fas fa-music"></i> SPOT-ify the Paatu
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+
+            <div class="collapse navbar-collapse mt-2 mt-lg-0" id="navbarNavDropdown">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
-                           href="{% url 'home' %}">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
                             <i class="fas fa-home"></i> Home
                         </a>
                     </li>
+
                     <li class="nav-item">
                         <a class="nav-link" href="#" onclick="showRules(); return false;">
                             <i class="fas fa-info-circle"></i> Rules
                         </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'friends_list' %}active{% endif %}" 
-                        href="{% url 'friends_list' %}">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'friends_list' %}active{% endif %}" href="{% url 'friends_list' %}">
                             <i class="fas fa-users"></i> Friends
                         </a>
                     </li>
+
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" 
-                               href="{% url 'profile' %}">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'profile' %}">
                                 <i class="fas fa-user"></i> Profile
                                 {% if user.userprofile.current_streak > 0 %}
-                                    <span class="streak-badge">
-                                        🔥 {{ user.userprofile.current_streak }}
-                                    </span>
+                                    <span class="streak-badge ms-1">🔥 {{ user.userprofile.current_streak }}</span>
                                 {% endif %}
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}" 
-                               href="{% url 'leaderboard' %}">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}" href="{% url 'leaderboard' %}">
                                 <i class="fas fa-trophy"></i> Leaderboard
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <form method="post" action="{% url 'account_logout' %}">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'archive' %}active{% endif %}" href="{% url 'archive' %}">
+                                <i class="fas fa-archive"></i> Archive
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <form method="post" action="{% url 'account_logout' %}" class="d-inline">
                                 {% csrf_token %}
-                                <button type="submit" class="logout-btn">
+                                <button type="submit" class="nav-link btn btn-link logout-btn px-0 text-start">
                                     <i class="fas fa-sign-out-alt"></i> Logout
                                 </button>
                             </form>
                         </li>
+
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'account_login' %}">
@@ -276,6 +321,9 @@
             </div>
         </div>
     </nav>
+
+
+    
 
     <main>
         <div class="container">

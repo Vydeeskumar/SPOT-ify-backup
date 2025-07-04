@@ -1950,6 +1950,25 @@
         }
     }
 
+    .text-glow {
+        color: #c084fc !important;
+        text-shadow: 0 0 8px rgba(192, 132, 252, 0.7);
+    }
+
+    .streak-badge {
+        background-color: rgba(255, 0, 228, 0.2);
+        color: #ff00e4;
+        border-radius: 10px;
+        padding: 2px 8px;
+        font-weight: 500;
+    }
+
+    
+
+
+
+
+
     
 
     
@@ -2229,26 +2248,24 @@ function toggleLeaderboard() {
                     <p class="text-muted mb-2">Or pay directly with:</p>
                     <div class="upi-buttons">
                         <!-- Google Pay -->
-                        <button onclick="window.location.href='upi://pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tn=Thaenmittai Support&cu=INR&tr=' + Date.now()" 
+                        <button onclick="window.location.href='tez://upi/pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tr=SPOTPAATU001&tn=Thaenmittai Support&am=10&cu=INR&mode=02'" 
                                 class="btn btn-support me-2 mb-2">
                             <i class="fab fa-google-pay"></i> GPay
                         </button>
 
                         <!-- PhonePe -->
-                        <button onclick="window.location.href='upi://pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tn=Thaenmittai Support&cu=INR&tr=' + Date.now()" 
+                        <button onclick="window.location.href='phonepe://pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tn=Thaenmittai Support&am=10&cu=INR'" 
                                 class="btn btn-support me-2 mb-2">
                             <i class="fas fa-mobile-alt"></i> PhonePe
                         </button>
 
                         <!-- Paytm -->
-                        <button onclick="window.location.href='upi://pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tn=Thaenmittai Support&cu=INR&tr=' + Date.now()" 
+                        <button onclick="window.location.href='paytmmp://pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tn=Thaenmittai Support&am=10&cu=INR'" 
                                 class="btn btn-support mb-2">
                             <i class="fas fa-wallet"></i> Paytm
                         </button>
-
                     </div>
-                    
-
+   
                 </div>
 
                 <!-- Divider -->
@@ -2418,6 +2435,7 @@ function updateCountdown() {
         console.error('Countdown update error:', error);
     }
 }
+
 
 
 // ADD this new function
@@ -2851,7 +2869,7 @@ async function searchSpotify(query) {
     try {
         // Add more search parameters and operators
         const searchQuery = `${query} OR lyrics:${query} OR track:${query}`;
-        const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&market=IN&limit=40&include_external=audio`, {
+        const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&market=IN&limit=20&include_external=audio`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             }
@@ -2895,7 +2913,7 @@ document.getElementById('guess-input').addEventListener('input', async function(
         } else {
             suggestionsContainer.style.display = 'none';
         }
-    }, 50);  // Reduced from 300ms to 150ms for faster response
+    }, 100);  // Reduced from 300ms to 150ms for faster response
 });
 
 function selectSuggestion(songName, spotifyId) {

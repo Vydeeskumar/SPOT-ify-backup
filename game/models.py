@@ -75,3 +75,13 @@ class Friendship(models.Model):
         
     def __str__(self):
         return f"{self.user.username} -> {self.friend.username}"
+    
+class DailySong(models.Model):
+    song = models.ForeignKey(Song, on_delete=models.CASCADE)
+    date = models.DateField()
+    total_players = models.IntegerField(default=0)
+    average_time = models.FloatField(null=True)
+    
+
+    class Meta:
+        ordering = ['-date']
