@@ -12,10 +12,20 @@ class Song(models.Model):
     image = models.ImageField(upload_to='song_images/', null=True, blank=True) 
     display_date = models.DateField(unique=True, null=True, blank=True)
     is_used = models.BooleanField(default=False)
-    spotify_id = models.CharField(max_length=200, null=True, blank=True) 
+    spotify_id = models.CharField(max_length=200, null=True, blank=True)
+
+    # ✅ NEW: Optional comma-separated duplicate Spotify IDs
+    spotify_duplicates = models.TextField(blank=True, default="")
 
     def __str__(self):
         return f"{self.title} - {self.artist}"
+
+    def get_all_spotify_ids(self):
+        """Returns list of primary + duplicate Spotify IDs"""
+        ids = [self.spotify_id.strip()] if self.spotify_id else []
+        ids += [x.strip() for x in self.spotify_duplicates.split(",") if x.strip()]
+        return ids
+
 
 class UserScore(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -29,7 +39,7 @@ class UserScore(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.song.title} - {self.score} points"
-    
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -65,6 +75,7 @@ class UserProfile(models.Model):
         self.last_played_date = date
         self.save()
 
+
 class Friendship(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friendships')
     friend = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friend_of')
@@ -75,13 +86,13 @@ class Friendship(models.Model):
         
     def __str__(self):
         return f"{self.user.username} -> {self.friend.username}"
-    
+
+
 class DailySong(models.Model):
     song = models.ForeignKey(Song, on_delete=models.CASCADE)
     date = models.DateField()
     total_players = models.IntegerField(default=0)
     average_time = models.FloatField(null=True)
-    
 
     class Meta:
         ordering = ['-date']

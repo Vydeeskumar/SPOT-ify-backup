@@ -65,40 +65,43 @@ def get_today_song():
             
     return song
 
+
+
 def check_answer(guess, correct_answer, spotify_id=None, today_song=None):
-    # First check Spotify ID match if available
-    if spotify_id and today_song and hasattr(today_song, 'spotify_id'):
-        if spotify_id == today_song.spotify_id:
-            return True, 100
-    
-    # Fallback to your existing fuzzy matching
+    # ✅ First: check if the guessed Spotify ID matches any known ID
+    if spotify_id and today_song:
+        all_ids = today_song.get_all_spotify_ids() if hasattr(today_song, "get_all_spotify_ids") else []
+        print(f"All Spotify IDs: {all_ids}")
+        if spotify_id in all_ids:
+            return True, 100  # Full score for ID match
+
+    # ✅ Fallback: fuzzy match on text
     guess = guess.lower().strip()
     correct = correct_answer.lower().strip()
-    correct_movie = today_song.movie.lower().strip()
-    
-    # Print for debugging
+    correct_movie = today_song.movie.lower().strip() if today_song and today_song.movie else ""
+
+    # 🔍 Debug
     print(f"Comparing - Guess from Spotify: '{guess}'")
     print(f"Correct from Database: '{correct}'")
     print(f"Movie should be: '{correct_movie}'")
-    
-    # Check if the guess includes the correct movie name
-    if correct_movie not in guess:
+
+    # ✅ Require movie name to be included in guess
+    if correct_movie and correct_movie not in guess:
         return False, 0
-    
-    # Calculate similarity ratio only if movie matches
+
+    # ✅ Check fuzzy similarity
     ratio = fuzz.ratio(guess, correct)
     partial_ratio = fuzz.partial_ratio(guess, correct)
     token_sort_ratio = fuzz.token_sort_ratio(guess, correct)
-    
+
     print(f"Similarity Ratios - Full: {ratio}, Partial: {partial_ratio}, Token Sort: {token_sort_ratio}")
-    if today_song:
-        print(f"Spotify IDs - Guess: {spotify_id}, Correct: {getattr(today_song, 'spotify_id', None)}")
-    
-    # If any ratio is above 80% AND movie matches, consider it correct
+
+    # ✅ If similarity is good enough, accept it
     if ratio > 80 or partial_ratio > 80 or token_sort_ratio > 80:
         return True, max(ratio, partial_ratio, token_sort_ratio)
-    
+
     return False, ratio
+
 
 @login_required
 def home(request):

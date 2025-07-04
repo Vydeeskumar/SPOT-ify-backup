@@ -2946,7 +2946,9 @@ document.getElementById('guess-input').addEventListener('input', async function(
         
         if (tracks && tracks.length > 0) {
             suggestionsContainer.innerHTML = tracks.map(track => `
-                <div class="suggestion-item" onclick="selectSuggestion('${track.name}', '${track.id}')">
+                <div class="suggestion-item" 
+                    data-song-name="${encodeURIComponent(track.name)}" 
+                    data-spotify-id="${track.id}">
                     <img src="${track.album.images[track.album.images.length-1].url}" alt="${track.name}">
                     <div class="suggestion-info">
                         <div class="suggestion-title">${track.name}</div>
@@ -2954,6 +2956,7 @@ document.getElementById('guess-input').addEventListener('input', async function(
                     </div>
                 </div>
             `).join('');
+
             
             suggestionsContainer.style.display = 'block';
         } else {
@@ -3152,6 +3155,17 @@ function showToast(message) {
         setTimeout(() => toast.remove(), 300);
     }, 2000);
 }
+
+document.getElementById('suggestions').addEventListener('click', function(e) {
+    const suggestion = e.target.closest('.suggestion-item');
+    if (!suggestion) return;
+
+    const songName = decodeURIComponent(suggestion.dataset.songName);
+    const spotifyId = suggestion.dataset.spotifyId;
+
+    selectSuggestion(songName, spotifyId);
+});
+
 
 </script>
 {% endblock %}

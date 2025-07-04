@@ -41,7 +41,7 @@ class SongAdmin(admin.ModelAdmin):
         }),
 
         ('Song Details', {
-            'fields': ('title', 'artist', 'movie', 'spotify_id'),
+            'fields': ('title', 'artist', 'movie', 'spotify_id', 'spotify_duplicates'),
             'classes': ('wide',)
         }),
         ('Media', {
