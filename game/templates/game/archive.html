@@ -73,16 +73,18 @@
         <div id="result-container" style="display: none;"></div>
 
     {% else %}
-        <div class="text-center">
-            <h3 class="mb-4">Select a Date to Play Archived Song</h3>
-            {% now "Y-m-d" as today %}
-            <form method="get" class="d-flex justify-content-center">
-                <input type="date" name="date" class="form-control w-auto" max="{{ today }}" required>
-                <button type="submit" class="btn btn-primary ml-2">Load</button>
-            </form>
+        <div class="archive-date-wrapper">
+            <div class="archive-date-box">
+                <h3 class="mb-4">Select a Date to Play Archived Song</h3>
+                {% now "Y-m-d" as today %}
+                <form method="get" class="d-flex justify-content-center flex-wrap">
+                    <input type="date" name="date" class="form-control w-auto mb-2" max="{{ today }}" required>
+                    <button type="submit" class="btn btn-primary ms-2">Load</button>
+                </form>
+            </div>
         </div>
-
     {% endif %}
+
 </div>
 
 <script>

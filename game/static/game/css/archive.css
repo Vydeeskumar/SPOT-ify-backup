@@ -398,6 +398,51 @@ audio {
     text-align: center;
 }
 
+.archive-date-wrapper {
+    min-height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.archive-date-wrapper {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.archive-date-wrapper {
+    min-height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+.archive-date-box {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0,255,157,0.15);
+    animation: fadeInUp 0.6s ease-out;
+}
+
+
+
 /* Reveal Animation */
 .reveal-animation {
     animation: fadeSlideIn 0.6s ease forwards;
@@ -424,4 +469,8 @@ audio {
         transform: scale(1);
     }
 }
+
+
+
+
 
