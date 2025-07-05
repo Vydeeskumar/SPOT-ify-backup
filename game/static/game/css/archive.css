@@ -470,6 +470,11 @@ audio {
     }
 }
 
+.archive-header .btn {
+    min-width: 160px;
+    text-align: center;
+}
+
 
 
 

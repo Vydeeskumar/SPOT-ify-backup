@@ -21,6 +21,9 @@ from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_date
 from datetime import date
+from django.views.decorators.http import require_GET
+from datetime import datetime, timedelta
+
 
 LAUNCH_DATE = date(2025, 6, 24)
 
@@ -626,34 +629,59 @@ def archive_list(request):
 
 
 
-
-
+LAUNCH_DATE = date(2024, 5, 20)  # Adjust if different
 
 @login_required
 def archive(request):
-    selected_date = request.GET.get('date')
+    selected_date_str = request.GET.get('date')
     selected_song = None
     user_guess_result = None
-    already_guessed = False
+    prev_date = next_date = None
+    selected_date = None
+    date_error = None  # NEW: for user feedback if invalid
 
-    if selected_date:
+    # Process selected date
+    if selected_date_str:
         try:
-            selected_date = parse_date(selected_date)
+            parsed_date = parse_date(selected_date_str)
+            if not parsed_date:
+                raise ValueError("Invalid date format")
+
+            selected_date = parsed_date
 
             if selected_date == date.today():
-                selected_song = None  # Prevent today's song
+                selected_song = None  # Don't show today's song
             elif selected_date < LAUNCH_DATE:
-                selected_song = None  # Prevent pre-launch
+                selected_song = None  # SPOT-ify not born
             else:
                 selected_song = Song.objects.filter(display_date=selected_date).first()
-        except:
-            selected_song = None
 
+                # Find prev/next
+                prev_song = Song.objects.filter(
+                    display_date__lt=selected_date,
+                    display_date__gte=LAUNCH_DATE
+                ).order_by('-display_date').first()
 
+                next_song = Song.objects.filter(
+                    display_date__gt=selected_date,
+                    display_date__lt=date.today()
+                ).order_by('display_date').first()
+
+                prev_date = prev_song.display_date if prev_song else None
+                next_date = next_song.display_date if next_song else None
+
+        except ValueError as ve:
+            print("Archive date error:", ve)
+            date_error = "Invalid date format. Please pick a valid date."
+        except Exception as e:
+            print("Archive date error:", e)
+            date_error = "Something went wrong. Please try again."
+
+    # Handle guess
     if request.method == 'POST' and selected_song:
         try:
             data = json.loads(request.body)
-            guess = data.get('guess', '').lower().strip()
+            guess = data.get('guess', '').strip().lower()
             spotify_id = data.get('spotify_id')
             time_taken = float(data.get('time_taken', 0))
 
@@ -661,8 +689,6 @@ def archive(request):
 
             if is_correct:
                 points = calculate_points(time_taken)
-
-                # Calculate hypothetical rank
                 total_players = UserScore.objects.filter(song=selected_song).count()
                 better_scores = UserScore.objects.filter(song=selected_song, score__gt=points).count()
                 rank = better_scores + 1
@@ -684,12 +710,17 @@ def archive(request):
         'selected_date': selected_date,
         'selected_song': selected_song,
         'user_guess_result': user_guess_result,
+        'prev_date': prev_date,
+        'next_date': next_date,
+        'date_error': date_error  # Pass to template
     }
     return render(request, 'game/archive.html', context)
 
-# views.py
-from django.views.decorators.http import require_GET
-from datetime import datetime
+
+
+
+
+
 @login_required
 @require_GET
 def load_archive_song(request):
