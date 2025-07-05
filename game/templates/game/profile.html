@@ -353,64 +353,62 @@
         padding: 10px;
     }
 }
+
+toast.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(176, 38, 255, 0.95);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    z-index: 9999;
+    text-align: center;
+    max-width: 90vw;
+    word-wrap: break-word;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+`;
+
 </style>
 
-<!-- Keep your existing script -->
-<script>
-    // Your existing shareProfile and shareStreak functions
-</script>
+
 
 
 <script>
 
 function shareProfile() {
-    // Get stats directly from the stat boxes using more specific selectors
-    const totalPoints = document.querySelector('.stat-box:has(i.fa-star) p').textContent;
-    const songsSolved = document.querySelector('.stat-box:has(i.fa-music) p').textContent;
-    const avgTime = document.querySelector('.stat-box:has(i.fa-clock) p').textContent;
-
-    const text = `🎮 Check out my SPOT-ify the Paatu stats!\n
-🎵 Songs Solved: ${songsSolved}\n
-⭐ Total Points: ${totalPoints}\n
-⚡ Avg Time: ${avgTime}\n
-Come play with me!`;
+    const shareUrl = `https://webzombies.pythonanywhere.com/profile/{{ user.username }}/`;
 
     if (navigator.share) {
-        // For mobile devices - uses native share dialog
         navigator.share({
-            title: 'My SPOT-ify the Paatu Profile',
-            text: text,
-            url: window.location.href
+            title: '{{ user.username }}\'s SPOT-ify Profile',
+            url: shareUrl
         }).catch(err => {
-            // Fallback if share fails
-            copyToClipboard(text);
+            copyToClipboard(shareUrl);
         });
     } else {
-        // For desktop - copy to clipboard
-        copyToClipboard(text);
+        copyToClipboard(shareUrl);
     }
 }
+
 
 function shareStreak() {
-    const currentStreak = document.querySelector('.streak').textContent.match(/\d+/)[0];
-    const text = `🔥 My SPOT-ify the Paatu streak: ${currentStreak} days!\n
-Can you beat my streak? Come play with me!`;
+    const shareUrl = `https://webzombies.pythonanywhere.com/profile/{{ user.username }}/`;
 
     if (navigator.share) {
-        // For mobile devices - uses native share dialog
         navigator.share({
-            title: 'My SPOT-ify the Paatu Streak',
-            text: text,
-            url: window.location.href
+            title: '{{ user.username }}\'s SPOT-ify Streak!',
+            url: shareUrl
         }).catch(err => {
-            // Fallback if share fails
-            copyToClipboard(text);
+            copyToClipboard(shareUrl);
         });
     } else {
-        // For desktop - copy to clipboard
-        copyToClipboard(text);
+        copyToClipboard(shareUrl);
     }
 }
+
 
 // Helper function to copy text to clipboard
 function copyToClipboard(text) {
@@ -427,7 +425,9 @@ function copyToClipboard(text) {
     document.body.removeChild(textarea);
     
     // Show feedback
-    showToast('Copied to clipboard!');
+    showToast('Profile copied (rendum onnu dhaan)');
+
+
 }
 
 // Add this toast notification

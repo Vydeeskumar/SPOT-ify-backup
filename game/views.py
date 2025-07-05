@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from datetime import timedelta
@@ -23,6 +23,8 @@ from django.utils.dateparse import parse_date
 from datetime import date
 from django.views.decorators.http import require_GET
 from datetime import datetime, timedelta
+
+
 
 
 LAUNCH_DATE = date(2025, 6, 24)
@@ -826,8 +828,6 @@ def giveup_archive(request):
         'total_players': total_players
     })
 
-
-
 def calculate_points(seconds):
     if seconds <= 10: return 8
     elif seconds <= 20: return 5
@@ -835,3 +835,16 @@ def calculate_points(seconds):
     elif seconds <= 45: return 3
     elif seconds <= 60: return 2
     else: return 1
+
+
+def public_profile(request, username):
+    user = get_object_or_404(User, username=username)
+    profile = get_object_or_404(UserProfile, user=user)
+    recent_scores = UserScore.objects.filter(user=user).order_by('-attempt_date')[:10]
+    
+    return render(request, 'game/profile.html', {
+        'user': user,
+        'profile': profile,
+        'recent_scores': recent_scores,
+        'public': True  # you can use this to show a "shared profile" badge or hide buttons
+    })

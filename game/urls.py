@@ -16,5 +16,6 @@ urlpatterns = [
     path('archive/submit/', views.archive_submit, name='archive_submit'),
     path('load-archive-song/', views.load_archive_song, name='load_archive_song'),
     path('giveup-archive/', views.giveup_archive, name='giveup_archive'),
+    path('profile/<str:username>/', views.public_profile, name='public_profile'),
 
 ]
