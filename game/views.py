@@ -20,6 +20,9 @@ from django.conf import settings
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_date
+from datetime import date
+
+LAUNCH_DATE = date(2025, 6, 24)
 
 def is_google_enabled():
     if settings.ENVIRONMENT == "production":
@@ -636,9 +639,16 @@ def archive(request):
     if selected_date:
         try:
             selected_date = parse_date(selected_date)
-            selected_song = Song.objects.filter(display_date=selected_date).first()
+
+            if selected_date == date.today():
+                selected_song = None  # Prevent today's song
+            elif selected_date < LAUNCH_DATE:
+                selected_song = None  # Prevent pre-launch
+            else:
+                selected_song = Song.objects.filter(display_date=selected_date).first()
         except:
             selected_song = None
+
 
     if request.method == 'POST' and selected_song:
         try:
@@ -689,9 +699,17 @@ def load_archive_song(request):
     except ValueError:
         return JsonResponse({'success': False, 'message': 'Invalid date format'}, status=400)
 
+
+    if selected_date == date.today():
+        return JsonResponse({'success': False, 'message': 'Cannot play today\'s song in archive'}, status=403)
+
+    if selected_date < LAUNCH_DATE:
+        return JsonResponse({'success': False, 'message': 'SPOT-ify wasn\'t born yet!'}, status=400)
+
     song = Song.objects.filter(display_date=selected_date).first()
     if not song:
         return JsonResponse({'success': False, 'message': 'No song found for that date'}, status=404)
+
 
     return JsonResponse({
         'success': True,

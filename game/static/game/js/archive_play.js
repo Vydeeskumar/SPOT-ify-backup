@@ -257,3 +257,43 @@ function showResults(result) {
 window.togglePlay = function () {
     document.getElementById('playPauseBtn').click();
 };
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const archiveDateInput = document.getElementById('archive-date');
+    if (!archiveDateInput) return;
+
+    archiveDateInput.addEventListener('change', async function () {
+        const selectedDate = this.value;
+        if (!selectedDate) return;
+
+        try {
+            const response = await fetch(`/load-archive-song?date=${selectedDate}`);
+            const data = await response.json();
+
+            if (!data.success) {
+                alert(data.message);  // ⛔ Handles: Today’s song & Early dates
+                return;
+            }
+
+            // ✅ Populate and play the song
+            document.getElementById('song-title').textContent = data.title;
+            document.getElementById('song-artist').textContent = data.artist;
+            document.getElementById('song-movie').textContent = data.movie;
+            document.getElementById('song-image').src = data.image;
+
+            const snippet = document.getElementById('song-snippet');
+            snippet.src = data.snippet_url;
+            snippet.load();
+
+            // Global vars for guess and reveal
+            window.songId = data.song_id;
+            window.revealSnippet = data.reveal_audio_url;
+            window.playDate = selectedDate;
+        } catch (err) {
+            console.error('Error loading archive song:', err);
+            alert('Failed to load song. Try again later.');
+        }
+    });
+});
+
