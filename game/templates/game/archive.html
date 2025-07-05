@@ -25,42 +25,12 @@
             {% elif selected_song %}
                 <div id="game-view">
                     <div class="archive-header mb-4">
-                        <div class="d-flex justify-content-center justify-content-md-between align-items-center flex-wrap gap-2 mb-3 w-100">
-
-                            <!-- Previous Day -->
-                            {% if prev_date %}
-                                <a href="?date={{ prev_date|date:'Y-m-d' }}" class="btn btn-outline-light">
-                                    <i class="fas fa-chevron-left me-1"></i> {{ prev_date|date:"F j, Y" }}
-                                </a>
-                            {% else %}
-                                <div class="invisible"></div>
-                            {% endif %}
-
-                            <!-- Back to Calendar -->
-                            <a href="{% url 'archive' %}" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Back to Calendar
-                            </a>
-
-                            <!-- Next Day -->
-                            {% if next_date %}
-                                <a href="?date={{ next_date|date:'Y-m-d' }}" class="btn btn-outline-light">
-                                    {{ next_date|date:"F j, Y" }} <i class="fas fa-chevron-right ms-1"></i>
-                                </a>
-                            {% else %}
-                                <div class="invisible"></div>
-                            {% endif %}
-
-                        </div>
-
-                        <!-- Date Badge -->
-                        <div class="archive-date-badge text-center mt-2">
+                        <a href="{% url 'archive' %}" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+                        <div class="archive-date-badge">
                             <i class="fas fa-calendar-alt"></i>
                             {{ selected_date|date:"F j, Y" }}
                         </div>
                     </div>
-
-                    
-                              
 
                     <div class="game-header">
                         <div class="timer" id="timer">00:00</div>
