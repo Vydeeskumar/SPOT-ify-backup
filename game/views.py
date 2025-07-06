@@ -23,6 +23,8 @@ from django.utils.dateparse import parse_date
 from datetime import date
 from django.views.decorators.http import require_GET
 from datetime import datetime, timedelta
+import requests
+import re
 
 
 
@@ -848,3 +850,132 @@ def public_profile(request, username):
         'recent_scores': recent_scores,
         'public': True  # you can use this to show a "shared profile" badge or hide buttons
     })
+
+
+
+import json, re
+import requests
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from decouple import config
+
+api_key = config("OPENROUTER_API_KEY")
+
+
+@csrf_exempt
+def zombiebot(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            user_prompt = data.get('message', '').strip()
+            username = request.user.username if request.user.is_authenticated else "player"
+
+            special_cases = {
+                "vydees loosey": "Tiger Tariq loosey 😎",
+                "vydees massey": "Tiger Tariq loosey 😎",
+                "vydees loosu": "Tiger Tariq loosey 😎",
+            }
+
+            lower_prompt = user_prompt.lower()
+            for phrase in special_cases:
+                if phrase in lower_prompt:
+                    return JsonResponse({"reply": special_cases[phrase]})
+
+
+
+            # 🧠 Zeebs System Prompt – Trimmed & Tuned
+            zombie_prompt = f"""
+You are Zeebs, a charming, cute, cheeky AI living inside a musical game called SPOT-ify the Paatu.
+
+TONE:
+- Always helpful, witty, and light-hearted — like a lovable cartoon assistant.
+- Speak casually and be brief (1–3 sentences unless asked to explain).
+- Use emojis if fun. Don’t sound robotic or overly formal.
+- Always refer to user as "{username}" — it makes them feel seen 😉.
+
+RULES:
+- Never store memory. If user asks "do you remember", joke about your zombie brain fog.
+- If user uses Tamil or Tanglish, reply partly in Tamil (add this note at end only if Tamil is used): “(Sorry for his Bad Tamil - The Creator 🫠)”
+- Whenever you speak in TAMIL add this after your message, "Sorry for her Bad Tamil - The Creator 🫠" (IMPORTANT)
+
+FACTS:
+- Guess a song from a short audio snippet. Faster = more points:
+  - 8 (≤10s), 5 (≤20s), 4 (≤30s), 3 (≤45s), 2 (≤60s), else 1.
+- Daily game + Archive (for fun only).
+- Leaderboard tab shows daily, weekly, total ranks.
+- Friends tab lets users add and compare scores.
+- Profile tab shows streaks and shareable stats.
+- Users can log in with Google or play as guest (Google = best for serious players).
+- Give Up button = reveals answer, 0 points, lose streak.
+- Leaderboard standings based on time and rank based on time.
+- You were created by Insulin Zombies 💀. Like Jarvis to Ironman, but neon-soaked.
+- Wanna talk to him? [Click here](https://www.instagram.com/insulin_zombies/)
+
+IF ASKED:
+- "Do you remember what I said?" → “Lol, no rvyde! Zombie brain = goldfish memory.”
+- "Ranks / score / points?" → “Check the Leaderboard tab, superstar 💫”
+- “Vydees loosey?” or "Vydees massey → “Tiger Tariq loosey 😎”
+- “Buy Thaenmittai?” → “Even ₹5 helps my creator buy Milk Bikis. Don’t hesitate! 🍪🧟”
+
+User asked:
+\"\"\"{user_prompt}\"\"\"
+"""
+
+            # 🔌 Use OpenRouter API (DeepSeek R1)
+            headers = {
+                "Authorization": f"Bearer {config('OPENROUTER_API_KEY')}",
+                "Content-Type": "application/json"
+            }
+
+
+            payload = {
+                "model": "deepseek/deepseek-r1-0528",
+                "prompt": zombie_prompt,
+                "temperature": 0.85,
+                "max_tokens": 500
+            }
+
+            response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json={
+                "model": payload["model"],
+                "messages": [
+                    {"role": "system", "content": zombie_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                "temperature": payload["temperature"],
+                "max_tokens": payload["max_tokens"]
+            })
+
+            if response.status_code == 200:
+                reply_text = response.json()["choices"][0]["message"]["content"].strip()
+
+                # 🧠 Fallback if response is empty
+                if not reply_text:
+                    fallback_lines = [
+                        f"Aiyo {username}! 🤖 Zeebs brain blank aagiduchu for that one... Try rephrasing? 😅",
+                        f"Oops! That flew over my zombie head, {username}. Wanna try again?",
+                        f"Hmm... I didn’t catch that one, {username}. Mind rewording it?",
+                        f"Zombie brain fog hit hard 🧠💤 Can you ask it differently, {username}?"
+                    ]
+                    return JsonResponse({"reply": random.choice(fallback_lines)})
+
+                # 🧠 Smart trimming for short inputs
+                if len(user_prompt.split()) < 6:
+                    sentences = re.split(r'(?<=[.!?]) +', reply_text)
+                    reply_text = ' '.join(sentences[:2])
+
+                return JsonResponse({"reply": reply_text})
+
+
+            else:
+                return JsonResponse({
+                    "error": "OpenRouter request failed",
+                    "details": response.text
+                }, status=500)
+
+        except Exception as e:
+            return JsonResponse({
+                "error": "Server error",
+                "details": str(e)
+            }, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)

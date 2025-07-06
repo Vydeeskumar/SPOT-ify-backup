@@ -1,0 +1,19 @@
+<div id="zombiebot-bubble" onclick="toggleZombiebot()" title="Ask Zombiebot">
+    🤖
+</div>
+
+<div id="zombiebot-chatbox" class="neon-box hidden">
+    <div class="chat-header">
+        💬 Zombiebot
+        <span class="close-btn" onclick="toggleZombiebot()">✖</span>
+    </div>
+
+    <!-- Message container -->
+    <div id="zombiebot-messages" class="chat-messages"></div>
+
+    <!-- Input area -->
+    <div class="chat-input-area">
+        <input id="zombiebot-input" type="text" placeholder="Ask me something..." />
+        <button onclick="sendZombiebotMessage()">▶</button>
+    </div>
+</div>
