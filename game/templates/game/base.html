@@ -632,7 +632,10 @@
     });
 </script>
 
-<script src="{% static 'game/js/chatbot.js' %}?v=9" defer></script>
+
+{% block extra_scripts %}
+<script src="{% static 'game/js/chatbot.js' %}?v=10" defer></script>
+{% endblock %}
 
 
 
