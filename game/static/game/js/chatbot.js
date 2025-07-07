@@ -111,6 +111,7 @@ function copyToClipboard(text) {
     });
 }
 
+window.sendZombiebotMessage = sendZombiebotMessage;
 
 
 console.log("✅ New chatbot.js loaded");
