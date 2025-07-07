@@ -629,19 +629,30 @@
             supportButton.style.visibility = 'visible';
             supportButton.style.opacity = '1';
         }
+
+        // Define the global toggleZombiebot function
+        window.toggleZombiebot = function () {
+            const chatWindow = document.querySelector(".chatbot-container");
+            chatWindow.classList.toggle("chatbot-open");
+        };
     });
 </script>
 
 
+{% include "game/chatbot.html" %}
+
 {% block extra_scripts %}
-<script src="{% static 'game/js/chatbot.js' %}?v=10" defer></script>
+<script src="{% static 'game/js/chatbot.js' %}?v=11" defer></script>
 {% endblock %}
 
 
 
 
 
-{% include "game/chatbot.html" %}
+
+
+
+
 
 
 
