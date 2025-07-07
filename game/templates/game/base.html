@@ -634,22 +634,16 @@
 </script>
 
 
-{% include "game/chatbot.html" %}
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        window.toggleZombiebot = function () {
-            const chatWindow = document.getElementById("zombiebot-chatbox");
-            if (chatWindow) {
-                chatWindow.classList.toggle("hidden");
-            } else {
-                console.warn("Zombiebot chat window not found!");
-            }
-        };
-    });
-</script>
+{% block extra_scripts %}
+    <!-- Chatbot UI and script -->
+    {% include "game/chatbot.html" %}
+    <script src="{% static 'game/js/chatbot.js' %}?v=102" defer></script>
 
-<script src="{% static 'game/js/chatbot.js' %}?v=100"></script>
+    <!-- Game logic script -->
+    <script src="{% static 'game/js/home.js' %}?v=102" defer></script>
+{% endblock %}
+
 
 
 
