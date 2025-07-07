@@ -318,6 +318,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Reattach all dynamic listeners here
+    document.querySelector('.leaderboard-toggle')?.addEventListener('click', toggleLeaderboard);
+    document.getElementById('upi-copy-btn')?.addEventListener('click', copyUpiId);  // Adjust ID if needed
+    document.querySelector('.btn-share-whatsapp')?.addEventListener('click', shareToWhatsApp);
+    document.querySelector('.btn-share-twitter')?.addEventListener('click', shareToTwitter);
+    document.querySelector('.btn-share-copy')?.addEventListener('click', copyShareText);
+
+
    
     
     function toggleLeaderboard() {
@@ -344,20 +352,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const currentTimeDisplay = document.getElementById('current-time');
     const totalTimeDisplay = document.getElementById('total-time');
 
-    audioElement.addEventListener('timeupdate', updateProgress);
-    audioElement.addEventListener('loadedmetadata', () => {
-        const minutes = Math.floor(audioElement.duration / 60);
-        const seconds = Math.floor(audioElement.duration % 60);
-        totalTimeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    });
+    if (audioElement) {
+        audioElement.addEventListener('timeupdate', updateProgress);
 
-    audioElement.addEventListener('ended', () => {
-        vinylPlayer.classList.remove('playing');
-        vinylPlayer.classList.add('paused');
-        playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
-        // Update vinyl center icon
-        document.getElementById('vinyl-play-icon').className = 'fas fa-play';
-    });
+        audioElement.addEventListener('loadedmetadata', () => {
+            const minutes = Math.floor(audioElement.duration / 60);
+            const seconds = Math.floor(audioElement.duration % 60);
+            totalTimeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        });
+
+        audioElement.addEventListener('ended', () => {
+            vinylPlayer.classList.remove('playing');
+            vinylPlayer.classList.add('paused');
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+            document.getElementById('vinyl-play-icon').className = 'fas fa-play';
+        });
+    }
+
 
     function updateProgress() {
         if (audioElement.duration) {
