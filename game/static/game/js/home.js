@@ -431,28 +431,32 @@ document.addEventListener('DOMContentLoaded', function () {
         playPauseBtn.click();
     };
 
-
-    window.toggleLeaderboard = function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggle = document.getElementById('leaderboard-toggle');
         const content = document.getElementById('leaderboard-content');
         const chevron = document.getElementById('leaderboard-chevron');
 
-        if (!content || !chevron) return;
-
-        if (content.style.display === 'none') {
-            content.style.display = 'block';
-            void content.offsetHeight;
-            chevron.style.transform = 'rotate(180deg)';
-            content.style.opacity = '1';
-            content.style.maxHeight = content.scrollHeight + 'px';
-        } else {
-            chevron.style.transform = 'rotate(0deg)';
-            content.style.opacity = '0';
-            content.style.maxHeight = '0';
-            setTimeout(() => {
-                content.style.display = 'none';
-            }, 300);
+        if (toggle && content && chevron) {
+            toggle.addEventListener('click', function () {
+                if (content.style.display === 'none' || content.style.display === '') {
+                    content.style.display = 'block';
+                    void content.offsetHeight;
+                    chevron.style.transform = 'rotate(180deg)';
+                    content.style.opacity = '1';
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                } else {
+                    chevron.style.transform = 'rotate(0deg)';
+                    content.style.opacity = '0';
+                    content.style.maxHeight = '0';
+                    setTimeout(() => {
+                        content.style.display = 'none';
+                    }, 300);
+                }
+            });
         }
-    };
+    });
+
+    
 
 
 
@@ -706,26 +710,26 @@ document.addEventListener('DOMContentLoaded', function () {
         return diffDays;
     }
 
-    function shareToWhatsApp() {
+    window.shareToWhatsApp = function () {
         const text = encodeURIComponent(getShareText());
         window.open(`https://wa.me/?text=${text}`, '_blank');
-    }
+    };
 
-    function shareToTwitter() {
+    window.shareToTwitter = function () {
         const text = encodeURIComponent(getShareText());
         window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
-    }
+    };
 
-    function shareToInstagram() {
-        // Copy text and show instructions
+    window.shareToInstagram = function () {
         copyShareText();
         alert('Text copied! Open Instagram and paste in your story or post.');
-    }
+    };
 
-    function copyShareText() {
+    window.copyShareText = function () {
         const text = getShareText();
         navigator.clipboard.writeText(text).then(() => {
             const copySuccess = document.getElementById('copySuccess');
+            if (!copySuccess) return;
             copySuccess.style.display = 'block';
             copySuccess.classList.add('show');
             setTimeout(() => {
@@ -735,7 +739,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }, 300);
             }, 2000);
         });
-    }
+    };
 
     // Add these new interaction functions
 

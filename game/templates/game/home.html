@@ -2083,7 +2083,7 @@
         </span>
     </div>
     
-    <div class="leaderboard-toggle" onclick="toggleLeaderboard()" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+    <div class="leaderboard-toggle" id="leaderboard-toggle"> style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
         <span style="color: white;">View Leaderboard</span>
         <i class="fas fa-chevron-down" id="leaderboard-chevron" style="color: var(--neon-purple); transition: transform 0.3s ease;"></i>
     </div>
@@ -2119,21 +2119,7 @@
     </div>
 </div>
 
-<!-- Add this JavaScript -->
-<script>
-function toggleLeaderboard() {
-    const content = document.getElementById('leaderboard-content');
-    const chevron = document.getElementById('leaderboard-chevron');
-    
-    if (content.style.display === 'none') {
-        content.style.display = 'block';
-        chevron.style.transform = 'rotate(180deg)';
-    } else {
-        content.style.display = 'none';
-        chevron.style.transform = 'rotate(0deg)';
-    }
-}
-</script>
+
 </div>
         {% else %}
             <!-- Game View Container -->
