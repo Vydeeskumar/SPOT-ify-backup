@@ -202,6 +202,21 @@ function showResults(result) {
     audio.pause();
     clearInterval(timerInterval);
 
+    // Construct Previous and Next URLs based on current date
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentDate = urlParams.get('date');
+
+    let prevDate = result.prev_date || null;
+    let nextDate = result.next_date || null;
+
+    let arrowsHTML = `
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+            ${prevDate ? `<a href="?date=${prevDate}" class="btn btn-sm btn-outline-warning"><i class="fas fa-chevron-left"></i></a>` : `<span></span>`}
+            <a href="/archive" class="btn btn-warning fw-bold"><i class="fas fa-archive"></i> Archive</a>
+            ${nextDate ? `<a href="?date=${nextDate}" class="btn btn-sm btn-outline-warning"><i class="fas fa-chevron-right"></i></a>` : `<span></span>`}
+        </div>
+    `;
+
     resultContainer.innerHTML = `
     <div class="reveal-animation">
         <div class="reveal-header mb-4">
@@ -237,11 +252,8 @@ function showResults(result) {
             </div>
         </div>
 
-        <a href="/archive" class="btn btn-archive-back mt-4">
-            <i class="fas fa-archive"></i> Back to Archive
-        </a>
+        ${arrowsHTML}
     </div>`;
-
 
     gameView.style.display = 'none';
     resultContainer.style.display = 'block';
@@ -252,6 +264,7 @@ function showResults(result) {
         revealAudio.play().catch(() => {});
     }
 }
+
 
 // Make togglePlay globally available for HTML onclick
 window.togglePlay = function () {
