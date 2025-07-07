@@ -266,53 +266,59 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     const leaderboardHTML = `
                         <div class="daily-leaderboard mt-4" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px; opacity: 0; animation: fadeIn 0.5s ease forwards 0.9s;">
-                            <div class="leaderboard-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        
+                            <div class="leaderboard-toggle" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: white;">View Leaderboard</span>
+                                <i class="fas fa-chevron-down" style="color: var(--neon-purple); transition: transform 0.3s ease;"></i>
+                            </div>
+
+                            <div id="leaderboard-content" style="display: none; transition: all 0.3s ease;">
                                 <h5 style="color: var(--neon-blue); margin: 0;">
                                     <i class="fas fa-trophy"></i> Today's Rankings
                                 </h5>
                                 <span style="color: var(--neon-purple);">
                                     Your Rank: #${data.userRank}
                                 </span>
-                            </div>
-                            
-                            <div class="leaderboard-toggle" onclick="toggleLeaderboard()" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                                <span style="color: white;">View Leaderboard</span>
-                                <i class="fas fa-chevron-down" id="leaderboard-chevron" style="color: var(--neon-purple); transition: transform 0.3s ease;"></i>
-                            </div>
 
-                            <div id="leaderboard-content" style="display: none; transition: all 0.3s ease;">
-                                <div class="leaderboard-list" style="max-height: 300px; overflow-y: auto;">
+                                <div class="leaderboard-list" style="max-height: 300px; overflow-y: auto; margin-top: 10px;">
                                     ${data.scores.map((score, index) => `
                                         <div class="leaderboard-item" style="display: grid; grid-template-columns: auto 1fr auto auto; gap: 15px; padding: 10px; margin: 5px 0; background: rgba(176, 38, 255, 0.1); border-radius: 8px; ${score.isCurrentUser ? 'border: 1px solid var(--neon-purple);' : ''}">
                                             <div style="color: var(--neon-purple); font-weight: bold;">
                                                 ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                                             </div>
                                             <div style="color: white;">
-                                                <a href="/profile/${score.username}" 
-                                                    style="color: white; text-decoration: none; font-weight: bold;">
+                                                <a href="/profile/${score.username}" style="color: white; text-decoration: none; font-weight: bold;">
                                                     ${score.username}
                                                 </a>
                                             </div>
-
                                             <div style="color: var(--neon-blue);">${score.score} pts</div>
                                             <div style="color: var(--neon-pink);">${score.guessTime}s</div>
                                         </div>
                                     `).join('')}
                                 </div>
-                                
-                                <div class="text-center mt-3" style="color: rgba(255, 255, 255, 0.6);">
-                                    <small>Total Players Today: ${data.totalPlayers}</small>
-                                </div>
                             </div>
                         </div>
                     `;
 
-                    // Insert after song details
+                    // ✅ Inject into page
                     songDetails.insertAdjacentHTML('afterend', leaderboardHTML);
+
+                    // ✅ Attach toggle listener to both static & dynamic toggles
+                    document.querySelectorAll('.leaderboard-toggle').forEach(toggle => {
+                        toggle.removeEventListener('click', toggleLeaderboard); // safe detach
+                        toggle.addEventListener('click', toggleLeaderboard);
+                    });
+
+
+                    
+
+
+
                 })
                 .catch(error => {
                     console.error('Error fetching rankings:', error);
                 });
+
 
             initializeCountdown();
 
@@ -327,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Reattach all dynamic listeners here
-    document.querySelector('.leaderboard-toggle')?.addEventListener('click', toggleLeaderboard);
+    
     document.getElementById('upi-copy-btn')?.addEventListener('click', copyUpiId);  // Adjust ID if needed
     document.querySelector('.btn-share-whatsapp')?.addEventListener('click', shareToWhatsApp);
     document.querySelector('.btn-share-twitter')?.addEventListener('click', shareToTwitter);
@@ -876,8 +882,33 @@ document.addEventListener('DOMContentLoaded', function () {
             selectSuggestion(songName, spotifyId);
         });
     }
+    
 
 });
+
+function toggleLeaderboard(e) {
+    const toggle = e.currentTarget;
+    const content = toggle.parentElement.querySelector('#leaderboard-content');
+    const chevron = toggle.querySelector('i');
+
+    if (!content || !chevron) return;
+
+    if (content.style.display === 'none' || content.style.display === '') {
+        content.style.display = 'block';
+        void content.offsetHeight;
+        chevron.style.transform = 'rotate(180deg)';
+        content.style.opacity = '1';
+        content.style.maxHeight = content.scrollHeight + 'px';
+    } else {
+        chevron.style.transform = 'rotate(0deg)';
+        content.style.opacity = '0';
+        content.style.maxHeight = '0';
+        setTimeout(() => {
+            content.style.display = 'none';
+        }, 300);
+    }
+}
+
 
 
 
