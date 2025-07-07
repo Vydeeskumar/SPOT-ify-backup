@@ -55,24 +55,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateTimer() {
         if (startTime === null) return;
+
         const elapsedTime = (Date.now() - startTime) / 1000;
         if (elapsedTime < 0) {
             startTime = Date.now();
             return;
         }
+
         const minutes = Math.floor(elapsedTime / 60);
         const seconds = Math.floor(elapsedTime % 60);
+
         const timerElement = document.getElementById('timer');
         if (timerElement) {
             timerElement.textContent = 
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        // Update points indicator
         const pointsIndicator = document.getElementById('points-indicator');
-        const pointsValue = pointsIndicator.querySelector('.points-value');
-        let currentPoints;
+        if (!pointsIndicator) return;
 
+        const pointsValue = pointsIndicator.querySelector('.points-value');
+        if (!pointsValue) return;
+
+        let currentPoints;
         if (elapsedTime <= 10) {
             currentPoints = 8;
         } else if (elapsedTime <= 20) {
@@ -87,25 +92,25 @@ document.addEventListener('DOMContentLoaded', function () {
             currentPoints = 1;
         }
 
-        // Only update if points changed
         if (pointsValue.textContent != currentPoints) {
             pointsValue.textContent = currentPoints;
             pointsValue.classList.remove('points-change');
-            void pointsValue.offsetWidth; // Trigger reflow
+            void pointsValue.offsetWidth;
             pointsValue.classList.add('points-change');
 
-            // Update colors based on points
+            // Update colors
             if (currentPoints >= 8) {
-                pointsValue.style.color = '#B026FF'; // Purple
+                pointsValue.style.color = '#B026FF';
             } else if (currentPoints >= 5) {
-                pointsValue.style.color = '#0096FF'; // Blue
+                pointsValue.style.color = '#0096FF';
             } else if (currentPoints >= 3) {
-                pointsValue.style.color = '#FFD700'; // Gold
+                pointsValue.style.color = '#FFD700';
             } else {
-                pointsValue.style.color = '#FF69B4'; // Pink
+                pointsValue.style.color = '#FF69B4';
             }
         }
     }
+
 
     function stopTimer() {
         if (startTime === null) return 0;
@@ -347,16 +352,26 @@ document.addEventListener('DOMContentLoaded', function () {
         audioElement.addEventListener('loadedmetadata', () => {
             const minutes = Math.floor(audioElement.duration / 60);
             const seconds = Math.floor(audioElement.duration % 60);
-            totalTimeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            if (totalTimeDisplay) {
+                totalTimeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
         });
 
         audioElement.addEventListener('ended', () => {
-            vinylPlayer.classList.remove('playing');
-            vinylPlayer.classList.add('paused');
-            playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
-            document.getElementById('vinyl-play-icon').className = 'fas fa-play';
+            if (vinylPlayer) {
+                vinylPlayer.classList.remove('playing');
+                vinylPlayer.classList.add('paused');
+            }
+            if (playPauseBtn) {
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+            }
+            const vinylIcon = document.getElementById('vinyl-play-icon');
+            if (vinylIcon) {
+                vinylIcon.className = 'fas fa-play';
+            }
         });
     }
+
 
 
     function updateProgress() {
