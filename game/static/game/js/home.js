@@ -318,6 +318,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+   
+    
+    function toggleLeaderboard() {
+        const content = document.getElementById('leaderboard-content');
+        const chevron = document.getElementById('leaderboard-chevron');
+        
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+            chevron.style.transform = 'rotate(180deg)';
+        } else {
+            content.style.display = 'none';
+            chevron.style.transform = 'rotate(0deg)';
+        }
+    }
+  
+
 
     // Initialize elements
     const audioElement = document.getElementById('song-snippet');
@@ -825,7 +841,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 2000);
     }
 
-    document.getElementById('suggestions').addEventListener('click', function(e) {
+    const suggestionsContainer = document.getElementById('suggestions');
+    if (suggestionsContainer) {
         const suggestion = e.target.closest('.suggestion-item');
         if (!suggestion) return;
 
@@ -833,7 +850,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const spotifyId = suggestion.dataset.spotifyId;
 
         selectSuggestion(songName, spotifyId);
-    });
+}
+
+
+
+
+
+
+
+
+
 
 
 
