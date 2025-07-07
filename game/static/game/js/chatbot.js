@@ -1,3 +1,6 @@
+console.log("✅ chatbot.js loaded");
+
+
 function toggleZombiebot() {
     const chatbox = document.getElementById("zombiebot-chatbox");
     chatbox.classList.toggle("hidden");
@@ -111,8 +114,11 @@ function copyToClipboard(text) {
     });
 }
 
+
+
+
+
+console.log("✅ Global functions registered");
+window.toggleZombiebot = toggleZombiebot;
 window.sendZombiebotMessage = sendZombiebotMessage;
-
-
-console.log("✅ New chatbot.js loaded");
 
