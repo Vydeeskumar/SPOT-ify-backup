@@ -23,21 +23,30 @@ function removeTypingIndicator() {
 function appendZombiebotMessage(sender, message) {
     const msgBox = document.getElementById('zombiebot-messages');
 
+    // 👇 Replace UPI ID with clickable span if found
+    if (message.includes('rvydeeskumar@oksbi')) {
+        message = message.replace(
+            'rvydeeskumar@oksbi',
+            `<span onclick="copyToClipboard('rvydeeskumar@oksbi')" style="color:var(--neon-purple); font-weight:bold; cursor:pointer;">rvydeeskumar@oksbi</span>`
+        );
+    }
+
     const wrapper = document.createElement('div');
     wrapper.className = 'zb-msg-row';
     wrapper.style.justifyContent = sender === 'you' ? 'flex-end' : 'flex-start';
 
     const bubble = document.createElement('div');
     bubble.className = sender === 'you' ? 'zb-bubble-user' : 'zb-bubble-bot';
-    bubble.innerText = message;
+
+    // 👇 Use innerHTML instead of innerText so HTML formatting works
+    bubble.innerHTML = message;
 
     wrapper.appendChild(bubble);
     msgBox.appendChild(wrapper);
     msgBox.scrollTop = msgBox.scrollHeight;
     bubble.scrollIntoView({ behavior: 'smooth' });
-
-
 }
+
 
 
 
@@ -95,6 +104,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert(`UPI ID copied: ${text}`);
+    });
+}
+
 
 
 console.log("✅ New chatbot.js loaded");

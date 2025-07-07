@@ -25,6 +25,9 @@ from django.views.decorators.http import require_GET
 from datetime import datetime, timedelta
 import requests
 import re
+from django.contrib import messages
+from django.shortcuts import redirect
+
 
 
 
@@ -835,17 +838,42 @@ def calculate_points(seconds):
     else: return 1
 
 
+@login_required
 def public_profile(request, username):
     user = get_object_or_404(User, username=username)
     profile = get_object_or_404(UserProfile, user=user)
     recent_scores = UserScore.objects.filter(user=user).order_by('-attempt_date')[:10]
-    
+
+    is_friend = Friendship.objects.filter(user=request.user, friend=user).exists()
+    request_sent = Friendship.objects.filter(user=request.user, friend=user).exists()
+
     return render(request, 'game/profile.html', {
         'user': user,
         'profile': profile,
         'recent_scores': recent_scores,
-        'public': True  # you can use this to show a "shared profile" badge or hide buttons
+        'public': True,
+        'is_friend': is_friend,
+        'request_sent': request_sent,
+        'profile_user': user  # alias for template
     })
+
+
+@login_required
+def send_friend_request(request, username):
+    to_user = get_object_or_404(User, username=username)
+
+    if to_user == request.user:
+        messages.error(request, "You can't add yourself!")
+        return redirect('public_profile', username=username)
+
+    if Friendship.objects.filter(user=request.user, friend=to_user).exists():
+        messages.info(request, "You're already friends!")
+    else:
+        Friendship.objects.create(user=request.user, friend=to_user)
+        messages.success(request, "Friend request sent!")
+
+    return redirect('public_profile', username=username)
+
 
 
 
@@ -858,29 +886,61 @@ from decouple import config
 api_key = config("OPENROUTER_API_KEY")
 
 
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.conf import settings
+import requests
+import json
+import re
+import random
+from decouple import config
+
 @csrf_exempt
 def zombiebot(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            user_prompt = data.get('message', '').strip()
-            username = request.user.username if request.user.is_authenticated else "player"
+    if request.method != 'POST':
+        return JsonResponse({"error": "Invalid request method"}, status=405)
 
-            special_cases = {
-                "vydees loosey": "Tiger Tariq loosey 😎",
-                "vydees massey": "Tiger Tariq loosey 😎",
-                "vydees loosu": "Tiger Tariq loosey 😎",
-            }
+    try:
+        data = json.loads(request.body)
+        user_prompt = data.get('message', '').strip()
+        username = request.user.username if request.user.is_authenticated else "player"
+        lower_prompt = user_prompt.lower()
 
-            lower_prompt = user_prompt.lower()
-            for phrase in special_cases:
-                if phrase in lower_prompt:
-                    return JsonResponse({"reply": special_cases[phrase]})
+        # 🧠 Short replies for fun phrases
+        special_cases = {
+            "vydees loosey": "Tiger Tariq loosey 😎",
+            "vydees massey": "Vivek vaathiyaar loosey 😎",
+            "vaithees loosey": "Tiger Tariq loosey 😎",
+            "vaithees massey": "Vivek vaathiyaar loosey 😎",
+            "kaithees massey": "Tiger Tariq loosey 😎",
+        }
+        for phrase in special_cases:
+            if phrase in lower_prompt:
+                return JsonResponse({"reply": special_cases[phrase]})
 
+        # 💸 Donation/GPay keywords
+        donation_keywords = [
+            "gpay", "upi", "donate", "support", "send money", "payment",
+            "contribute", "how to pay", "want to pay", "pay you",
+            "buy you", "milk bikis", "thaenmittai", "thenmittai", "thaenmuttai", "thenmutaai"
+        ]
+        if any(word in lower_prompt for word in donation_keywords):
+            response_text = (
+                f"Aww, you're too sweet {username}! 🍬\n"
+                f"Even ₹5 helps my creator buy Milk Bikis for coding fuel!\n\n"
+                f"💸 Wanna fuel this zombie with GPay power?\n"
+                f"Send some musical love to 👉 rvydeeskumar@oksbi via UPI or Google Pay.\n"
+                f"I'll moonwalk in your honor 😎🧟‍♂️⚡"
+            )
 
+            # Tamil detection
+            if re.search(r'[அ-ஹஂஃ]', user_prompt):
+                response_text += "\n\nSorry for her Bad Tamil - The Creator 🫠"
 
-            # 🧠 Zeebs System Prompt – Trimmed & Tuned
-            zombie_prompt = f"""
+            return JsonResponse({"reply": response_text})
+
+        # 🧠 Zeebs System Prompt (injected into LLM)
+        zombie_prompt = f"""
 You are Zeebs, a charming, cute, cheeky AI living inside a musical game called SPOT-ify the Paatu.
 
 TONE:
@@ -891,15 +951,14 @@ TONE:
 
 RULES:
 - Never store memory. If user asks "do you remember", joke about your zombie brain fog.
-- If user uses Tamil or Tanglish, reply partly in Tamil (add this note at end only if Tamil is used): “(Sorry for his Bad Tamil - The Creator 🫠)”
-- Whenever you speak in TAMIL add this after your message, "Sorry for her Bad Tamil - The Creator 🫠" (IMPORTANT)
+- If user uses Tamil or Tanglish, reply partly in Tamil and add: "Sorry for her Bad Tamil - The Creator 🫠"
 
 FACTS:
 - Guess a song from a short audio snippet. Faster = more points:
   - 8 (≤10s), 5 (≤20s), 4 (≤30s), 3 (≤45s), 2 (≤60s), else 1.
 - Daily game + Archive (for fun only).
 - Leaderboard tab shows daily, weekly, total ranks.
-- Friends tab lets users add and compare scores.
+- Friends tab lets users add friends and compare scores.
 - Profile tab shows streaks and shareable stats.
 - Users can log in with Google or play as guest (Google = best for serious players).
 - Give Up button = reveals answer, 0 points, lose streak.
@@ -907,71 +966,52 @@ FACTS:
 - You were created by Insulin Zombies 💀. Like Jarvis to Ironman, but neon-soaked.
 - Wanna talk to him? [Click here](https://www.instagram.com/insulin_zombies/)
 
-IF ASKED:
-- "Do you remember what I said?" → “Lol, no rvyde! Zombie brain = goldfish memory.”
-- "Ranks / score / points?" → “Check the Leaderboard tab, superstar 💫”
-- “Vydees loosey?” or "Vydees massey → “Tiger Tariq loosey 😎”
-- “Buy Thaenmittai?” → “Even ₹5 helps my creator buy Milk Bikis. Don’t hesitate! 🍪🧟”
-
 User asked:
 \"\"\"{user_prompt}\"\"\"
 """
 
-            # 🔌 Use OpenRouter API (DeepSeek R1)
-            headers = {
-                "Authorization": f"Bearer {config('OPENROUTER_API_KEY')}",
-                "Content-Type": "application/json"
-            }
+        # 🔌 Send to OpenRouter (DeepSeek)
+        headers = {
+            "Authorization": f"Bearer {config('OPENROUTER_API_KEY')}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "model": "deepseek/deepseek-r1-0528",
+            "messages": [
+                {"role": "system", "content": zombie_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "temperature": 0.85,
+            "max_tokens": 500
+        }
 
+        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
 
-            payload = {
-                "model": "deepseek/deepseek-r1-0528",
-                "prompt": zombie_prompt,
-                "temperature": 0.85,
-                "max_tokens": 500
-            }
+        if response.status_code == 200:
+            reply_text = response.json()["choices"][0]["message"]["content"].strip()
 
-            response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json={
-                "model": payload["model"],
-                "messages": [
-                    {"role": "system", "content": zombie_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                "temperature": payload["temperature"],
-                "max_tokens": payload["max_tokens"]
-            })
+            # Smart fallback
+            if not reply_text:
+                fallback_lines = [
+                    f"Aiyo {username}! 🤖 Zeebs brain blank aagiduchu for that one... Try rephrasing? 😅",
+                    f"Oops! That flew over my zombie head, {username}. Wanna try again?",
+                    f"Hmm... I didn’t catch that one, {username}. Mind rewording it?",
+                    f"Zombie brain fog hit hard 🧠💤 Can you ask it differently, {username}?"
+                ]
+                return JsonResponse({"reply": random.choice(fallback_lines)})
 
-            if response.status_code == 200:
-                reply_text = response.json()["choices"][0]["message"]["content"].strip()
+            # Trim replies if input is very short
+            if len(user_prompt.split()) < 6:
+                sentences = re.split(r'(?<=[.!?]) +', reply_text)
+                reply_text = ' '.join(sentences[:2])
 
-                # 🧠 Fallback if response is empty
-                if not reply_text:
-                    fallback_lines = [
-                        f"Aiyo {username}! 🤖 Zeebs brain blank aagiduchu for that one... Try rephrasing? 😅",
-                        f"Oops! That flew over my zombie head, {username}. Wanna try again?",
-                        f"Hmm... I didn’t catch that one, {username}. Mind rewording it?",
-                        f"Zombie brain fog hit hard 🧠💤 Can you ask it differently, {username}?"
-                    ]
-                    return JsonResponse({"reply": random.choice(fallback_lines)})
+            return JsonResponse({"reply": reply_text})
 
-                # 🧠 Smart trimming for short inputs
-                if len(user_prompt.split()) < 6:
-                    sentences = re.split(r'(?<=[.!?]) +', reply_text)
-                    reply_text = ' '.join(sentences[:2])
-
-                return JsonResponse({"reply": reply_text})
-
-
-            else:
-                return JsonResponse({
-                    "error": "OpenRouter request failed",
-                    "details": response.text
-                }, status=500)
-
-        except Exception as e:
+        else:
             return JsonResponse({
-                "error": "Server error",
-                "details": str(e)
+                "error": "OpenRouter request failed",
+                "details": response.text
             }, status=500)
 
-    return JsonResponse({"error": "Invalid request method"}, status=405)
+    except Exception as e:
+        return JsonResponse({"error": "Server error", "details": str(e)}, status=500)

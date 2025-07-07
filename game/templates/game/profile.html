@@ -9,6 +9,21 @@
                 <div class="card-header">
                     <i class="fas fa-user-circle"></i>
                     <h5 class="mb-0">{{ user.username }}'s Profile</h5>
+                    {% if public and profile_user != request.user %}
+                        {% if is_friend %}
+                            <p style="margin-top: 10px; color: var(--neon-green); font-weight: bold;">✅ You are already friends</p>
+                        {% else %}
+                            <form action="{% url 'send_friend_request' profile_user.username %}" method="post" style="margin-top: 10px;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-share-add">
+                                    <i class="fas fa-user-plus"></i> Add Friend
+                                </button>
+                            </form>
+
+                        {% endif %}
+                    {% endif %}
+
+
                 </div>
                 <div class="card-body">
                     <div class="streak-info">
@@ -119,6 +134,14 @@
 </div>
 
 <style>
+
+:root {
+    --neon-purple: #b026ff;
+    --neon-blue: #0096ff;
+    --neon-pink: #ff69b4;
+    --neon-green: #00ff8c; /* ✅ ADD THIS LINE */
+}
+
 .glass-card {
     background: rgba(18, 18, 18, 0.95);
     border-radius: 15px;
@@ -310,6 +333,24 @@
     margin-bottom: 10px;
 }
 
+.neon-button {
+    background: var(--neon-purple);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px var(--neon-purple);
+}
+
+.neon-button:hover {
+    box-shadow: 0 0 20px var(--neon-pink);
+    transform: scale(1.05);
+}
+
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
     .container {
@@ -370,6 +411,55 @@ toast.style.cssText = `
     word-wrap: break-word;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 `;
+
+.btn-share-add {
+    background: rgba(0, 255, 140, 0.1);
+    border: 2px solid var(--neon-green);
+    color: var(--neon-green);
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    justify-content: center;
+}
+
+.btn-share-add:hover {
+    background: var(--neon-green);
+    color: white;
+    box-shadow: 0 0 15px rgba(0, 255, 140, 0.4);
+    transform: scale(1.05);
+}
+
+.btn-share-add {
+    background: rgba(0, 255, 140, 0.1);
+    border: 2px solid var(--neon-green);
+    color: var(--neon-green);
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 255, 140, 0.4);
+}
+
+.btn-share-add:hover {
+    background: var(--neon-green);
+    color: black;
+    box-shadow: 0 0 15px rgba(0, 255, 140, 0.6);
+    transform: scale(1.05);
+}
+
+
+
+
+
+
 
 </style>
 
