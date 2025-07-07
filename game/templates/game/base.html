@@ -632,8 +632,13 @@
 
         // Define the global toggleZombiebot function
         window.toggleZombiebot = function () {
-            const chatWindow = document.querySelector(".chatbot-container");
-            chatWindow.classList.toggle("chatbot-open");
+            const chatWindow = document.getElementById("zombiebot-chatbox");
+            if (chatWindow) {
+                chatWindow.classList.toggle("hidden");
+            } else {
+                console.warn("Zombiebot chat window not found!");
+            }
+            
         };
     });
 </script>
