@@ -630,7 +630,14 @@
             supportButton.style.opacity = '1';
         }
 
-        // Define the global toggleZombiebot function
+    });
+</script>
+
+
+{% include "game/chatbot.html" %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
         window.toggleZombiebot = function () {
             const chatWindow = document.getElementById("zombiebot-chatbox");
             if (chatWindow) {
@@ -638,18 +645,11 @@
             } else {
                 console.warn("Zombiebot chat window not found!");
             }
-            
         };
     });
 </script>
 
-
-{% include "game/chatbot.html" %}
-
-{% block extra_scripts %}
-<script src="{% static 'game/js/chatbot.js' %}?v=13" defer></script>
-{% endblock %}
-
+<script src="{% static 'game/js/chatbot.js' %}?v=100"></script>
 
 
 
