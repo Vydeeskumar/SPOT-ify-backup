@@ -469,21 +469,17 @@ def friends_list(request):
     # Get friend requests if you want to implement that
     friend_requests = Friendship.objects.filter(friend=request.user)
     
-    # Get friend suggestions (users with similar scores)
-    user_score = UserScore.objects.filter(user=request.user).aggregate(total=Sum('score'))['total'] or 0
-    
-    similar_users = User.objects.annotate(
-        total_score=Sum('userscore__score')
-    ).filter(
-        total_score__range=(user_score * 0.8, user_score * 1.2)
-    ).exclude(
+    # Get random suggested users (not already friends and not self)
+    suggested_users = User.objects.exclude(
         id__in=friends.values_list('friend_id', flat=True)
-    ).exclude(id=request.user.id)[:5]
+    ).exclude(
+        id=request.user.id
+    ).order_by('?')[:5]  # Random 5 users
 
     context = {
         'friends': friends,
         'friend_requests': friend_requests,
-        'suggested_friends': similar_users,
+        'suggested_friends': suggested_users,
     }
     return render(request, 'game/friends.html', context)
 
@@ -871,12 +867,10 @@ def zombiebot(request):
             username = request.user.username if request.user.is_authenticated else "player"
 
             special_cases = {
-                "vydees loosey": "Vivek vaathiyaaru loosey 😎", 
-                "vydees massey": "Vivek vaathiyaaru loosey 😎", 
-                "vaithees massey": "Tiger Tariq loosey 😎",
-                "vaithees loosey": "Tiger Tariq loosey 😎"
+                "vydees loosey": "Tiger Tariq loosey 😎",
+                "vydees massey": "Tiger Tariq loosey 😎",
+                "vydees loosu": "Tiger Tariq loosey 😎",
             }
-
 
             lower_prompt = user_prompt.lower()
             for phrase in special_cases:
@@ -904,12 +898,9 @@ FACTS:
 - Guess a song from a short audio snippet. Faster = more points:
   - 8 (≤10s), 5 (≤20s), 4 (≤30s), 3 (≤45s), 2 (≤60s), else 1.
 - Daily game + Archive (for fun only).
-- Archive tab - players can play the old missed out games(doesnt affect the leaderboard but), just shows hypotetical rank.
 - Leaderboard tab shows daily, weekly, total ranks.
 - Friends tab lets users add and compare scores.
-- Profile tab shows streaks and shareable stats to flex it with friends.
-- Buy Me a Thaenmittai button will appear after playing the game, where players can give buy as a token of love to the creator.
-- Dont hesitate to send small amount. Even with 5 Rupees, Creator will buy Milk Bikis and  dance happily.
+- Profile tab shows streaks and shareable stats.
 - Users can log in with Google or play as guest (Google = best for serious players).
 - Give Up button = reveals answer, 0 points, lose streak.
 - Leaderboard standings based on time and rank based on time.
