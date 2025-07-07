@@ -326,20 +326,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('.btn-share-copy')?.addEventListener('click', copyShareText);
 
 
-   
-    
-    function toggleLeaderboard() {
-        const content = document.getElementById('leaderboard-content');
-        const chevron = document.getElementById('leaderboard-chevron');
-        
-        if (content.style.display === 'none') {
-            content.style.display = 'block';
-            chevron.style.transform = 'rotate(180deg)';
-        } else {
-            content.style.display = 'none';
-            chevron.style.transform = 'rotate(0deg)';
-        }
-    }
   
 
 
@@ -381,8 +367,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const totalMinutes = Math.floor(audioElement.duration / 60);
             const totalSeconds = Math.floor(audioElement.duration % 60);
             
-            currentTimeDisplay.textContent = `${currentMinutes}:${currentSeconds.toString().padStart(2, '0')}`;
-            totalTimeDisplay.textContent = `${totalMinutes}:${totalSeconds.toString().padStart(2, '0')}`;
+            if (currentTimeDisplay && totalTimeDisplay) {
+                currentTimeDisplay.textContent = `${currentMinutes}:${currentSeconds.toString().padStart(2, '0')}`;
+                totalTimeDisplay.textContent = `${totalMinutes}:${totalSeconds.toString().padStart(2, '0')}`;
+            }
+
         }
     }
 
@@ -420,19 +409,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Add this new function right after the above code
-    function togglePlay() {
+    window.togglePlay = function() {
         playPauseBtn.click();
-    }
+    };
 
-    function toggleLeaderboard() {
+
+    window.toggleLeaderboard = function () {
         const content = document.getElementById('leaderboard-content');
         const chevron = document.getElementById('leaderboard-chevron');
-        
+
         if (!content || !chevron) return;
 
         if (content.style.display === 'none') {
             content.style.display = 'block';
-            // Force reflow
             void content.offsetHeight;
             chevron.style.transform = 'rotate(180deg)';
             content.style.opacity = '1';
@@ -445,7 +434,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 content.style.display = 'none';
             }, 300);
         }
-    }
+    };
+
+
 
     // Give Up functionality
     if (giveUpBtn) {
@@ -854,28 +845,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const suggestionsContainer = document.getElementById('suggestions');
     if (suggestionsContainer) {
-        const suggestion = e.target.closest('.suggestion-item');
-        if (!suggestion) return;
+        suggestionsContainer.addEventListener('click', function(e) {
+            const suggestion = e.target.closest('.suggestion-item');
+            if (!suggestion) return;
 
-        const songName = decodeURIComponent(suggestion.dataset.songName);
-        const spotifyId = suggestion.dataset.spotifyId;
-
-        selectSuggestion(songName, spotifyId);
-}
-
-
-
-
-
-
-
-
-
-
-
-
+            const songName = decodeURIComponent(suggestion.dataset.songName);
+            const spotifyId = suggestion.dataset.spotifyId;
+            selectSuggestion(songName, spotifyId);
+        });
+    }
 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
