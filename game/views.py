@@ -873,9 +873,10 @@ def zombiebot(request):
             special_cases = {
                 "vydees loosey": "Vivek vaathiyaaru loosey 😎", 
                 "vydees massey": "Vivek vaathiyaaru loosey 😎", 
-                "Vaithees massey": "Tiger Tariq loosey 😎",
-                "Vaithees loosey": "Tiger Tariq loosey 😎"
+                "vaithees massey": "Tiger Tariq loosey 😎",
+                "vaithees loosey": "Tiger Tariq loosey 😎"
             }
+
 
             lower_prompt = user_prompt.lower()
             for phrase in special_cases:
