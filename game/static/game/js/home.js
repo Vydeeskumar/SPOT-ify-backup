@@ -660,39 +660,42 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let debounceTimeout;
 
-    document.getElementById('guess-input').addEventListener('input', async function(e) {
-        clearTimeout(debounceTimeout);
-        const query = e.target.value;
-        
-        debounceTimeout = setTimeout(async () => {
-            if (query.length < 2) {
-                document.getElementById('suggestions').style.display = 'none';
-                return;
-            }
-            
-            const tracks = await searchSpotify(query);
-            const suggestionsContainer = document.getElementById('suggestions');
-            
-            if (tracks && tracks.length > 0) {
-                suggestionsContainer.innerHTML = tracks.map(track => `
-                    <div class="suggestion-item" 
-                        data-song-name="${encodeURIComponent(track.name)}" 
-                        data-spotify-id="${track.id}">
-                        <img src="${track.album.images[track.album.images.length-1].url}" alt="${track.name}">
-                        <div class="suggestion-info">
-                            <div class="suggestion-title">${track.name}</div>
-                            <div class="suggestion-artist">${track.artists[0].name}</div>
-                        </div>
-                    </div>
-                `).join('');
+    const guessInputField = document.getElementById('guess-input');
+    if (guessInputField) {
+        guessInputField.addEventListener('input', async function (e) {
+            clearTimeout(debounceTimeout);
+            const query = e.target.value;
 
-                
-                suggestionsContainer.style.display = 'block';
-            } else {
-                suggestionsContainer.style.display = 'none';
-            }
-        }, 100);  // Reduced from 300ms to 150ms for faster response
-    });
+            debounceTimeout = setTimeout(async () => {
+                if (query.length < 2) {
+                    document.getElementById('suggestions').style.display = 'none';
+                    return;
+                }
+
+                const tracks = await searchSpotify(query);
+                const suggestionsContainer = document.getElementById('suggestions');
+
+                if (tracks && tracks.length > 0) {
+                    suggestionsContainer.innerHTML = tracks.map(track => `
+                        <div class="suggestion-item" 
+                            data-song-name="${encodeURIComponent(track.name)}" 
+                            data-spotify-id="${track.id}">
+                            <img src="${track.album.images[track.album.images.length - 1].url}" alt="${track.name}">
+                            <div class="suggestion-info">
+                                <div class="suggestion-title">${track.name}</div>
+                                <div class="suggestion-artist">${track.artists[0].name}</div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    suggestionsContainer.style.display = 'block';
+                } else {
+                    suggestionsContainer.style.display = 'none';
+                }
+            }, 100);
+        });
+    }
+
 
     function selectSuggestion(songName, spotifyId) {
         document.getElementById('guess-input').value = songName;
