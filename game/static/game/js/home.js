@@ -306,10 +306,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     songDetails.insertAdjacentHTML('afterend', leaderboardHTML);
 
                     // ✅ Attach toggle listener to both static & dynamic toggles
-                    document.querySelectorAll('.leaderboard-toggle').forEach(toggle => {
-                        toggle.removeEventListener('click', toggleLeaderboard); // safe detach
-                        toggle.addEventListener('click', toggleLeaderboard);
-                    });
+                    const toggles = document.querySelectorAll('.leaderboard-toggle');
+                    if (toggles.length > 0) {
+                        toggles.forEach(toggle => {
+                            toggle.removeEventListener('click', toggleLeaderboard);
+                            toggle.addEventListener('click', toggleLeaderboard);
+                        });
+                    }
+
 
 
                     
