@@ -192,12 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    function attachLeaderboardToggleListeners() {
-        document.querySelectorAll('.leaderboard-toggle').forEach(toggle => {
-            toggle.removeEventListener('click', toggleLeaderboard); // Detach if any
-            toggle.addEventListener('click', toggleLeaderboard);     // Reattach
-        });
-    }
+    
 
 
     function showResultView() {
@@ -279,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const leaderboardHTML = `
                         <div class="daily-leaderboard mt-4" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px; opacity: 0; animation: fadeIn 0.5s ease forwards 0.9s;">
                         
-                            <div class="leaderboard-toggle" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <div class="leaderboard-toggle" onclick="toggleLeaderboard(event)" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
                                 <span style="color: white;">View Leaderboard</span>
                                 <i class="fas fa-chevron-down" style="color: var(--neon-purple); transition: transform 0.3s ease;"></i>
                             </div>
@@ -314,10 +309,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // ✅ Inject into page
                     songDetails.insertAdjacentHTML('afterend', leaderboardHTML);
-                    setTimeout(() => {
-                        attachLeaderboardToggleListeners();  // ✅ Attach toggles after DOM insertion
-                    }, 100);
-
+                    
 
 
 
@@ -912,9 +904,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        attachLeaderboardToggleListeners(); // Fallback for static toggles
-    });
+    
 
     
 
