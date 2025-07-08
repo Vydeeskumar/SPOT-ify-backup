@@ -696,22 +696,33 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-
+    // Select suggestion and apply it to the guess input
     function selectSuggestion(songName, spotifyId) {
-        document.getElementById('guess-input').value = songName;
-        document.getElementById('guess-input').dataset.spotifyId = spotifyId;  // Store the ID
-        document.getElementById('suggestions').style.display = 'none';
+        const guessInput = document.getElementById('guess-input');
+        const suggestions = document.getElementById('suggestions');
+
+        if (guessInput && suggestions) {
+            guessInput.value = songName;
+            guessInput.dataset.spotifyId = spotifyId;  // Store the ID
+            suggestions.style.display = 'none';
+        }
     }
 
     // Close suggestions when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('#guess-input') && !e.target.closest('#suggestions')) {
-            document.getElementById('suggestions').style.display = 'none';
+    document.addEventListener('click', function (e) {
+        const guessInput = document.getElementById('guess-input');
+        const suggestions = document.getElementById('suggestions');
+
+        if (suggestions && !e.target.closest('#guess-input') && !e.target.closest('#suggestions')) {
+            suggestions.style.display = 'none';
         }
     });
 
-    // Get token when page loads
+    // Get token when page loads (✅ leave this untouched)
     getSpotifyToken();
+
+
+
 
     // Share functions
     function getShareText() {
