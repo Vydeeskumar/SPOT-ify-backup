@@ -25,10 +25,7 @@ function toggleLeaderboard(e) {
     console.log("🟣 Toggle leaderboard clicked");
 }
 
-
-
-
-
+window.toggleLeaderboard = toggleLeaderboard;
 
 
 
@@ -216,6 +213,7 @@ document.addEventListener('DOMContentLoaded', function () {
             toggle.addEventListener('click', toggleLeaderboard);
         });
     }
+
 
 
     
@@ -496,35 +494,7 @@ document.addEventListener('DOMContentLoaded', function () {
         playPauseBtn.click();
     };
 
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.leaderboard-toggle').forEach(toggle => {
-            const content = toggle.parentElement.querySelector('#leaderboard-content');
-            const chevron = toggle.querySelector('i');
-
-            if (toggle && content && chevron) {
-                toggle.addEventListener('click', function () {
-                    if (content.style.display === 'none' || content.style.display === '') {
-                        content.style.display = 'block';
-                        void content.offsetHeight;
-                        chevron.style.transform = 'rotate(180deg)';
-                        content.style.opacity = '1';
-                        content.style.maxHeight = content.scrollHeight + 'px';
-                    } else {
-                        chevron.style.transform = 'rotate(0deg)';
-                        content.style.opacity = '0';
-                        content.style.maxHeight = '0';
-                        setTimeout(() => {
-                            content.style.display = 'none';
-                        }, 300);
-                    }
-                });
-            }
-        });
-    });
-
-
-    
-
+   
 
 
     // Give Up functionality
@@ -968,6 +938,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     
 
+});
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        attachLeaderboardToggleListeners();  // ✅ Ensures DOM is fully ready
+    }, 100);
 });
 
 
