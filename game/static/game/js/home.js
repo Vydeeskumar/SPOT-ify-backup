@@ -254,6 +254,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     .catch(error => console.log('Audio playback failed:', error));
             }
 
+            
+
             // Remove any existing leaderboard
             const existingLeaderboard = document.querySelector('.daily-leaderboard');
             if (existingLeaderboard) {
@@ -312,21 +314,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // ✅ Inject into page
                     songDetails.insertAdjacentHTML('afterend', leaderboardHTML);
-                    attachLeaderboardToggleListeners(); 
+                    setTimeout(() => {
+                        attachLeaderboardToggleListeners();  // ✅ Attach toggles after DOM insertion
+                    }, 100);
 
-
-                    // ✅ Attach toggle listener to both static & dynamic toggles
-                    const toggles = document.querySelectorAll('.leaderboard-toggle');
-                    if (toggles.length > 0) {
-                        toggles.forEach(toggle => {
-                            toggle.removeEventListener('click', toggleLeaderboard);
-                            toggle.addEventListener('click', toggleLeaderboard);
-                        });
-                    }
-
-
-
-                    
 
 
 
