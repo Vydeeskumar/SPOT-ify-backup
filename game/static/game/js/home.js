@@ -438,29 +438,31 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     document.addEventListener('DOMContentLoaded', function () {
-        const toggle = document.getElementById('leaderboard-toggle');
-        const content = document.getElementById('leaderboard-content');
-        const chevron = document.getElementById('leaderboard-chevron');
+        document.querySelectorAll('.leaderboard-toggle').forEach(toggle => {
+            const content = toggle.parentElement.querySelector('#leaderboard-content');
+            const chevron = toggle.querySelector('i');
 
-        if (toggle && content && chevron) {
-            toggle.addEventListener('click', function () {
-                if (content.style.display === 'none' || content.style.display === '') {
-                    content.style.display = 'block';
-                    void content.offsetHeight;
-                    chevron.style.transform = 'rotate(180deg)';
-                    content.style.opacity = '1';
-                    content.style.maxHeight = content.scrollHeight + 'px';
-                } else {
-                    chevron.style.transform = 'rotate(0deg)';
-                    content.style.opacity = '0';
-                    content.style.maxHeight = '0';
-                    setTimeout(() => {
-                        content.style.display = 'none';
-                    }, 300);
-                }
-            });
-        }
+            if (toggle && content && chevron) {
+                toggle.addEventListener('click', function () {
+                    if (content.style.display === 'none' || content.style.display === '') {
+                        content.style.display = 'block';
+                        void content.offsetHeight;
+                        chevron.style.transform = 'rotate(180deg)';
+                        content.style.opacity = '1';
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    } else {
+                        chevron.style.transform = 'rotate(0deg)';
+                        content.style.opacity = '0';
+                        content.style.maxHeight = '0';
+                        setTimeout(() => {
+                            content.style.display = 'none';
+                        }, 300);
+                    }
+                });
+            }
+        });
     });
+
 
     
 
