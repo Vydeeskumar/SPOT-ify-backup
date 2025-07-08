@@ -941,7 +941,11 @@ function toggleLeaderboard(e) {
             content.style.display = 'none';
         }, 300);
     }
+    console.log("🟣 Toggle leaderboard clicked");
+
 }
+
+window.toggleLeaderboard = toggleLeaderboard;
 
 
 
