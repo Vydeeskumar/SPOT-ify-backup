@@ -1,3 +1,36 @@
+function toggleLeaderboard(e) {
+    const toggle = e.currentTarget;
+    const content = toggle.parentElement.querySelector('#leaderboard-content');
+    const chevron = toggle.querySelector('i');
+
+    if (!content || !chevron) return;
+
+    if (content.style.display === 'none' || content.style.display === '') {
+        content.style.display = 'block';
+        void content.offsetHeight;
+        chevron.style.transform = 'rotate(180deg)';
+        content.style.opacity = '1';
+        content.style.maxHeight = content.scrollHeight + 'px';
+    } else {
+        chevron.style.transform = 'rotate(0deg)';
+        content.style.opacity = '0';
+        content.style.maxHeight = '0';
+        setTimeout(() => {
+            content.style.display = 'none';
+        }, 300);
+    }
+
+    console.log("🟣 Toggle leaderboard clicked");
+
+}
+
+window.toggleLeaderboard = toggleLeaderboard;
+
+
+
+
+
+
 document.addEventListener('DOMContentLoaded', function () {
     console.log("✅ home.js loaded");
     const mainGame = document.getElementById('game-main');  // Add this container to home.html
@@ -173,6 +206,13 @@ document.addEventListener('DOMContentLoaded', function () {
         window.countdownInterval = setInterval(updateCountdown, 1000);
     }
 
+     function attachLeaderboardToggleListeners() {
+        document.querySelectorAll('.leaderboard-toggle').forEach(toggle => {
+            toggle.removeEventListener('click', toggleLeaderboard);  // Clean existing
+            toggle.addEventListener('click', toggleLeaderboard);      // Attach fresh
+        });
+    }
+
     
         
     // Check if we need to show countdown
@@ -274,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const leaderboardHTML = `
                         <div class="daily-leaderboard mt-4" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px; opacity: 0; animation: fadeIn 0.5s ease forwards 0.9s;">
                         
-                            <div class="leaderboard-toggle" onclick="toggleLeaderboard(event)" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <div class="leaderboard-toggle" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
                                 <span style="color: white;">View Leaderboard</span>
                                 <i class="fas fa-chevron-down" style="color: var(--neon-purple); transition: transform 0.3s ease;"></i>
                             </div>
@@ -286,6 +326,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <span style="color: var(--neon-purple);">
                                     Your Rank: #${data.userRank}
                                 </span>
+
 
                                 <div class="leaderboard-list" style="max-height: 300px; overflow-y: auto; margin-top: 10px;">
                                     ${data.scores.map((score, index) => `
@@ -309,7 +350,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // ✅ Inject into page
                     songDetails.insertAdjacentHTML('afterend', leaderboardHTML);
-                    
+                    setTimeout(() => {
+                        attachLeaderboardToggleListeners();
+                    }, 100);  // ⬅️ This is key
+
 
 
 
@@ -330,6 +374,9 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error in showResultView:', error);
         }
     }
+
+   
+
 
     // Reattach all dynamic listeners here
     
@@ -910,32 +957,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-function toggleLeaderboard(e) {
-    const toggle = e.currentTarget;
-    const content = toggle.parentElement.querySelector('#leaderboard-content');
-    const chevron = toggle.querySelector('i');
 
-    if (!content || !chevron) return;
-
-    if (content.style.display === 'none' || content.style.display === '') {
-        content.style.display = 'block';
-        void content.offsetHeight;
-        chevron.style.transform = 'rotate(180deg)';
-        content.style.opacity = '1';
-        content.style.maxHeight = content.scrollHeight + 'px';
-    } else {
-        chevron.style.transform = 'rotate(0deg)';
-        content.style.opacity = '0';
-        content.style.maxHeight = '0';
-        setTimeout(() => {
-            content.style.display = 'none';
-        }, 300);
-    }
-    console.log("🟣 Toggle leaderboard clicked");
-
-}
-
-window.toggleLeaderboard = toggleLeaderboard;
 
 
 
