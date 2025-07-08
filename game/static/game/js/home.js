@@ -27,6 +27,15 @@ function toggleLeaderboard(e) {
 
 window.toggleLeaderboard = toggleLeaderboard;
 
+function attachLeaderboardToggleListeners() {
+        const toggles = document.querySelectorAll('.leaderboard-toggle');
+        console.log(`🟣 Found ${toggles.length} leaderboard toggles`);
+        toggles.forEach(toggle => {
+            toggle.removeEventListener('click', toggleLeaderboard);
+            toggle.addEventListener('click', toggleLeaderboard);
+        });
+    }
+
 
 
 
@@ -205,14 +214,7 @@ document.addEventListener('DOMContentLoaded', function () {
         window.countdownInterval = setInterval(updateCountdown, 1000);
     }
 
-    function attachLeaderboardToggleListeners() {
-        const toggles = document.querySelectorAll('.leaderboard-toggle');
-        console.log(`🟣 Found ${toggles.length} leaderboard toggles`);
-        toggles.forEach(toggle => {
-            toggle.removeEventListener('click', toggleLeaderboard);
-            toggle.addEventListener('click', toggleLeaderboard);
-        });
-    }
+    
 
 
 
@@ -946,6 +948,7 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         attachLeaderboardToggleListeners();  // ✅ Ensures DOM is fully ready
+        console.log("🟣 Attached toggle listeners to static leaderboard");
     }, 100);
 });
 
