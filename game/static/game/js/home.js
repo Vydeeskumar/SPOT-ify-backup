@@ -192,6 +192,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    function attachLeaderboardToggleListeners() {
+        document.querySelectorAll('.leaderboard-toggle').forEach(toggle => {
+            toggle.removeEventListener('click', toggleLeaderboard); // Detach if any
+            toggle.addEventListener('click', toggleLeaderboard);     // Reattach
+        });
+    }
+
+
     function showResultView() {
         try {
 
@@ -304,6 +312,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // ✅ Inject into page
                     songDetails.insertAdjacentHTML('afterend', leaderboardHTML);
+                    attachLeaderboardToggleListeners(); 
+
 
                     // ✅ Attach toggle listener to both static & dynamic toggles
                     const toggles = document.querySelectorAll('.leaderboard-toggle');
@@ -910,6 +920,11 @@ document.addEventListener('DOMContentLoaded', function () {
             selectSuggestion(songName, spotifyId);
         });
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        attachLeaderboardToggleListeners(); // Fallback for static toggles
+    });
+
     
 
 });
