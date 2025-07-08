@@ -2033,312 +2033,315 @@
 {% endblock %}
 
 {% block content %}
-<div class="game-container">
-    {% if today_song %}
-        {% if user_already_played %}
-            <!-- Already played view -->
-            <div class="result-container">
-                <h4 style="color: var(--neon-purple); margin-bottom: 20px;">Today's Song</h4>
-                <div class="main-game-image-wrapper">
-                    <img src="{{ today_song.image.url }}" alt="{{ today_song.title }}" class="song-image reveal-glow-pink">
-                </div>
-
-                <div class="song-details" style="margin: 20px 0;">
-                    <div class="song-title">{{ today_song.title }}</div>
-                    <div class="song-info">from {{ today_song.movie }}</div>
-                    <div class="song-info">{{ today_song.composer }}</div>
-                </div>
-                
-                <div class="already-played-message" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; margin: 20px 0;">
-                    <i class="fas fa-clock"></i>
-                    <p style="margin: 10px 0;">You've already played today! Come back tomorrow for a New Paatu.</p>
-                </div>
-
-                <div class="countdown-section" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px; margin-top: 20px;">
-    <h5 style="color: var(--neon-blue); margin-bottom: 15px;">Next Song In:</h5>
-    <div class="countdown-timer" style="display: flex; justify-content: center; gap: 20px;">
-        <div class="countdown-box" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; min-width: 80px;">
-            <span id="countdown-hours" style="font-size: 2em; color: var(--neon-purple); font-weight: bold; display: block;">00</span>
-            <small style="color: rgba(255, 255, 255, 0.6); text-transform: uppercase;">hours</small>
-        </div>
-        <div class="countdown-box" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; min-width: 80px;">
-            <span id="countdown-minutes" style="font-size: 2em; color: var(--neon-purple); font-weight: bold; display: block;">00</span>
-            <small style="color: rgba(255, 255, 255, 0.6); text-transform: uppercase;">minutes</small>
-        </div>
-        <div class="countdown-box" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; min-width: 80px;">
-            <span id="countdown-seconds" style="font-size: 2em; color: var(--neon-purple); font-weight: bold; display: block;">00</span>
-            <small style="color: rgba(255, 255, 255, 0.6); text-transform: uppercase;">seconds</small>
-        </div>
-    </div>
-</div>
-
-<!-- Daily Leaderboard Section -->
-<div class="daily-leaderboard mt-4" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px;">
-    <div class="leaderboard-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h5 style="color: var(--neon-blue); margin: 0;">
-            <i class="fas fa-trophy"></i> Today's Rankings
-        </h5>
-        <span style="color: var(--neon-purple);">
-            Your Rank: #{{ user_daily_rank }}
-        </span>
-    </div>
-    
-    <div class="leaderboard-toggle" id="leaderboard-toggle" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-        <span style="color: white;">View Leaderboard</span>
-        <i class="fas fa-chevron-down" id="leaderboard-chevron" style="color: var(--neon-purple); transition: transform 0.3s ease;"></i>
-    </div>
-
-
-    <div id="leaderboard-content" style="display: none; transition: all 0.3s ease;">
-        <div class="leaderboard-list" style="max-height: 300px; overflow-y: auto;">
-            {% for score in daily_scores %}
-            <div class="leaderboard-item" style="display: grid; grid-template-columns: auto 1fr auto auto; gap: 15px; padding: 10px; margin: 5px 0; background: rgba(176, 38, 255, 0.1); border-radius: 8px; {% if score.user == user %}border: 1px solid var(--neon-purple);{% endif %}">
-                <div style="color: var(--neon-purple); font-weight: bold;">
-                    {% if forloop.counter == 1 %}🥇
-                    {% elif forloop.counter == 2 %}🥈
-                    {% elif forloop.counter == 3 %}🥉
-                    {% else %}#{{ forloop.counter }}
-                    {% endif %}
-                </div>
-                <div style="color: white;">
-                    <a href="{% url 'public_profile' score.user.username %}"
-                        style="color: white; text-decoration: none; font-weight: bold;">
-                        {{ score.user.username }}
-                    </a>
-
-                </div>
-
-                <div style="color: var(--neon-blue);">{{ score.score }} pts</div>
-                <div style="color: var(--neon-pink);">{{ score.guess_time|floatformat:1 }}s</div>
-            </div>
-            {% endfor %}
-        </div>
-        
-        <div class="text-center mt-3" style="color: rgba(255, 255, 255, 0.6);">
-            <small>Total Players Today: {{ total_players_today }}</small>
-        </div>
-    </div>
-</div>
-
-
-</div>
-        {% else %}
-            <!-- Game View Container -->
-            <div id="game-container">
-                <div class="game-header">
-                    <h2>Today's Song</h2>
-                    <div class="timer" id="timer">00:00</div>
-                    <div class="points-indicator" id="points-indicator">Points: <span class="points-value">8</span></div>
-                </div>
-
-                <div id="game-view">
-                    <div class="vinyl-player" id="vinyl-player">
-                        <div class="vinyl-record">
-                            <div class="vinyl-grooves"></div>
-                            <div class="vinyl-center" onclick="togglePlay()">
-                                <i class="fas fa-play" id="vinyl-play-icon"></i>
-                            </div>
-                        </div>
-                        <audio id="song-snippet" src="{{ today_song.snippet.url }}" preload="auto"></audio>
+<div id="game-main">
+    <div class="game-container">
+        {% if today_song %}
+            {% if user_already_played %}
+                <!-- Already played view -->
+                <div class="result-container">
+                    <h4 style="color: var(--neon-purple); margin-bottom: 20px;">Today's Song</h4>
+                    <div class="main-game-image-wrapper">
+                        <img src="{{ today_song.image.url }}" alt="{{ today_song.title }}" class="song-image reveal-glow-pink">
                     </div>
 
-                    <div class="progress-container">
-                        <div class="progress-bar" id="song-progress">
-                            <div class="progress-fill"></div>
-                        </div>
-                    </div>
-
-                    <div class="game-controls">
-                        <button id="playPauseBtn" class="btn btn-play">
-                            <i class="fas fa-play"></i> Play
-                        </button>
-                        <button id="giveUpBtn" class="btn btn-giveup">
-                            <i class="fas fa-flag"></i> Give Up
-                        </button>
-                    </div>
-
-                    <form id="guess-form" class="guess-form">
-                        {% csrf_token %}
-                        <div class="mb-3 position-relative">
-                            <input type="text" 
-                                id="guess-input" 
-                                class="form-control" 
-                                placeholder="Enter song name" 
-                                autocomplete="off"
-                                required>
-                            <div id="suggestions" class="suggestions-container"></div>
-                        </div>
-                        <button type="submit" class="btn btn-play">Submit Guess</button>
-                    </form>
-                    <div id="result-message" class="mt-3"></div>
-                </div>
-            </div>
-
-            <!-- Result View Container (Initially Hidden) -->
-            <!-- Result View Container (Initially Hidden) -->
-            <div id="result-container" class="result-container" style="display: none;">
-                <div class="reveal-animation">
-                    <!-- Success/Score Message -->
-                    <div class="reveal-header mb-4" style="background: rgba(176, 38, 255, 0.1); padding: 20px; border-radius: 15px;">
-                        <h4 style="color: var(--neon-purple); margin: 0; font-size: 1.2rem;" id="score-message">
-                            <!-- This will be populated by JavaScript -->
-                        </h4>
-                    </div>
-                    <!-- Song Details -->
-                    {% if today_song.image %}
-                        <div class="main-game-image-wrapper">
-                            <img src="{{ today_song.image.url }}" alt="{{ today_song.title }}"
-                                class="song-image reveal-glow-pink"
-                                style="box-shadow: 0 0 12px #ff00e4, 0 0 24px #ff00e4, 0 0 36px #ff00e4; border-radius: 12px;">
-
-                        </div>
-   
-                    {% endif %}
-                   
-                    <div class="song-details">
+                    <div class="song-details" style="margin: 20px 0;">
                         <div class="song-title">{{ today_song.title }}</div>
-                        <div class="song-info">{{ today_song.movie }}</div>
-                        <div class="song-info">{{ today_song.artist }}</div>
-                    </div>
-
-                    <!-- Rest of your existing code -->
-                    {% if today_song.reveal_snippet %}
-                        <audio id="reveal-snippet" src="{{ today_song.reveal_snippet.url }}" preload="auto"></audio>
-                    {% endif %}
-
-                     <!-- Add the share section RIGHT HERE, after song details but before countdown -->
-                    <div class="share-section mt-4" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px;">
-                        <h5 style="color: var(--neon-blue); margin-bottom: 15px;">
-                            <i class="fas fa-share-alt"></i> Share Your Score
-                        </h5>
-                        
-                        <div class="share-buttons" style="display: flex; justify-content: center; gap: 20px;">
-                            <button onclick="shareToWhatsApp()" class="btn-share-icon whatsapp" title="Share to WhatsApp">
-                                <i class="fab fa-whatsapp"></i>
-                            </button>
-                            <button onclick="shareToTwitter()" class="btn-share-icon twitter" title="Share to X">
-                                <svg width="20" height="20" viewBox="0 0 24 24">
-                                    <path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                                </svg>
-                            </button>
-                            <button onclick="shareToInstagram()" class="btn-share-icon instagram" title="Share to Instagram">
-                                <i class="fab fa-instagram"></i>
-                            </button>
-                            <button onclick="copyShareText()" class="btn-share-icon copy" title="Copy to Clipboard">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-
-                        <!-- Success message for copy -->
-                        <div id="copySuccess" class="copy-success" style="display: none;">
-                            Copied to clipboard!
-                        </div>
-                    </div>
-
-
-                    <div class="countdown-section mt-4 reveal-details">
-                        <h5>Next Song In:</h5>
-                        <div class="countdown-timer">
-                            <div class="countdown-box">
-                                <span id="countdown-hours">00</span>
-                                <small>hours</small>
-                            </div>
-                            <div class="countdown-box">
-                                <span id="countdown-minutes">00</span>
-                                <small>minutes</small>
-                            </div>
-                            <div class="countdown-box">
-                                <span id="countdown-seconds">00</span>
-                                <small>seconds</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-support mt-4" data-bs-toggle="modal" data-bs-target="#supportModal">
-                        <i class="fas fa-candy-cane"></i> Buy me a Thaenmittai
-                    </button>
-                </div>
-            </div>
-        {% endif %}
-    {% else %}
-        <div class="alert alert-info">
-            No song available for today.
-        </div>
-    {% endif %}
-</div>
-
-
-
-<!-- Support Modal -->
-<div class="modal fade" id="supportModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="background: var(--darker-bg); border: 2px solid var(--neon-purple);">
-            <div class="modal-header border-0">
-                <h5 class="modal-title" style="color: var(--neon-purple);">
-                    <i class="fas fa-candy-cane"></i> Buy me a Thaenmittai
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center">
-                <div class="support-animation mb-4">
-                    <i class="fas fa-candy-cane fa-3x" style="color: var(--neon-pink);"></i>
-                </div>
-                <p class="text-white">Enjoyed the game? Support me with a sweet Thaenmittai! 🍬</p>
-                <div class="payment-option mb-4">
-                    <h6 class="text-white mb-3">
-                        <i class="fas fa-mobile-alt"></i> Pay via UPI
-                    </h6>
-                    <!-- Copyable UPI ID -->
-                    <div class="upi-id-container mb-3">
-                        <input type="text" value="rvydeeskumar-1@okhdfcbank" id="upiId" readonly 
-                            class="form-control bg-dark text-white text-center mb-2">
-                        <button onclick="copyUpiId()" class="btn btn-support">
-                            <i class="fas fa-copy"></i> Copy UPI ID
-                        </button>
+                        <div class="song-info">from {{ today_song.movie }}</div>
+                        <div class="song-info">{{ today_song.composer }}</div>
                     </div>
                     
-                    <!-- Direct App Buttons -->
-                    <p class="text-muted mb-2">Or pay directly with:</p>
-                    <div class="upi-buttons">
-                        <!-- Google Pay -->
-                        <button onclick="window.location.href='tez://upi/pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tr=SPOTPAATU001&tn=Thaenmittai Support&am=10&cu=INR&mode=02'" 
-                                class="btn btn-support me-2 mb-2">
-                            <i class="fab fa-google-pay"></i> GPay
-                        </button>
+                    <div class="already-played-message" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; margin: 20px 0;">
+                        <i class="fas fa-clock"></i>
+                        <p style="margin: 10px 0;">You've already played today! Come back tomorrow for a New Paatu.</p>
+                    </div>
 
-                        <!-- PhonePe -->
-                        <button onclick="window.location.href='phonepe://pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tn=Thaenmittai Support&am=10&cu=INR'" 
-                                class="btn btn-support me-2 mb-2">
-                            <i class="fas fa-mobile-alt"></i> PhonePe
-                        </button>
+                    <div class="countdown-section" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px; margin-top: 20px;">
+        <h5 style="color: var(--neon-blue); margin-bottom: 15px;">Next Song In:</h5>
+        <div class="countdown-timer" style="display: flex; justify-content: center; gap: 20px;">
+            <div class="countdown-box" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; min-width: 80px;">
+                <span id="countdown-hours" style="font-size: 2em; color: var(--neon-purple); font-weight: bold; display: block;">00</span>
+                <small style="color: rgba(255, 255, 255, 0.6); text-transform: uppercase;">hours</small>
+            </div>
+            <div class="countdown-box" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; min-width: 80px;">
+                <span id="countdown-minutes" style="font-size: 2em; color: var(--neon-purple); font-weight: bold; display: block;">00</span>
+                <small style="color: rgba(255, 255, 255, 0.6); text-transform: uppercase;">minutes</small>
+            </div>
+            <div class="countdown-box" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; min-width: 80px;">
+                <span id="countdown-seconds" style="font-size: 2em; color: var(--neon-purple); font-weight: bold; display: block;">00</span>
+                <small style="color: rgba(255, 255, 255, 0.6); text-transform: uppercase;">seconds</small>
+            </div>
+        </div>
+    </div>
 
-                        <!-- Paytm -->
-                        <button onclick="window.location.href='paytmmp://pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tn=Thaenmittai Support&am=10&cu=INR'" 
-                                class="btn btn-support mb-2">
-                            <i class="fas fa-wallet"></i> Paytm
+    <!-- Daily Leaderboard Section -->
+    <div class="daily-leaderboard mt-4" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px;">
+        <div class="leaderboard-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h5 style="color: var(--neon-blue); margin: 0;">
+                <i class="fas fa-trophy"></i> Today's Rankings
+            </h5>
+            <span style="color: var(--neon-purple);">
+                Your Rank: #{{ user_daily_rank }}
+            </span>
+        </div>
+        
+        <div class="leaderboard-toggle" id="leaderboard-toggle" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: white;">View Leaderboard</span>
+            <i class="fas fa-chevron-down" id="leaderboard-chevron" style="color: var(--neon-purple); transition: transform 0.3s ease;"></i>
+        </div>
+
+
+        <div id="leaderboard-content" style="display: none; transition: all 0.3s ease;">
+            <div class="leaderboard-list" style="max-height: 300px; overflow-y: auto;">
+                {% for score in daily_scores %}
+                <div class="leaderboard-item" style="display: grid; grid-template-columns: auto 1fr auto auto; gap: 15px; padding: 10px; margin: 5px 0; background: rgba(176, 38, 255, 0.1); border-radius: 8px; {% if score.user == user %}border: 1px solid var(--neon-purple);{% endif %}">
+                    <div style="color: var(--neon-purple); font-weight: bold;">
+                        {% if forloop.counter == 1 %}🥇
+                        {% elif forloop.counter == 2 %}🥈
+                        {% elif forloop.counter == 3 %}🥉
+                        {% else %}#{{ forloop.counter }}
+                        {% endif %}
+                    </div>
+                    <div style="color: white;">
+                        <a href="{% url 'public_profile' score.user.username %}"
+                            style="color: white; text-decoration: none; font-weight: bold;">
+                            {{ score.user.username }}
+                        </a>
+
+                    </div>
+
+                    <div style="color: var(--neon-blue);">{{ score.score }} pts</div>
+                    <div style="color: var(--neon-pink);">{{ score.guess_time|floatformat:1 }}s</div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="text-center mt-3" style="color: rgba(255, 255, 255, 0.6);">
+                <small>Total Players Today: {{ total_players_today }}</small>
+            </div>
+        </div>
+    </div>
+
+
+    </div>
+            {% else %}
+                <!-- Game View Container -->
+                <div id="game-container">
+                    <div class="game-header">
+                        <h2>Today's Song</h2>
+                        <div class="timer" id="timer">00:00</div>
+                        <div class="points-indicator" id="points-indicator">Points: <span class="points-value">8</span></div>
+                    </div>
+
+                    <div id="game-view">
+                        <div class="vinyl-player" id="vinyl-player">
+                            <div class="vinyl-record">
+                                <div class="vinyl-grooves"></div>
+                                <div class="vinyl-center" onclick="togglePlay()">
+                                    <i class="fas fa-play" id="vinyl-play-icon"></i>
+                                </div>
+                            </div>
+                            <audio id="song-snippet" src="{{ today_song.snippet.url }}" preload="auto"></audio>
+                        </div>
+
+                        <div class="progress-container">
+                            <div class="progress-bar" id="song-progress">
+                                <div class="progress-fill"></div>
+                            </div>
+                        </div>
+
+                        <div class="game-controls">
+                            <button id="playPauseBtn" class="btn btn-play">
+                                <i class="fas fa-play"></i> Play
+                            </button>
+                            <button id="giveUpBtn" class="btn btn-giveup">
+                                <i class="fas fa-flag"></i> Give Up
+                            </button>
+                        </div>
+
+                        <form id="guess-form" class="guess-form">
+                            {% csrf_token %}
+                            <div class="mb-3 position-relative">
+                                <input type="text" 
+                                    id="guess-input" 
+                                    class="form-control" 
+                                    placeholder="Enter song name" 
+                                    autocomplete="off"
+                                    required>
+                                <div id="suggestions" class="suggestions-container"></div>
+                            </div>
+                            <button type="submit" class="btn btn-play">Submit Guess</button>
+                        </form>
+                        <div id="result-message" class="mt-3"></div>
+                    </div>
+                </div>
+
+                <!-- Result View Container (Initially Hidden) -->
+                <!-- Result View Container (Initially Hidden) -->
+                <div id="result-container" class="result-container" style="display: none;">
+                    <div class="reveal-animation">
+                        <!-- Success/Score Message -->
+                        <div class="reveal-header mb-4" style="background: rgba(176, 38, 255, 0.1); padding: 20px; border-radius: 15px;">
+                            <h4 style="color: var(--neon-purple); margin: 0; font-size: 1.2rem;" id="score-message">
+                                <!-- This will be populated by JavaScript -->
+                            </h4>
+                        </div>
+                        <!-- Song Details -->
+                        {% if today_song.image %}
+                            <div class="main-game-image-wrapper">
+                                <img src="{{ today_song.image.url }}" alt="{{ today_song.title }}"
+                                    class="song-image reveal-glow-pink"
+                                    style="box-shadow: 0 0 12px #ff00e4, 0 0 24px #ff00e4, 0 0 36px #ff00e4; border-radius: 12px;">
+
+                            </div>
+    
+                        {% endif %}
+                    
+                        <div class="song-details">
+                            <div class="song-title">{{ today_song.title }}</div>
+                            <div class="song-info">{{ today_song.movie }}</div>
+                            <div class="song-info">{{ today_song.artist }}</div>
+                        </div>
+
+                        <!-- Rest of your existing code -->
+                        {% if today_song.reveal_snippet %}
+                            <audio id="reveal-snippet" src="{{ today_song.reveal_snippet.url }}" preload="auto"></audio>
+                        {% endif %}
+
+                        <!-- Add the share section RIGHT HERE, after song details but before countdown -->
+                        <div class="share-section mt-4" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px;">
+                            <h5 style="color: var(--neon-blue); margin-bottom: 15px;">
+                                <i class="fas fa-share-alt"></i> Share Your Score
+                            </h5>
+                            
+                            <div class="share-buttons" style="display: flex; justify-content: center; gap: 20px;">
+                                <button onclick="shareToWhatsApp()" class="btn-share-icon whatsapp" title="Share to WhatsApp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </button>
+                                <button onclick="shareToTwitter()" class="btn-share-icon twitter" title="Share to X">
+                                    <svg width="20" height="20" viewBox="0 0 24 24">
+                                        <path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                    </svg>
+                                </button>
+                                <button onclick="shareToInstagram()" class="btn-share-icon instagram" title="Share to Instagram">
+                                    <i class="fab fa-instagram"></i>
+                                </button>
+                                <button onclick="copyShareText()" class="btn-share-icon copy" title="Copy to Clipboard">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+
+                            <!-- Success message for copy -->
+                            <div id="copySuccess" class="copy-success" style="display: none;">
+                                Copied to clipboard!
+                            </div>
+                        </div>
+
+
+                        <div class="countdown-section mt-4 reveal-details">
+                            <h5>Next Song In:</h5>
+                            <div class="countdown-timer">
+                                <div class="countdown-box">
+                                    <span id="countdown-hours">00</span>
+                                    <small>hours</small>
+                                </div>
+                                <div class="countdown-box">
+                                    <span id="countdown-minutes">00</span>
+                                    <small>minutes</small>
+                                </div>
+                                <div class="countdown-box">
+                                    <span id="countdown-seconds">00</span>
+                                    <small>seconds</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-support mt-4" data-bs-toggle="modal" data-bs-target="#supportModal">
+                            <i class="fas fa-candy-cane"></i> Buy me a Thaenmittai
                         </button>
                     </div>
-   
                 </div>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info">
+                No song available for today.
+            </div>
+        {% endif %}
+    </div>
 
-                <!-- Divider -->
-                <div class="divider my-4">
-                    <span class="text-muted">OR</span>
+
+
+    <!-- Support Modal -->
+    <div class="modal fade" id="supportModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background: var(--darker-bg); border: 2px solid var(--neon-purple);">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" style="color: var(--neon-purple);">
+                        <i class="fas fa-candy-cane"></i> Buy me a Thaenmittai
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
+                <div class="modal-body text-center">
+                    <div class="support-animation mb-4">
+                        <i class="fas fa-candy-cane fa-3x" style="color: var(--neon-pink);"></i>
+                    </div>
+                    <p class="text-white">Enjoyed the game? Support me with a sweet Thaenmittai! 🍬</p>
+                    <div class="payment-option mb-4">
+                        <h6 class="text-white mb-3">
+                            <i class="fas fa-mobile-alt"></i> Pay via UPI
+                        </h6>
+                        <!-- Copyable UPI ID -->
+                        <div class="upi-id-container mb-3">
+                            <input type="text" value="rvydeeskumar-1@okhdfcbank" id="upiId" readonly 
+                                class="form-control bg-dark text-white text-center mb-2">
+                            <button onclick="copyUpiId()" class="btn btn-support">
+                                <i class="fas fa-copy"></i> Copy UPI ID
+                            </button>
+                        </div>
+                        
+                        <!-- Direct App Buttons -->
+                        <p class="text-muted mb-2">Or pay directly with:</p>
+                        <div class="upi-buttons">
+                            <!-- Google Pay -->
+                            <button onclick="window.location.href='tez://upi/pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tr=SPOTPAATU001&tn=Thaenmittai Support&am=10&cu=INR&mode=02'" 
+                                    class="btn btn-support me-2 mb-2">
+                                <i class="fab fa-google-pay"></i> GPay
+                            </button>
 
-                <!-- PayPal Option -->
-                <div class="payment-option">
-                    <h6 class="text-white mb-3">
-                        <i class="fab fa-paypal"></i> Pay via PayPal
-                    </h6>
-                    <button onclick="window.location.href='https://paypal.me/rvydeeskumar'" 
-                            class="btn btn-paypal">
-                        <i class="fab fa-paypal"></i> Support with PayPal
-                    </button>
+                            <!-- PhonePe -->
+                            <button onclick="window.location.href='phonepe://pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tn=Thaenmittai Support&am=10&cu=INR'" 
+                                    class="btn btn-support me-2 mb-2">
+                                <i class="fas fa-mobile-alt"></i> PhonePe
+                            </button>
+
+                            <!-- Paytm -->
+                            <button onclick="window.location.href='paytmmp://pay?pa=rvydeeskumar@oksbi&pn=Vydeeskumar&tn=Thaenmittai Support&am=10&cu=INR'" 
+                                    class="btn btn-support mb-2">
+                                <i class="fas fa-wallet"></i> Paytm
+                            </button>
+                        </div>
+    
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="divider my-4">
+                        <span class="text-muted">OR</span>
+                    </div>
+
+                    <!-- PayPal Option -->
+                    <div class="payment-option">
+                        <h6 class="text-white mb-3">
+                            <i class="fab fa-paypal"></i> Pay via PayPal
+                        </h6>
+                        <button onclick="window.location.href='https://paypal.me/rvydeeskumar'" 
+                                class="btn btn-paypal">
+                            <i class="fab fa-paypal"></i> Support with PayPal
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
+
 

@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     console.log("✅ home.js loaded");
+    const mainGame = document.getElementById('game-main');  // Add this container to home.html
+    if (!mainGame) return; 
 
         // Initialize variables
     let startTime = null;
@@ -603,6 +605,12 @@ document.addEventListener('DOMContentLoaded', function () {
             button.innerHTML = originalText;
         }, 2000);
     }
+
+    window.copyUpiId = copyUpiId;
+
+
+
+
     let accessToken = '';
 
     async function getSpotifyToken() {
