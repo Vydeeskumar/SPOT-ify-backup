@@ -5,7 +5,9 @@ function toggleLeaderboard(e) {
 
     if (!content || !chevron) return;
 
-    if (content.style.display === 'none' || content.style.display === '') {
+    const isHidden = content.style.display === 'none' || content.style.display === '';
+
+    if (isHidden) {
         content.style.display = 'block';
         void content.offsetHeight;
         chevron.style.transform = 'rotate(180deg)';
@@ -21,10 +23,10 @@ function toggleLeaderboard(e) {
     }
 
     console.log("🟣 Toggle leaderboard clicked");
-
 }
 
-window.toggleLeaderboard = toggleLeaderboard;
+
+
 
 
 
@@ -206,12 +208,15 @@ document.addEventListener('DOMContentLoaded', function () {
         window.countdownInterval = setInterval(updateCountdown, 1000);
     }
 
-     function attachLeaderboardToggleListeners() {
-        document.querySelectorAll('.leaderboard-toggle').forEach(toggle => {
-            toggle.removeEventListener('click', toggleLeaderboard);  // Clean existing
-            toggle.addEventListener('click', toggleLeaderboard);      // Attach fresh
+    function attachLeaderboardToggleListeners() {
+        const toggles = document.querySelectorAll('.leaderboard-toggle');
+        console.log(`🟣 Found ${toggles.length} leaderboard toggles`);
+        toggles.forEach(toggle => {
+            toggle.removeEventListener('click', toggleLeaderboard);
+            toggle.addEventListener('click', toggleLeaderboard);
         });
     }
+
 
     
         
@@ -348,8 +353,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     `;
 
+                    console.log("✅ songDetails found:", songDetails);
+                    if (!songDetails) {
+                        console.error("❌ songDetails element not found. Leaderboard won't be injected.");
+                        return; // 🛑 Don't proceed if songDetails is missing
+                    }
+
                     // ✅ Inject into page
                     songDetails.insertAdjacentHTML('afterend', leaderboardHTML);
+                    console.log("✅ Leaderboard HTML injected after .song-details");
+
                     setTimeout(() => {
                         attachLeaderboardToggleListeners();
                     }, 100);  // ⬅️ This is key
