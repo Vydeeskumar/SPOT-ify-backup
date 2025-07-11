@@ -209,12 +209,21 @@ def home(request):
             attempt_date__date=timezone.now().date()
         )
 
-        # Get user's rank
-        user_rank = UserScore.objects.filter(
+        # Get user's rank (considering both score and time)
+        better_scores = UserScore.objects.filter(
             song=today_song,
             attempt_date__date=timezone.now().date(),
             score__gt=user_score.score
-        ).count() + 1
+        ).count()
+
+        same_score_faster = UserScore.objects.filter(
+            song=today_song,
+            attempt_date__date=timezone.now().date(),
+            score=user_score.score,
+            guess_time__lt=user_score.guess_time
+        ).count()
+
+        user_rank = better_scores + same_score_faster + 1
 
         # Get total players today
         total_players_today = UserScore.objects.filter(
@@ -588,12 +597,21 @@ def get_daily_rankings(request):
             attempt_date__date=ist_date
         )
 
-        # Calculate user's rank
-        user_rank = UserScore.objects.filter(
+        # Calculate user's rank (considering both score and time)
+        better_scores = UserScore.objects.filter(
             song=today_song,
             attempt_date__date=ist_date,
             score__gt=user_score.score
-        ).count() + 1
+        ).count()
+
+        same_score_faster = UserScore.objects.filter(
+            song=today_song,
+            attempt_date__date=ist_date,
+            score=user_score.score,
+            guess_time__lt=user_score.guess_time
+        ).count()
+
+        user_rank = better_scores + same_score_faster + 1
 
     except UserScore.DoesNotExist:
         user_rank = "-"  # Handle case where user hasn't played yet
@@ -779,8 +797,15 @@ def archive_submit(request):
 
         if is_correct:
             points = calculate_points(time_taken)
-            scores = UserScore.objects.filter(song=song).order_by('-score', 'guess_time')
-            rank = scores.filter(score__gt=points).count() + 1
+
+            # Calculate rank considering both score and time
+            better_scores = UserScore.objects.filter(song=song, score__gt=points).count()
+            same_score_faster = UserScore.objects.filter(
+                song=song,
+                score=points,
+                guess_time__lt=time_taken
+            ).count()
+            rank = better_scores + same_score_faster + 1
 
             return JsonResponse({
                 'correct': True,
@@ -812,11 +837,17 @@ def giveup_archive(request):
         return JsonResponse({'error': 'Song not found'}, status=404)
 
     points = 0  # give up → 0 points
+    time_taken = 30.0  # Default time for give up
 
-    # Rank = count of users who scored > 0 + 1
-    scores = UserScore.objects.filter(song=song).order_by('-score', 'guess_time')
-    rank = scores.filter(score__gt=points).count() + 1
-    total_players = scores.count()
+    # Rank = count of users who scored > 0 + count of users who gave up faster + 1
+    better_scores = UserScore.objects.filter(song=song, score__gt=points).count()
+    same_score_faster = UserScore.objects.filter(
+        song=song,
+        score=points,
+        guess_time__lt=time_taken
+    ).count()
+    rank = better_scores + same_score_faster + 1
+    total_players = UserScore.objects.filter(song=song).count()
 
     return JsonResponse({
         'song_title': song.title,
