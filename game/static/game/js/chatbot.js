@@ -1,9 +1,32 @@
 console.log("✅ chatbot.js loaded");
 
 
+let hasShownWelcome = false;
+
 function toggleZombiebot() {
     const chatbox = document.getElementById("zombiebot-chatbox");
+    const isOpening = chatbox.classList.contains("hidden");
+
     chatbox.classList.toggle("hidden");
+
+    // Show welcome message when opening chatbot for the first time
+    if (isOpening && !hasShownWelcome) {
+        showWelcomeMessage();
+        hasShownWelcome = true;
+    }
+}
+
+function showWelcomeMessage() {
+    const welcomeMessage = `Hey there! 👋 I'm Zeebs, your friendly zombie chatbot assistant! 🧟‍♂️
+
+I'm here to help you with any questions about SPOT-ify - whether it's about gameplay, scoring, features, or just want to chat!
+
+Feel free to ask me anything! 🎵✨`;
+
+    // Add a small delay to make it feel more natural
+    setTimeout(() => {
+        appendZombiebotMessage('bot', welcomeMessage);
+    }, 500);
 }
 
 let isFirstMessage = true;
