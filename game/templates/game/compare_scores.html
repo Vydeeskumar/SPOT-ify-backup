@@ -143,6 +143,20 @@
 </div>
 
 <style>
+/* Gaming Rivalry Color Palette */
+:root {
+    --player1-primary: #FF4757;     /* Vibrant Red */
+    --player1-secondary: #FF6B7A;   /* Light Red */
+    --player1-glow: rgba(255, 71, 87, 0.3);
+
+    --player2-primary: #3742FA;     /* Electric Blue */
+    --player2-secondary: #5352ED;   /* Purple Blue */
+    --player2-glow: rgba(55, 66, 250, 0.3);
+
+    --vs-color: #FFD700;            /* Gold */
+    --vs-glow: rgba(255, 215, 0, 0.4);
+}
+
 /* Main Container */
 .compare-container {
     padding: 15px;
@@ -220,15 +234,30 @@
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    background: rgba(176, 38, 255, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 2px solid;
 }
 
-.player-avatar i {
+.player-name.left .player-avatar {
+    background: var(--player1-glow);
+    border-color: var(--player1-primary);
+}
+
+.player-name.right .player-avatar {
+    background: var(--player2-glow);
+    border-color: var(--player2-primary);
+}
+
+.player-name.left .player-avatar i {
     font-size: 1.5rem;
-    color: var(--neon-purple);
+    color: var(--player1-primary);
+}
+
+.player-name.right .player-avatar i {
+    font-size: 1.5rem;
+    color: var(--player2-primary);
 }
 
 .player-name span {
@@ -239,13 +268,14 @@
 }
 
 .vs-divider {
-    background: var(--neon-pink);
-    color: white;
+    background: var(--vs-color);
+    color: #000;
     padding: 8px 16px;
     border-radius: 20px;
     font-weight: bold;
     font-size: 1rem;
-    box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+    box-shadow: 0 0 15px var(--vs-glow);
+    text-shadow: none;
 }
 
 /* Stats Comparison */
@@ -310,11 +340,13 @@
 }
 
 .stat-left .stat-value {
-    color: var(--neon-blue);
+    color: var(--player1-primary);
+    text-shadow: 0 0 8px var(--player1-glow);
 }
 
 .stat-right .stat-value {
-    color: var(--neon-pink);
+    color: var(--player2-primary);
+    text-shadow: 0 0 8px var(--player2-glow);
 }
 
 .stat-left small, .stat-right small {
@@ -350,18 +382,21 @@
 }
 
 .games-column.left h4 {
-    color: var(--neon-blue);
+    color: var(--player1-primary);
+    text-shadow: 0 0 5px var(--player1-glow);
 }
 
 .games-column.right h4 {
-    color: var(--neon-pink);
+    color: var(--player2-primary);
+    text-shadow: 0 0 5px var(--player2-glow);
 }
 
 .games-divider {
     width: 2px;
-    background: linear-gradient(to bottom, transparent, var(--neon-purple), transparent);
+    background: linear-gradient(to bottom, transparent, var(--vs-color), transparent);
     min-height: 200px;
     margin: 0 10px;
+    box-shadow: 0 0 4px var(--vs-glow);
 }
 
 .game-item {
@@ -373,11 +408,13 @@
 }
 
 .games-column.left .game-item {
-    border-left: 3px solid var(--neon-blue);
+    border-left: 3px solid var(--player1-primary);
+    background: linear-gradient(90deg, var(--player1-glow), rgba(255, 255, 255, 0.05));
 }
 
 .games-column.right .game-item {
-    border-right: 3px solid var(--neon-pink);
+    border-right: 3px solid var(--player2-primary);
+    background: linear-gradient(-90deg, var(--player2-glow), rgba(255, 255, 255, 0.05));
 }
 
 .game-item.perfect {
@@ -494,8 +531,9 @@
 }
 
 .stat-row:hover .stat-center {
-    background: rgba(176, 38, 255, 0.2);
+    background: var(--vs-glow);
     transform: scale(1.05);
+    box-shadow: 0 0 10px var(--vs-glow);
 }
 
 /* Animations */
