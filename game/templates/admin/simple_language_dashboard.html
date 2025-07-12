@@ -1,0 +1,56 @@
+{% extends "admin/base_site.html" %}
+{% load admin_extras %}
+
+{% block title %}Multi-Language Dashboard{% endblock %}
+
+{% block content %}
+<h1>Multi-Language Game Dashboard</h1>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0;">
+    {% for lang_code, lang_name in languages %}
+    <div style="border: 2px solid #007cba; border-radius: 8px; padding: 20px; background: #f8f9fa;">
+        <h2 style="margin: 0 0 15px 0; color: #007cba;">
+            {% if lang_code == 'tamil' %}
+                🎵 SPOT-ify the Paatu
+            {% elif lang_code == 'english' %}
+                🎧 SPOT-ify the Song
+            {% elif lang_code == 'hindi' %}
+                🎤 SPOT-ify the Gaana
+            {% endif %}
+        </h2>
+        
+        <div style="margin-bottom: 15px;">
+            <strong>Language:</strong> {{ lang_name }}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <strong>Today's Song ({{ today }}):</strong><br>
+            {% with today_song=today_songs|lookup:lang_code %}
+            {% if today_song %}
+                <span style="color: green;">✅ {{ today_song.title }} - {{ today_song.artist }}</span>
+            {% else %}
+                <span style="color: red;">❌ No song set</span>
+            {% endif %}
+            {% endwith %}
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <a href="{% url 'admin:game_song_changelist' %}?language={{ lang_code }}" 
+               style="background: #007cba; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; margin-right: 10px;">
+                Manage {{ lang_name }} Songs
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div style="margin-top: 30px; padding: 20px; background: #e8f4f8; border-radius: 8px;">
+    <h3>Quick Actions</h3>
+    <ul>
+        <li><a href="{% url 'admin:game_song_changelist' %}">View All Songs</a></li>
+        <li><a href="{% url 'admin:game_userscore_changelist' %}">View All Scores</a></li>
+        <li><a href="{% url 'admin:game_song_add' %}">Add New Song</a></li>
+    </ul>
+</div>
+
+{% endblock %}

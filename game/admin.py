@@ -270,3 +270,38 @@ class CustomUserAdmin(UserAdmin):
     list_filter = ('is_staff', 'is_superuser', 'is_active')
     search_fields = ('username', 'email')
     ordering = ('-date_joined',)
+
+# Add language dashboard to default admin
+from django.urls import path as admin_path
+from django.shortcuts import render as admin_render
+
+def language_dashboard_simple(request):
+    """Simple language dashboard for default admin"""
+    context = {
+        'title': 'Multi-Language Dashboard',
+        'languages': LANGUAGE_CHOICES,
+        'today': timezone.now().date(),
+    }
+
+    # Get today's songs for each language
+    today_songs = {}
+    for lang_code, lang_name in LANGUAGE_CHOICES:
+        song = Song.objects.filter(
+            display_date=timezone.now().date(),
+            language=lang_code
+        ).first()
+        today_songs[lang_code] = song
+
+    context['today_songs'] = today_songs
+    return admin_render(request, 'admin/simple_language_dashboard.html', context)
+
+# Add URL to admin - simpler approach
+original_get_urls = admin.site.get_urls
+
+def get_custom_urls():
+    custom_urls = [
+        admin_path('language-dashboard/', admin.site.admin_view(language_dashboard_simple), name='language_dashboard'),
+    ]
+    return original_get_urls() + custom_urls
+
+admin.site.get_urls = get_custom_urls

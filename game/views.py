@@ -277,20 +277,23 @@ def home(request, language='tamil'):
     return render(request, 'game/home.html', context)
 
 @login_required
-def profile(request):
+def profile(request, language='tamil'):
+    current_language = language
     # Get or create user profile
     profile, created = UserProfile.objects.get_or_create(user=request.user)
-    
-    # Get recent activity (last 5 songs)
+
+    # Get recent activity (last 5 songs) for current language
     recent_scores = UserScore.objects.filter(
-        user=request.user
+        user=request.user,
+        language=current_language
     ).select_related('song').order_by('-attempt_date')[:5]
-    
-    # Get monthly statistics
+
+    # Get monthly statistics for current language
     today = timezone.now().date()
     month_start = today.replace(day=1)
     monthly_stats = UserScore.objects.filter(
         user=request.user,
+        language=current_language,
         attempt_date__date__gte=month_start
     ).aggregate(
         monthly_points=Sum('score'),
@@ -298,9 +301,10 @@ def profile(request):
         monthly_songs=Count('id')
     )
 
-    # Get all-time statistics
+    # Get all-time statistics for current language
     all_time_stats = UserScore.objects.filter(
-        user=request.user
+        user=request.user,
+        language=current_language
     ).aggregate(
         total_points=Sum('score'),
         avg_score=Avg('score'),
@@ -308,19 +312,23 @@ def profile(request):
         total_songs=Count('id')
     )
 
-    # Calculate success rate
-    total_attempts = UserScore.objects.filter(user=request.user).count()
+    # Get language-specific stats
+    language_stats = profile.get_stats_for_language(current_language)
+
+    # Calculate success rate for current language
+    total_attempts = UserScore.objects.filter(user=request.user, language=current_language).count()
     if total_attempts > 0:
-        success_rate = (profile.total_songs_solved / total_attempts) * 100
+        success_rate = (language_stats['total_songs_solved'] / total_attempts) * 100
     else:
         success_rate = 0
 
-    # Get streak history (last 7 days)
+    # Get streak history (last 7 days) for current language
     streak_history = []
     for i in range(7):
         date = today - timedelta(days=i)
         played = UserScore.objects.filter(
             user=request.user,
+            language=current_language,
             attempt_date__date=date
         ).exists()
         streak_history.append({
@@ -337,6 +345,9 @@ def profile(request):
         'success_rate': round(success_rate, 1),
         'streak_history': streak_history,
         'today': today,
+        'current_language': current_language,
+        'language_display': dict(LANGUAGE_CHOICES)[current_language],
+        'language_stats': language_stats,
     }
     return render(request, 'game/profile.html', context)
 
@@ -447,9 +458,10 @@ def leaderboard(request, language='tamil'):
     return render(request, 'game/leaderboard.html', context)
 
 @login_required
-def give_up(request):
+def give_up(request, language='tamil'):
+    current_language = language
     if request.method == 'POST':
-        today_song = get_today_song()
+        today_song = get_today_song(current_language)
         if not today_song:
             return JsonResponse({'error': 'No song available'}, status=400)
         
@@ -466,7 +478,8 @@ def give_up(request):
             user=request.user,
             song=today_song,
             score=0,
-            guess_time=3600  # Maximum time
+            guess_time=3600,  # Maximum time
+            language=current_language
         )
         
         # Update user profile
@@ -484,7 +497,7 @@ def give_up(request):
     
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
-def guest_login(request):
+def guest_login(request, language='tamil'):
     if request.method == 'POST':
         username = request.POST.get('username')
         
@@ -519,7 +532,8 @@ def guest_login(request):
     return redirect('account_login')
 
 @login_required
-def friends_list(request):
+def friends_list(request, language='tamil'):
+    current_language = language
     # Get user's friends
     friends = Friendship.objects.filter(user=request.user).select_related('friend')
     
@@ -537,11 +551,13 @@ def friends_list(request):
         'friends': friends,
         'friend_requests': friend_requests,
         'suggested_friends': suggested_users,
+        'current_language': current_language,
+        'language_display': dict(LANGUAGE_CHOICES)[current_language],
     }
     return render(request, 'game/friends.html', context)
 
 @login_required
-def add_friend(request):
+def add_friend(request, language='tamil'):
     if request.method == 'POST':
         username = request.POST.get('username')
         try:
@@ -553,10 +569,10 @@ def add_friend(request):
                 messages.error(request, "You can't add yourself as a friend!")
         except User.DoesNotExist:
             messages.error(request, f'User {username} not found.')
-    return redirect('friends_list')
+    return redirect('friends_list', language=language)
 
 @login_required
-def remove_friend(request, friend_id):
+def remove_friend(request, friend_id, language='tamil'):
     if request.method == 'POST':
         try:
             friendship = Friendship.objects.get(user=request.user, friend_id=friend_id)
@@ -564,7 +580,7 @@ def remove_friend(request, friend_id):
             messages.success(request, 'Friend removed.')
         except Friendship.DoesNotExist:
             messages.error(request, 'Friend not found.')
-    return redirect('friends_list')
+    return redirect('friends_list', language=language)
 
 @login_required
 def compare_scores(request, friend_id):
@@ -705,7 +721,8 @@ def archive_list(request):
 LAUNCH_DATE = date(2024, 5, 20)  # Adjust if different
 
 @login_required
-def archive(request):
+def archive(request, language='tamil'):
+    current_language = language
     selected_date_str = request.GET.get('date')
     selected_song = None
     user_guess_result = None
@@ -727,17 +744,22 @@ def archive(request):
             elif selected_date < LAUNCH_DATE:
                 selected_song = None  # SPOT-ify not born
             else:
-                selected_song = Song.objects.filter(display_date=selected_date).first()
+                selected_song = Song.objects.filter(
+                    display_date=selected_date,
+                    language=current_language
+                ).first()
 
-                # Find prev/next
+                # Find prev/next for current language
                 prev_song = Song.objects.filter(
                     display_date__lt=selected_date,
-                    display_date__gte=LAUNCH_DATE
+                    display_date__gte=LAUNCH_DATE,
+                    language=current_language
                 ).order_by('-display_date').first()
 
                 next_song = Song.objects.filter(
                     display_date__gt=selected_date,
-                    display_date__lt=date.today()
+                    display_date__lt=date.today(),
+                    language=current_language
                 ).order_by('display_date').first()
 
                 prev_date = prev_song.display_date if prev_song else None
@@ -762,8 +784,15 @@ def archive(request):
 
             if is_correct:
                 points = calculate_points(time_taken)
-                total_players = UserScore.objects.filter(song=selected_song).count()
-                better_scores = UserScore.objects.filter(song=selected_song, score__gt=points).count()
+                total_players = UserScore.objects.filter(
+                    song=selected_song,
+                    language=current_language
+                ).count()
+                better_scores = UserScore.objects.filter(
+                    song=selected_song,
+                    language=current_language,
+                    score__gt=points
+                ).count()
                 rank = better_scores + 1
 
                 user_guess_result = {
@@ -785,7 +814,9 @@ def archive(request):
         'user_guess_result': user_guess_result,
         'prev_date': prev_date,
         'next_date': next_date,
-        'date_error': date_error  # Pass to template
+        'date_error': date_error,  # Pass to template
+        'current_language': current_language,
+        'language_display': dict(LANGUAGE_CHOICES)[current_language],
     }
     return render(request, 'game/archive.html', context)
 
@@ -796,7 +827,8 @@ def archive(request):
 
 @login_required
 @require_GET
-def load_archive_song(request):
+def load_archive_song(request, language='tamil'):
+    current_language = language
     date_str = request.GET.get('date')
     try:
         selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
@@ -810,7 +842,10 @@ def load_archive_song(request):
     if selected_date < LAUNCH_DATE:
         return JsonResponse({'success': False, 'message': 'SPOT-ify wasn\'t born yet!'}, status=400)
 
-    song = Song.objects.filter(display_date=selected_date).first()
+    song = Song.objects.filter(
+        display_date=selected_date,
+        language=current_language
+    ).first()
     if not song:
         return JsonResponse({'success': False, 'message': 'No song found for that date'}, status=404)
 
