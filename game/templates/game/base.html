@@ -14,11 +14,51 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPOT-ify the Paatu – Daily Tamil Song Guessing Game</title>
+    <title>
+        {% if current_language == 'tamil' %}
+            SPOT-ify the Paatu – Daily Tamil Song Guessing Game
+        {% elif current_language == 'english' %}
+            SPOT-ify the Song – Daily English Song Guessing Game
+        {% elif current_language == 'hindi' %}
+            SPOT-ify the Gaana – Daily Hindi Song Guessing Game
+        {% else %}
+            SPOT-ify the Paatu – Daily Tamil Song Guessing Game
+        {% endif %}
+    </title>
     <link rel="canonical" href="https://webzombies.pythonanywhere.com{{ request.path }}">
-    <meta name="description" content="Play the daily Tamil song guessing game! Listen to song snippets, make your guess, and compete with friends. New challenges every day with SPOT-ify the Paatu.">
-    <meta property="og:title" content="Spot-ify the Paatu - Daily Tamil Song Guessing Game">
-    <meta property="og:description" content="Play the daily Tamil song guessing game! Listen to song snippets, make your guess, and compete with friends. New challenges every day!">
+    <meta name="description" content="
+        {% if current_language == 'tamil' %}
+            Play the daily Tamil song guessing game! Listen to song snippets, make your guess, and compete with friends. New challenges every day with SPOT-ify the Paatu.
+        {% elif current_language == 'english' %}
+            Play the daily English song guessing game! Listen to song snippets, make your guess, and compete with friends. New challenges every day with SPOT-ify the Song.
+        {% elif current_language == 'hindi' %}
+            Play the daily Hindi song guessing game! Listen to song snippets, make your guess, and compete with friends. New challenges every day with SPOT-ify the Gaana.
+        {% else %}
+            Play the daily Tamil song guessing game! Listen to song snippets, make your guess, and compete with friends. New challenges every day with SPOT-ify the Paatu.
+        {% endif %}
+    ">
+    <meta property="og:title" content="
+        {% if current_language == 'tamil' %}
+            SPOT-ify the Paatu - Daily Tamil Song Guessing Game
+        {% elif current_language == 'english' %}
+            SPOT-ify the Song - Daily English Song Guessing Game
+        {% elif current_language == 'hindi' %}
+            SPOT-ify the Gaana - Daily Hindi Song Guessing Game
+        {% else %}
+            SPOT-ify the Paatu - Daily Tamil Song Guessing Game
+        {% endif %}
+    ">
+    <meta property="og:description" content="
+        {% if current_language == 'tamil' %}
+            Play the daily Tamil song guessing game! Listen to song snippets, make your guess, and compete with friends. New challenges every day!
+        {% elif current_language == 'english' %}
+            Play the daily English song guessing game! Listen to song snippets, make your guess, and compete with friends. New challenges every day!
+        {% elif current_language == 'hindi' %}
+            Play the daily Hindi song guessing game! Listen to song snippets, make your guess, and compete with friends. New challenges every day!
+        {% else %}
+            Play the daily Tamil song guessing game! Listen to song snippets, make your guess, and compete with friends. New challenges every day!
+        {% endif %}
+    ">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://webzombies.pythonanywhere.com/">
     <meta property="og:image" content="{% static 'game/images/spotify-logo.jpg' %}">
@@ -38,12 +78,98 @@
 
     <style>
         :root {
+            /* Default Tamil Theme */
+            --primary-color: #B026FF;
+            --secondary-color: #FF69B4;
+            --accent-color: #0096FF;
             --neon-purple: #B026FF;
             --neon-blue: #0096FF;
             --neon-pink: #FF69B4;
             --neon-green: #00ff8c;
             --dark-bg: #121212;
             --darker-bg: #0a0a0a;
+        }
+
+        /* Language-specific themes */
+        .theme-tamil {
+            --primary-color: #B026FF;
+            --secondary-color: #FF69B4;
+            --accent-color: #0096FF;
+            --neon-purple: #B026FF;
+            --neon-pink: #FF69B4;
+            --neon-blue: #0096FF;
+        }
+
+        .theme-english {
+            --primary-color: #1E90FF;
+            --secondary-color: #00FF7F;
+            --accent-color: #FFD700;
+            --neon-purple: #1E90FF;
+            --neon-pink: #00FF7F;
+            --neon-blue: #FFD700;
+        }
+
+        .theme-hindi {
+            --primary-color: #FF6B35;
+            --secondary-color: #FF4757;
+            --accent-color: #FFA502;
+            --neon-purple: #FF6B35;
+            --neon-pink: #FF4757;
+            --neon-blue: #FFA502;
+        }
+
+        /* Language Switcher Styling */
+        .language-switcher {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 8px 12px !important;
+            margin-right: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .language-switcher:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary-color) !important;
+        }
+
+        .language-text {
+            margin-left: 5px;
+            font-weight: 600;
+        }
+
+        .language-dropdown {
+            background: var(--darker-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            padding: 8px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .language-dropdown .dropdown-item {
+            color: white;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+        .language-dropdown .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary-color);
+        }
+
+        .language-dropdown .dropdown-item.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .language-dropdown .dropdown-item i {
+            margin-right: 8px;
+            width: 16px;
+        }
+
+        .language-dropdown .dropdown-item small {
+            font-size: 0.75rem;
+            opacity: 0.8;
         }
 
         body {
@@ -327,12 +453,20 @@
     </style>
     {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body class="theme-{{ current_language|default:'tamil' }}">
     {% load socialaccount %}
     <nav class="navbar navbar-expand-lg navbar-dark custom-navbar px-3">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="fas fa-music"></i> SPOT-ify the Paatu
+                {% if current_language == 'tamil' %}
+                    <i class="fas fa-music"></i> SPOT-ify the Paatu
+                {% elif current_language == 'english' %}
+                    <i class="fas fa-headphones"></i> SPOT-ify the Song
+                {% elif current_language == 'hindi' %}
+                    <i class="fas fa-microphone"></i> SPOT-ify the Gaana
+                {% else %}
+                    <i class="fas fa-music"></i> SPOT-ify the Paatu
+                {% endif %}
             </a>
 
             <button class="navbar-toggler neon-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -345,9 +479,47 @@
            
 
             <div class="collapse navbar-collapse mt-2 mt-lg-0" id="navbarNavDropdown">
+                <!-- Language Switcher -->
+                <div class="navbar-nav me-auto">
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle language-switcher" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-globe"></i>
+                            {% if current_language == 'tamil' %}
+                                <span class="language-text">Paatu</span>
+                            {% elif current_language == 'english' %}
+                                <span class="language-text">Song</span>
+                            {% elif current_language == 'hindi' %}
+                                <span class="language-text">Gaana</span>
+                            {% else %}
+                                <span class="language-text">Paatu</span>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu language-dropdown" aria-labelledby="languageDropdown">
+                            <li>
+                                <a class="dropdown-item {% if current_language == 'tamil' %}active{% endif %}" href="/tamil/">
+                                    <i class="fas fa-music"></i> SPOT-ify the Paatu
+                                    <small class="text-muted d-block">Tamil Songs</small>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {% if current_language == 'english' %}active{% endif %}" href="/english/">
+                                    <i class="fas fa-headphones"></i> SPOT-ify the Song
+                                    <small class="text-muted d-block">English Songs</small>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {% if current_language == 'hindi' %}active{% endif %}" href="/hindi/">
+                                    <i class="fas fa-microphone"></i> SPOT-ify the Gaana
+                                    <small class="text-muted d-block">Hindi Songs</small>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' language=current_language|default:'tamil' %}">
                             <i class="fas fa-home"></i> Home
                         </a>
                     </li>
@@ -359,14 +531,14 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'friends_list' %}active{% endif %}" href="{% url 'friends_list' %}">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'friends_list' %}active{% endif %}" href="{% url 'friends_list' language=current_language|default:'tamil' %}">
                             <i class="fas fa-users"></i> Friends
                         </a>
                     </li>
 
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'profile' %}">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'profile' language=current_language|default:'tamil' %}">
                                 <i class="fas fa-user"></i> Profile
                                 {% if user.userprofile.current_streak > 0 %}
                                     <span class="streak-badge ms-1">🔥 {{ user.userprofile.current_streak }}</span>
@@ -375,13 +547,13 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}" href="{% url 'leaderboard' %}">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}" href="{% url 'leaderboard' language=current_language|default:'tamil' %}">
                                 <i class="fas fa-trophy"></i> Leaderboard
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'archive' %}active{% endif %}" href="{% url 'archive' %}">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'archive' %}active{% endif %}" href="{% url 'archive' language=current_language|default:'tamil' %}">
                                 <i class="fas fa-archive"></i> Archive
                             </a>
                         </li>

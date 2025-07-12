@@ -3,22 +3,36 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.models import Max
 
+# Language choices for the multi-language system
+LANGUAGE_CHOICES = [
+    ('tamil', 'Tamil'),
+    ('english', 'English'),
+    ('hindi', 'Hindi'),
+]
+
 class Song(models.Model):
     title = models.CharField(max_length=200)
     artist = models.CharField(max_length=200)
     movie = models.CharField(max_length=200, null=True, blank=True)
     snippet = models.FileField(upload_to='song_snippets/')
-    reveal_snippet = models.FileField(upload_to='song_snippets/', null=True, blank=True)  
-    image = models.ImageField(upload_to='song_images/', null=True, blank=True) 
-    display_date = models.DateField(unique=True, null=True, blank=True)
+    reveal_snippet = models.FileField(upload_to='song_snippets/', null=True, blank=True)
+    image = models.ImageField(upload_to='song_images/', null=True, blank=True)
+    display_date = models.DateField(null=True, blank=True)  # Removed unique=True for multi-language
     is_used = models.BooleanField(default=False)
     spotify_id = models.CharField(max_length=200, null=True, blank=True)
+
+    # ✅ NEW: Language support for multi-language system
+    language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES, default='tamil')
 
     # ✅ NEW: Optional comma-separated duplicate Spotify IDs
     spotify_duplicates = models.TextField(blank=True, default="")
 
     def __str__(self):
-        return f"{self.title} - {self.artist}"
+        return f"{self.title} - {self.artist} ({self.get_language_display()})"
+
+    class Meta:
+        # Ensure unique display_date per language
+        unique_together = ['display_date', 'language']
 
     def get_all_spotify_ids(self):
         """Returns list of primary + duplicate Spotify IDs"""
@@ -34,15 +48,45 @@ class UserScore(models.Model):
     guess_time = models.FloatField()  # Time taken in seconds
     attempt_date = models.DateTimeField(auto_now_add=True)
 
+    # ✅ NEW: Language support for multi-language leaderboards
+    language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES, default='tamil')
+
     class Meta:
         ordering = ['-score', 'guess_time']  # Order by highest score and lowest time
 
     def __str__(self):
-        return f"{self.user.username} - {self.song.title} - {self.score} points"
+        return f"{self.user.username} - {self.song.title} - {self.score} points ({self.get_language_display()})"
 
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    # ✅ UPDATED: Language-specific stats
+    # Tamil stats
+    tamil_current_streak = models.IntegerField(default=0)
+    tamil_longest_streak = models.IntegerField(default=0)
+    tamil_total_points = models.IntegerField(default=0)
+    tamil_total_songs_solved = models.IntegerField(default=0)
+    tamil_average_time = models.FloatField(default=0)
+    tamil_last_played_date = models.DateField(null=True, blank=True)
+
+    # English stats
+    english_current_streak = models.IntegerField(default=0)
+    english_longest_streak = models.IntegerField(default=0)
+    english_total_points = models.IntegerField(default=0)
+    english_total_songs_solved = models.IntegerField(default=0)
+    english_average_time = models.FloatField(default=0)
+    english_last_played_date = models.DateField(null=True, blank=True)
+
+    # Hindi stats
+    hindi_current_streak = models.IntegerField(default=0)
+    hindi_longest_streak = models.IntegerField(default=0)
+    hindi_total_points = models.IntegerField(default=0)
+    hindi_total_songs_solved = models.IntegerField(default=0)
+    hindi_average_time = models.FloatField(default=0)
+    hindi_last_played_date = models.DateField(null=True, blank=True)
+
+    # Legacy fields (for backward compatibility)
     current_streak = models.IntegerField(default=0)
     longest_streak = models.IntegerField(default=0)
     total_points = models.IntegerField(default=0)
@@ -53,26 +97,73 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Profile"
 
-    def update_stats(self, score, guess_time, date):
+    def get_stats_for_language(self, language):
+        """Get stats for a specific language"""
+        return {
+            'current_streak': getattr(self, f'{language}_current_streak'),
+            'longest_streak': getattr(self, f'{language}_longest_streak'),
+            'total_points': getattr(self, f'{language}_total_points'),
+            'total_songs_solved': getattr(self, f'{language}_total_songs_solved'),
+            'average_time': getattr(self, f'{language}_average_time'),
+            'last_played_date': getattr(self, f'{language}_last_played_date'),
+        }
+
+    def update_stats(self, score, guess_time, date, language='tamil'):
+        """Update stats for a specific language"""
         from datetime import timedelta
-        
+
+        # Get current language-specific stats
+        current_streak_field = f'{language}_current_streak'
+        longest_streak_field = f'{language}_longest_streak'
+        total_points_field = f'{language}_total_points'
+        total_songs_field = f'{language}_total_songs_solved'
+        average_time_field = f'{language}_average_time'
+        last_played_field = f'{language}_last_played_date'
+
+        current_streak = getattr(self, current_streak_field)
+        longest_streak = getattr(self, longest_streak_field)
+        total_points = getattr(self, total_points_field)
+        total_songs = getattr(self, total_songs_field)
+        average_time = getattr(self, average_time_field)
+        last_played_date = getattr(self, last_played_field)
+
         # Update streak
-        if self.last_played_date:
-            if self.last_played_date == date - timedelta(days=1):
-                self.current_streak += 1
-            elif self.last_played_date != date:
-                self.current_streak = 1
+        if last_played_date:
+            if last_played_date == date - timedelta(days=1):
+                current_streak += 1
+            elif last_played_date != date:
+                current_streak = 1
         else:
-            self.current_streak = 1
+            current_streak = 1
 
         # Update longest streak
-        self.longest_streak = max(self.longest_streak, self.current_streak)
-        
+        longest_streak = max(longest_streak, current_streak)
+
         # Update other stats
-        self.total_points += score
-        self.total_songs_solved += 1
-        self.average_time = ((self.average_time * (self.total_songs_solved - 1)) + guess_time) / self.total_songs_solved
-        self.last_played_date = date
+        total_points += score
+        total_songs += 1
+        if total_songs > 1:
+            average_time = ((average_time * (total_songs - 1)) + guess_time) / total_songs
+        else:
+            average_time = guess_time
+
+        # Set updated values
+        setattr(self, current_streak_field, current_streak)
+        setattr(self, longest_streak_field, longest_streak)
+        setattr(self, total_points_field, total_points)
+        setattr(self, total_songs_field, total_songs)
+        setattr(self, average_time_field, average_time)
+        setattr(self, last_played_field, date)
+
+        # Also update legacy fields for backward compatibility (use Tamil as default)
+        if language == 'tamil':
+            self.current_streak = current_streak
+            self.longest_streak = longest_streak
+            self.total_points = total_points
+            self.total_songs_solved = total_songs
+            self.average_time = average_time
+            self.last_played_date = date
+
         self.save()
 
 
@@ -94,5 +185,13 @@ class DailySong(models.Model):
     total_players = models.IntegerField(default=0)
     average_time = models.FloatField(null=True)
 
+    # ✅ NEW: Language support for daily songs
+    language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES, default='tamil')
+
     class Meta:
         ordering = ['-date']
+        # Ensure unique date per language
+        unique_together = ['date', 'language']
+
+    def __str__(self):
+        return f"{self.song.title} - {self.date} ({self.get_language_display()})"

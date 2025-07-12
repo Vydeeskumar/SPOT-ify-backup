@@ -1,0 +1,21 @@
+{% extends "admin/index.html" %}
+{% load static %}
+
+{% block content %}
+{% if show_language_dashboard %}
+<div style="background: #f8f9fa; padding: 20px; margin-bottom: 20px; border-radius: 8px; border-left: 4px solid #007cba;">
+    <h2 style="margin: 0 0 10px 0; color: #333;">
+        <i class="fas fa-globe"></i> Multi-Language Dashboard
+    </h2>
+    <p style="margin: 0 0 15px 0; color: #666;">
+        Manage Tamil, English, and Hindi songs from a unified interface with language-specific analytics.
+    </p>
+    <a href="{% url 'admin:language_dashboard' %}" 
+       style="background: #007cba; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">
+        <i class="fas fa-chart-bar"></i> Open Language Dashboard
+    </a>
+</div>
+{% endif %}
+
+{{ block.super }}
+{% endblock %}

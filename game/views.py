@@ -5,7 +5,7 @@ from datetime import timedelta
 from django.db.models import Sum, Avg, Count, Max
 from django.http import JsonResponse
 from django.contrib import messages
-from .models import Song, UserScore, UserProfile, Friendship, DailySong
+from .models import Song, UserScore, UserProfile, Friendship, DailySong, LANGUAGE_CHOICES
 from .utils import calculate_points
 from fuzzywuzzy import fuzz
 import json
@@ -34,6 +34,15 @@ from django.shortcuts import redirect
 
 LAUNCH_DATE = date(2025, 6, 24)
 
+def language_redirect(request):
+    """Redirect root URL to Tamil version for backward compatibility"""
+    return redirect('/tamil/')
+
+def get_language_from_request(request):
+    """Extract language from URL path"""
+    # Get language from URL resolver kwargs
+    return getattr(request, 'resolver_match', {}).kwargs.get('language', 'tamil')
+
 def is_google_enabled():
     if settings.ENVIRONMENT == "production":
         return SocialApp.objects.filter(provider="google").exists()
@@ -56,26 +65,29 @@ def sitemap_view(request):
 
 
 
-def get_today_song():
+def get_today_song(language='tamil'):
+    """Get today's song for a specific language"""
     today = timezone.now().date()
-    song = Song.objects.filter(display_date=today).first()
-    
+    song = Song.objects.filter(display_date=today, language=language).first()
+
     if song:
         # Create or update DailySong entry for today
         daily_song, created = DailySong.objects.get_or_create(
             date=today,
+            language=language,
             defaults={'song': song}
         )
-        
+
         # Update total players if it already exists
         if not created:
             total_players = UserScore.objects.filter(
                 song=song,
-                attempt_date__date=today
+                attempt_date__date=today,
+                language=language
             ).count()
             daily_song.total_players = total_players
             daily_song.save()
-            
+
     return song
 
 
@@ -117,22 +129,29 @@ def check_answer(guess, correct_answer, spotify_id=None, today_song=None):
 
 
 @login_required
-def home(request):
-    today_song = get_today_song()
+def home(request, language='tamil'):
+    # Get language from URL or default to Tamil
+    current_language = language
+    today_song = get_today_song(current_language)
     user_already_played = False
 
     current_time = timezone.localtime(timezone.now())
     print(f"Current IST time: {current_time}")
     print(f"Current IST date: {current_time.date()}")
-    
+    print(f"Current language: {current_language}")
+
     if not today_song:
-        messages.warning(request, "No song is available for today. Please check back later!")
-        return render(request, 'game/home.html', {'today_song': None})
-    
+        messages.warning(request, f"No {current_language} song is available for today. Please check back later!")
+        return render(request, 'game/home.html', {
+            'today_song': None,
+            'current_language': current_language
+        })
+
     user_already_played = UserScore.objects.filter(
         user=request.user,
         song=today_song,
-        attempt_date__date=timezone.now().date()
+        attempt_date__date=timezone.now().date(),
+        language=current_language
     ).exists()
 
     if request.method == 'POST':
@@ -151,22 +170,27 @@ def home(request):
 
             if is_correct:
                 points = calculate_points(time_taken)
-                    
+
                 UserScore.objects.create(
                     user=request.user,
                     song=today_song,
                     score=points,
-                    guess_time=time_taken
-                )    
-                
+                    guess_time=time_taken,
+                    language=current_language
+                )
+
                 profile, created = UserProfile.objects.get_or_create(user=request.user)
-                profile.update_stats(points, time_taken, timezone.now().date())
+                profile.update_stats(points, time_taken, timezone.now().date(), current_language)
+
+                # Get language-specific streak
+                language_stats = profile.get_stats_for_language(current_language)
+                current_streak = language_stats['current_streak']
 
                 return JsonResponse({
                     'correct': True,
                     'points': points,
-                    'streak': profile.current_streak,
-                    'message': f'Correct! You earned {points} points! 🔥 Streak: {profile.current_streak}'
+                    'streak': current_streak,
+                    'message': f'Correct! You earned {points} points! 🔥 Streak: {current_streak}'
                 })
             else:
                 return JsonResponse({
@@ -179,7 +203,10 @@ def home(request):
 
     # Get user profile for displaying streak
     profile, created = UserProfile.objects.get_or_create(user=request.user)
-    
+
+    # Get language-specific stats
+    language_stats = profile.get_stats_for_language(current_language)
+
     # Initialize context with basic data
     context = {
         'today_song': today_song,
@@ -187,48 +214,56 @@ def home(request):
         'user_score': UserScore.objects.filter(
             user=request.user,
             song=today_song,
-            attempt_date__date=timezone.now().date()
+            attempt_date__date=timezone.now().date(),
+            language=current_language
         ).first() if user_already_played else None,
-        'give_up': False, 
-        'current_streak': profile.current_streak,
-        'longest_streak': profile.longest_streak,
+        'give_up': False,
+        'current_streak': language_stats['current_streak'],
+        'longest_streak': language_stats['longest_streak'],
+        'current_language': current_language,
+        'language_display': dict(LANGUAGE_CHOICES)[current_language],
     }
 
     # Add daily leaderboard data if user has played
     if user_already_played:
-        # Get daily scores
+        # Get daily scores for current language
         daily_scores = UserScore.objects.filter(
             song=today_song,
-            attempt_date__date=timezone.now().date()
+            attempt_date__date=timezone.now().date(),
+            language=current_language
         ).select_related('user').order_by('-score', 'guess_time')[:10]
 
         # Get user's score for today
         user_score = UserScore.objects.get(
             user=request.user,
             song=today_song,
-            attempt_date__date=timezone.now().date()
+            attempt_date__date=timezone.now().date(),
+            language=current_language
         )
 
         # Get user's rank (considering both score and time)
         better_scores = UserScore.objects.filter(
             song=today_song,
             attempt_date__date=timezone.now().date(),
+            language=current_language,
             score__gt=user_score.score
         ).count()
 
         same_score_faster = UserScore.objects.filter(
             song=today_song,
             attempt_date__date=timezone.now().date(),
+            language=current_language,
             score=user_score.score,
             guess_time__lt=user_score.guess_time
         ).count()
 
         user_rank = better_scores + same_score_faster + 1
 
-        # Get total players today
+        # Get total players today for current language
         total_players_today = UserScore.objects.filter(
             song=today_song,
-            attempt_date__date=timezone.now().date()
+            attempt_date__date=timezone.now().date(),
+            language=current_language
         ).count()
 
         # Add to context
@@ -306,7 +341,9 @@ def profile(request):
     return render(request, 'game/profile.html', context)
 
 @login_required
-def leaderboard(request):
+def leaderboard(request, language='tamil'):
+    # Get language from URL or default to Tamil
+    current_language = language
     today = timezone.now().date()
     week_start = today - timedelta(days=today.weekday())
     month_start = today.replace(day=1)
@@ -314,7 +351,7 @@ def leaderboard(request):
     def get_ranked_scores(base_queryset):
         """Helper function to get ranked scores with consistent calculation"""
         return base_queryset.values(
-            'user', 
+            'user',
             'user__username'
         ).annotate(
             total_score=Sum('score'),
@@ -326,10 +363,16 @@ def leaderboard(request):
             'avg_time'
         )
 
-    # Get complete ranked lists
-    weekly_queryset = UserScore.objects.filter(attempt_date__date__gte=week_start)
-    monthly_queryset = UserScore.objects.filter(attempt_date__date__gte=month_start)
-    alltime_queryset = UserScore.objects.all()
+    # Get complete ranked lists for current language
+    weekly_queryset = UserScore.objects.filter(
+        attempt_date__date__gte=week_start,
+        language=current_language
+    )
+    monthly_queryset = UserScore.objects.filter(
+        attempt_date__date__gte=month_start,
+        language=current_language
+    )
+    alltime_queryset = UserScore.objects.filter(language=current_language)
 
     weekly_all = get_ranked_scores(weekly_queryset)
     monthly_all = get_ranked_scores(monthly_queryset)
@@ -396,7 +439,9 @@ def leaderboard(request):
         'user_stats': user_stats,
         'total_players': total_players,
         'week_start': week_start,
-        'month_start': month_start
+        'month_start': month_start,
+        'current_language': current_language,
+        'language_display': dict(LANGUAGE_CHOICES)[current_language],
     }
 
     return render(request, 'game/leaderboard.html', context)
@@ -576,17 +621,20 @@ def compare_scores(request, friend_id):
         return redirect('friends_list')
     
 @login_required
-def get_daily_rankings(request):
-    today_song = get_today_song()
-    
+def get_daily_rankings(request, language='tamil'):
+    # Get language from URL or default to Tamil
+    current_language = language
+    today_song = get_today_song(current_language)
+
     # Get current IST date
     ist_now = timezone.localtime(timezone.now())
     ist_date = ist_now.date()
-    
-    # Get daily scores using IST date
+
+    # Get daily scores using IST date for current language
     daily_scores = UserScore.objects.filter(
         song=today_song,
-        attempt_date__date=ist_date
+        attempt_date__date=ist_date,
+        language=current_language
     ).select_related('user').order_by('-score', 'guess_time')[:10]
 
     try:
@@ -594,19 +642,22 @@ def get_daily_rankings(request):
         user_score = UserScore.objects.get(
             user=request.user,
             song=today_song,
-            attempt_date__date=ist_date
+            attempt_date__date=ist_date,
+            language=current_language
         )
 
         # Calculate user's rank (considering both score and time)
         better_scores = UserScore.objects.filter(
             song=today_song,
             attempt_date__date=ist_date,
+            language=current_language,
             score__gt=user_score.score
         ).count()
 
         same_score_faster = UserScore.objects.filter(
             song=today_song,
             attempt_date__date=ist_date,
+            language=current_language,
             score=user_score.score,
             guess_time__lt=user_score.guess_time
         ).count()
@@ -629,7 +680,8 @@ def get_daily_rankings(request):
         'userRank': user_rank,
         'totalPlayers': UserScore.objects.filter(
             song=today_song,
-            attempt_date__date=ist_date
+            attempt_date__date=ist_date,
+            language=current_language
         ).count()
     })
 

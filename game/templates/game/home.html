@@ -1564,7 +1564,17 @@
             {% if user_already_played %}
                 <!-- Already played view -->
                 <div class="result-container">
-                    <h4 style="color: var(--neon-purple); margin-bottom: 20px;">Today's Song</h4>
+                    <h4 style="color: var(--neon-purple); margin-bottom: 20px;">
+                        {% if current_language == 'tamil' %}
+                            Today's Paatu
+                        {% elif current_language == 'english' %}
+                            Today's Song
+                        {% elif current_language == 'hindi' %}
+                            Today's Gaana
+                        {% else %}
+                            Today's Song
+                        {% endif %}
+                    </h4>
                     <div class="main-game-image-wrapper">
                         <img src="{{ today_song.image.url }}" alt="{{ today_song.title }}" class="song-image reveal-glow-pink">
                     </div>
@@ -1577,7 +1587,17 @@
                     
                     <div class="already-played-message" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; margin: 20px 0;">
                         <i class="fas fa-clock"></i>
-                        <p style="margin: 10px 0;">You've already played today! Come back tomorrow for a New Paatu.</p>
+                        <p style="margin: 10px 0;">
+                            {% if current_language == 'tamil' %}
+                                You've already played today! Come back tomorrow for a New Paatu.
+                            {% elif current_language == 'english' %}
+                                You've already played today! Come back tomorrow for a New Song.
+                            {% elif current_language == 'hindi' %}
+                                You've already played today! Come back tomorrow for a New Gaana.
+                            {% else %}
+                                You've already played today! Come back tomorrow for a New Song.
+                            {% endif %}
+                        </p>
                     </div>
 
                     <div class="countdown-section" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px; margin-top: 20px;">
@@ -1650,7 +1670,17 @@
                 <!-- Game View Container -->
                 <div id="game-container">
                     <div class="game-header">
-                        <h2>Today's Song</h2>
+                        <h2>
+                            {% if current_language == 'tamil' %}
+                                Today's Paatu
+                            {% elif current_language == 'english' %}
+                                Today's Song
+                            {% elif current_language == 'hindi' %}
+                                Today's Gaana
+                            {% else %}
+                                Today's Song
+                            {% endif %}
+                        </h2>
                         <div class="timer" id="timer">00:00</div>
                         <div class="points-indicator" id="points-indicator">Points: <span class="points-value">8</span></div>
                     </div>

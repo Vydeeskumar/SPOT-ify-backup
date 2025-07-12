@@ -1,8 +1,13 @@
 from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.utils.html import format_html
-from .models import Song, UserScore, UserProfile
+from django.urls import path
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from .models import Song, UserScore, UserProfile, DailySong, LANGUAGE_CHOICES
 from django import forms
+from django.utils import timezone
+from datetime import date
 
 class SongAdminForm(forms.ModelForm):
     spotify_search = forms.CharField(
@@ -16,23 +21,122 @@ class SongAdminForm(forms.ModelForm):
         model = Song
         fields = '__all__'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set default language if not specified
+        if not self.instance.pk and 'language' not in self.initial:
+            self.initial['language'] = 'tamil'
+
 # Customize Admin Site
 class SpotifyPaatuAdminSite(AdminSite):
-    site_header = 'SPOT-ify the Paatu Administration'
-    site_title = 'SPOT-ify the Paatu Admin'
-    index_title = 'Game Management'
+    site_header = 'SPOT-ify Multi-Language Administration'
+    site_title = 'SPOT-ify Admin'
+    index_title = 'Multi-Language Game Management'
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('language-dashboard/', self.admin_view(self.language_dashboard_view), name='language_dashboard'),
+            path('set-daily-song/', self.admin_view(self.set_daily_song_view), name='set_daily_song'),
+            path('language-stats/<str:language>/', self.admin_view(self.language_stats_view), name='language_stats'),
+        ]
+        return custom_urls + urls
+
+    def index(self, request, extra_context=None):
+        """Override admin index to add custom dashboard link"""
+        extra_context = extra_context or {}
+        extra_context['show_language_dashboard'] = True
+        return super().index(request, extra_context)
+
+    def language_dashboard_view(self, request):
+        """Multi-language dashboard with tabs"""
+        context = {
+            'title': 'Multi-Language Dashboard',
+            'languages': LANGUAGE_CHOICES,
+            'today': timezone.now().date(),
+        }
+
+        # Get today's songs for each language
+        today_songs = {}
+        for lang_code, lang_name in LANGUAGE_CHOICES:
+            song = Song.objects.filter(
+                display_date=timezone.now().date(),
+                language=lang_code
+            ).first()
+            today_songs[lang_code] = song
+
+        context['today_songs'] = today_songs
+
+        return render(request, 'admin/language_dashboard.html', context)
+
+    def set_daily_song_view(self, request):
+        """Set daily song for a specific language"""
+        if request.method == 'POST':
+            language = request.POST.get('language')
+            song_id = request.POST.get('song_id')
+            date_str = request.POST.get('date')
+
+            try:
+                song = Song.objects.get(id=song_id, language=language)
+                target_date = timezone.datetime.strptime(date_str, '%Y-%m-%d').date()
+
+                # Update song's display date
+                song.display_date = target_date
+                song.save()
+
+                # Create or update DailySong entry
+                daily_song, created = DailySong.objects.get_or_create(
+                    date=target_date,
+                    language=language,
+                    defaults={'song': song}
+                )
+                if not created:
+                    daily_song.song = song
+                    daily_song.save()
+
+                return JsonResponse({'success': True, 'message': f'Daily song set for {language}'})
+            except Exception as e:
+                return JsonResponse({'success': False, 'error': str(e)})
+
+        return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+    def language_stats_view(self, request, language):
+        """Get stats for a specific language"""
+        today = timezone.now().date()
+
+        # Get today's song
+        today_song = Song.objects.filter(
+            display_date=today,
+            language=language
+        ).first()
+
+        stats = {
+            'language': language,
+            'today_song': today_song.title if today_song else None,
+            'total_songs': Song.objects.filter(language=language).count(),
+            'used_songs': Song.objects.filter(language=language, is_used=True).count(),
+        }
+
+        if today_song:
+            stats['today_players'] = UserScore.objects.filter(
+                song=today_song,
+                attempt_date__date=today,
+                language=language
+            ).count()
+
+        return JsonResponse(stats)
 
 admin_site = SpotifyPaatuAdminSite(name='spotifyadmin')
 
 # Song Admin
 @admin.register(Song)
 class SongAdmin(admin.ModelAdmin):
-    form = SongAdminForm 
-    list_display = ('song_title_with_movie', 'artist', 'display_date', 'status_tag')
-    list_filter = ('is_used', 'display_date')
+    form = SongAdminForm
+    list_display = ('song_title_with_movie', 'artist', 'language_tag', 'display_date', 'status_tag')
+    list_filter = ('language', 'is_used', 'display_date')
     search_fields = ('title', 'movie', 'artist')
     date_hierarchy = 'display_date'
-    ordering = ('-display_date',)
+    ordering = ('-display_date', 'language')
     list_per_page = 20
     fieldsets = (
         ('Spotify Search', {
@@ -41,11 +145,11 @@ class SongAdmin(admin.ModelAdmin):
         }),
 
         ('Song Details', {
-            'fields': ('title', 'artist', 'movie', 'spotify_id', 'spotify_duplicates'),
+            'fields': ('title', 'artist', 'movie', 'language', 'spotify_id', 'spotify_duplicates'),
             'classes': ('wide',)
         }),
         ('Media', {
-            'fields': ('snippet', 'reveal_snippet', 'image'),  # Added reveal_snippet here
+            'fields': ('snippet', 'reveal_snippet', 'image'),
             'classes': ('wide',)
         }),
         ('Schedule', {
@@ -68,6 +172,20 @@ class SongAdmin(admin.ModelAdmin):
         )
     song_title_with_movie.short_description = 'Song'
 
+    def language_tag(self, obj):
+        colors = {
+            'tamil': '#B026FF',
+            'english': '#1E90FF',
+            'hindi': '#FF6B35'
+        }
+        color = colors.get(obj.language, '#666')
+        return format_html(
+            '<span style="background-color: {}; color: white; padding: 3px 8px; border-radius: 10px; font-size: 0.8em;">{}</span>',
+            color,
+            obj.get_language_display()
+        )
+    language_tag.short_description = 'Language'
+
     def status_tag(self, obj):
         if obj.is_used:
             return format_html(
@@ -81,8 +199,8 @@ class SongAdmin(admin.ModelAdmin):
 # User Score Admin
 @admin.register(UserScore)
 class UserScoreAdmin(admin.ModelAdmin):
-    list_display = ('user', 'song_details', 'score_display', 'formatted_time', 'attempt_date')
-    list_filter = ('attempt_date', 'score')
+    list_display = ('user', 'song_details', 'language_tag', 'score_display', 'formatted_time', 'attempt_date')
+    list_filter = ('language', 'attempt_date', 'score')
     search_fields = ('user__username', 'song__title')
     date_hierarchy = 'attempt_date'
     ordering = ('-attempt_date',)
@@ -94,6 +212,20 @@ class UserScoreAdmin(admin.ModelAdmin):
             obj.song.movie
         )
     song_details.short_description = 'Song'
+
+    def language_tag(self, obj):
+        colors = {
+            'tamil': '#B026FF',
+            'english': '#1E90FF',
+            'hindi': '#FF6B35'
+        }
+        color = colors.get(obj.language, '#666')
+        return format_html(
+            '<span style="background-color: {}; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.75em;">{}</span>',
+            color,
+            obj.get_language_display()
+        )
+    language_tag.short_description = 'Lang'
 
     def score_display(self, obj):
         color = '#2e7d32' if obj.score > 5 else '#f57c00' if obj.score > 2 else '#c62828'
