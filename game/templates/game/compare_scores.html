@@ -15,16 +15,10 @@
         <!-- Player Names Header -->
         <div class="players-header">
             <div class="player-name left">
-                <div class="player-avatar">
-                    <i class="fas fa-user-circle"></i>
-                </div>
                 <span>{{ user.username }}</span>
             </div>
             <div class="vs-divider">VS</div>
             <div class="player-name right">
-                <div class="player-avatar">
-                    <i class="fas fa-user-circle"></i>
-                </div>
                 <span>{{ friend.username }}</span>
             </div>
         </div>
@@ -224,47 +218,40 @@
 
 .player-name {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    flex: 1;
-}
-
-.player-avatar {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid;
+    flex: 1;
+    padding: 15px 10px;
+    border-radius: 12px;
+    position: relative;
 }
 
-.player-name.left .player-avatar {
-    background: var(--player1-glow);
-    border-color: var(--player1-primary);
+.player-name.left {
+    background: linear-gradient(135deg, var(--player1-glow), rgba(255, 71, 87, 0.1));
+    border: 2px solid var(--player1-primary);
 }
 
-.player-name.right .player-avatar {
-    background: var(--player2-glow);
-    border-color: var(--player2-primary);
-}
-
-.player-name.left .player-avatar i {
-    font-size: 1.5rem;
-    color: var(--player1-primary);
-}
-
-.player-name.right .player-avatar i {
-    font-size: 1.5rem;
-    color: var(--player2-primary);
+.player-name.right {
+    background: linear-gradient(135deg, var(--player2-glow), rgba(55, 66, 250, 0.1));
+    border: 2px solid var(--player2-primary);
 }
 
 .player-name span {
     font-weight: bold;
-    font-size: 1rem;
-    color: white;
+    font-size: 1.1rem;
     text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.player-name.left span {
+    color: var(--player1-primary);
+    text-shadow: 0 0 8px var(--player1-glow);
+}
+
+.player-name.right span {
+    color: var(--player2-primary);
+    text-shadow: 0 0 8px var(--player2-glow);
 }
 
 .vs-divider {
@@ -489,13 +476,12 @@
         padding: 25px;
     }
 
-    .player-avatar {
-        width: 55px;
-        height: 55px;
+    .player-name {
+        padding: 20px 15px;
     }
 
-    .player-avatar i {
-        font-size: 1.8rem;
+    .player-name span {
+        font-size: 1.3rem;
     }
 
     .stats-comparison {
