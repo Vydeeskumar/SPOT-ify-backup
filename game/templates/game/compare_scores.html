@@ -221,37 +221,21 @@
     align-items: center;
     justify-content: center;
     flex: 1;
-    padding: 15px 10px;
-    border-radius: 12px;
-    position: relative;
-}
-
-.player-name.left {
-    background: linear-gradient(135deg, var(--player1-glow), rgba(255, 71, 87, 0.1));
-    border: 2px solid var(--player1-primary);
-}
-
-.player-name.right {
-    background: linear-gradient(135deg, var(--player2-glow), rgba(55, 66, 250, 0.1));
-    border: 2px solid var(--player2-primary);
 }
 
 .player-name span {
     font-weight: bold;
     font-size: 1.1rem;
     text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    text-transform: capitalize;
 }
 
 .player-name.left span {
     color: var(--player1-primary);
-    text-shadow: 0 0 8px var(--player1-glow);
 }
 
 .player-name.right span {
     color: var(--player2-primary);
-    text-shadow: 0 0 8px var(--player2-glow);
 }
 
 .vs-divider {
@@ -474,10 +458,6 @@
 
     .players-header {
         padding: 25px;
-    }
-
-    .player-name {
-        padding: 20px 15px;
     }
 
     .player-name span {
