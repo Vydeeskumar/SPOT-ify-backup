@@ -8,66 +8,94 @@
             <i class="fas fa-arrow-left"></i>
         </a>
         <h1 class="neon-text">Score Battle</h1>
-        <div class="vs-badge">VS</div>
     </div>
 
-    <!-- Players Cards -->
-    <div class="players-comparison">
-        <!-- Your Stats -->
-        <div class="player-card your-stats">
-            <div class="player-header">
+    <!-- Mobile-First Comparison Layout -->
+    <div class="comparison-layout">
+        <!-- Player Names Header -->
+        <div class="players-header">
+            <div class="player-name left">
                 <div class="player-avatar">
                     <i class="fas fa-user-circle"></i>
                 </div>
-                <h2>Your Stats</h2>
+                <span>{{ user.username }}</span>
             </div>
-            
-            <div class="stats-grid">
-                <div class="stat-item total-score">
-                    <div class="stat-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Total Score</h3>
-                        <span class="stat-value">{{ user_stats.total_score|default:0 }}</span>
-                    </div>
+            <div class="vs-divider">VS</div>
+            <div class="player-name right">
+                <div class="player-avatar">
+                    <i class="fas fa-user-circle"></i>
                 </div>
+                <span>{{ friend.username }}</span>
+            </div>
+        </div>
 
-                <div class="stat-item avg-score">
-                    <div class="stat-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Average Time</h3>
-                        <span class="stat-value">{{ user_stats.avg_time|default:0|floatformat:1 }}s</span>
-                    </div>
+        <!-- Stats Comparison -->
+        <div class="stats-comparison">
+            <!-- Total Score -->
+            <div class="stat-row">
+                <div class="stat-left">
+                    <span class="stat-value">{{ user_stats.total_score|default:0 }}</span>
                 </div>
-
-                <div class="stat-item games">
-                    <div class="stat-icon">
-                        <i class="fas fa-gamepad"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Games</h3>
-                        <span class="stat-value">{{ user_stats.games_played|default:0 }}</span>
-                    </div>
+                <div class="stat-center">
+                    <i class="fas fa-star"></i>
+                    <span>Total Score</span>
                 </div>
-
-                <div class="stat-item best-score">
-                    <div class="stat-icon">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Best Time</h3>
-                        <span class="stat-value">{{ user_stats.best_time|default:0|floatformat:1 }}s 
-                            <small style="color: var(--neon-blue)">({{ user_stats.best_time_score }} pts)</small>
-                    </div>
+                <div class="stat-right">
+                    <span class="stat-value">{{ friend_stats.total_score|default:0 }}</span>
                 </div>
             </div>
 
-            <div class="recent-games-section">
-                <h3>Recent Games</h3>
-                <div class="games-list">
+            <!-- Games Played -->
+            <div class="stat-row">
+                <div class="stat-left">
+                    <span class="stat-value">{{ user_stats.games_played|default:0 }}</span>
+                </div>
+                <div class="stat-center">
+                    <i class="fas fa-gamepad"></i>
+                    <span>Games</span>
+                </div>
+                <div class="stat-right">
+                    <span class="stat-value">{{ friend_stats.games_played|default:0 }}</span>
+                </div>
+            </div>
+
+            <!-- Average Time -->
+            <div class="stat-row">
+                <div class="stat-left">
+                    <span class="stat-value">{{ user_stats.avg_time|default:0|floatformat:1 }}s</span>
+                </div>
+                <div class="stat-center">
+                    <i class="fas fa-clock"></i>
+                    <span>Avg Time</span>
+                </div>
+                <div class="stat-right">
+                    <span class="stat-value">{{ friend_stats.avg_time|default:0|floatformat:1 }}s</span>
+                </div>
+            </div>
+
+            <!-- Best Time -->
+            <div class="stat-row">
+                <div class="stat-left">
+                    <span class="stat-value">{{ user_stats.best_time|default:0|floatformat:1 }}s</span>
+                    <small>({{ user_stats.best_time_score|default:0 }} pts)</small>
+                </div>
+                <div class="stat-center">
+                    <i class="fas fa-trophy"></i>
+                    <span>Best Time</span>
+                </div>
+                <div class="stat-right">
+                    <span class="stat-value">{{ friend_stats.best_time|default:0|floatformat:1 }}s</span>
+                    <small>({{ friend_stats.best_time_score|default:0 }} pts)</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Games Comparison -->
+        <div class="recent-games-section">
+            <h3>Recent Games</h3>
+            <div class="games-comparison">
+                <div class="games-column left">
+                    <h4>Your Games</h4>
                     {% for score in user_recent %}
                         <div class="game-item {% if score.score >= 8 %}perfect{% elif score.score >= 5 %}good{% elif score.score >= 3 %}average{% endif %}">
                             <div class="game-info">
@@ -76,7 +104,7 @@
                             </div>
                             <div class="game-score">
                                 <span class="points">{{ score.score }}</span>
-                                <small>points</small>
+                                <small>pts</small>
                             </div>
                         </div>
                     {% empty %}
@@ -86,64 +114,11 @@
                         </div>
                     {% endfor %}
                 </div>
-            </div>
-        </div>
 
-        <!-- Friend's Stats -->
-        <div class="player-card friend-stats">
-            <div class="player-header">
-                <div class="player-avatar">
-                    <i class="fas fa-user-circle"></i>
-                </div>
-                <h2>{{ friend.username }}</h2>
-            </div>
-            
-            <div class="stats-grid">
-                <div class="stat-item total-score">
-                    <div class="stat-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Total Score</h3>
-                        <span class="stat-value">{{ friend_stats.total_score|default:0 }}</span>
-                    </div>
-                </div>
+                <div class="games-divider"></div>
 
-                <div class="stat-item avg-score">
-                    <div class="stat-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Average Time</h3>
-                        <span class="stat-value">{{ friend_stats.avg_time|default:0|floatformat:1 }}s</span>
-                    </div>
-                </div>
-
-                <div class="stat-item games">
-                    <div class="stat-icon">
-                        <i class="fas fa-gamepad"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Games</h3>
-                        <span class="stat-value">{{ friend_stats.games_played|default:0 }}</span>
-                    </div>
-                </div>
-
-                <div class="stat-item best-score">
-                    <div class="stat-icon">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Best Time</h3>
-                        <span class="stat-value">{{ friend_stats.best_time|default:0|floatformat:1 }}s 
-                            <small style="color: var(--neon-blue)">({{ friend_stats.best_time_score }} pts)</small>
-                    </div>
-                </div>
-            </div>
-
-            <div class="recent-games-section">
-                <h3>Recent Games</h3>
-                <div class="games-list">
+                <div class="games-column right">
+                    <h4>{{ friend.username }}'s Games</h4>
                     {% for score in friend_recent %}
                         <div class="game-item {% if score.score >= 8 %}perfect{% elif score.score >= 5 %}good{% elif score.score >= 3 %}average{% endif %}">
                             <div class="game-info">
@@ -152,7 +127,7 @@
                             </div>
                             <div class="game-score">
                                 <span class="points">{{ score.score }}</span>
-                                <small>points</small>
+                                <small>pts</small>
                             </div>
                         </div>
                     {% empty %}
@@ -170,98 +145,80 @@
 <style>
 /* Main Container */
 .compare-container {
-    padding: 20px;
+    padding: 15px;
     min-height: 100vh;
     background: var(--darker-bg);
     color: white;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
 /* Page Header */
 .page-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin-bottom: 40px;
-    position: relative;
-    padding: 20px 0; 
+    margin-bottom: 25px;
+    padding: 15px 0;
 }
 
 .back-button {
-    position: absolute;
-    left: 0;
     color: var(--neon-purple);
     font-size: 1.2rem;
-    padding: 10px;
+    padding: 8px;
     border-radius: 50%;
     background: rgba(176, 38, 255, 0.1);
     transition: all 0.3s ease;
+    margin-right: 15px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .back-button:hover {
-    transform: translateX(-5px);
     background: rgba(176, 38, 255, 0.2);
     color: var(--neon-purple);
 }
 
 .neon-text {
     color: var(--neon-purple);
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     font-weight: bold;
     text-shadow: 0 0 10px rgba(176, 38, 255, 0.5);
     margin: 0;
-    z-index: 2; 
 }
 
-.vs-badge {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: var(--neon-pink);
-    color: white;
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 1.2rem;
-    box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
-    z-index: 2;
-}
-
-/* Players Comparison Layout */
-.players-comparison {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 40px;
-    max-width: 1400px;
-    margin: 0 auto;
-    position: relative;
-}
-
-/* Player Cards */
-.player-card {
+/* Comparison Layout */
+.comparison-layout {
     background: rgba(255, 255, 255, 0.03);
     border-radius: 20px;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     overflow: hidden;
-    transition: transform 0.3s ease;
 }
 
-.player-card:hover {
-    transform: translateY(-5px);
-}
-
-.player-header {
-    background: rgba(176, 38, 255, 0.1);
-    padding: 20px;
+/* Players Header */
+.players-header {
     display: flex;
     align-items: center;
-    gap: 15px;
+    justify-content: space-between;
+    padding: 20px;
+    background: rgba(176, 38, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.player-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
 }
 
 .player-avatar {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     background: rgba(176, 38, 255, 0.2);
     display: flex;
@@ -270,371 +227,305 @@
 }
 
 .player-avatar i {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     color: var(--neon-purple);
 }
 
-.player-header h2 {
-    margin: 0;
-    font-size: 1.3rem;
+.player-name span {
+    font-weight: bold;
+    font-size: 1rem;
     color: white;
+    text-align: center;
 }
 
-/* Stats Grid */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+.vs-divider {
+    background: var(--neon-pink);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+}
+
+/* Stats Comparison */
+.stats-comparison {
     padding: 20px;
 }
 
-.stat-item {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
-    padding: 15px;
-    display: flex;
+.stat-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: 15px;
-    transition: all 0.3s ease;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.stat-item:hover {
-    background: rgba(176, 38, 255, 0.1);
-    transform: translateY(-3px);
+.stat-row:last-child {
+    border-bottom: none;
 }
 
-.stat-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: rgba(176, 38, 255, 0.1);
+.stat-left, .stat-right {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    gap: 5px;
 }
 
-.stat-icon i {
+.stat-left {
+    text-align: right;
+}
+
+.stat-right {
+    text-align: left;
+}
+
+.stat-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 10px;
+    background: rgba(176, 38, 255, 0.1);
+    border-radius: 12px;
+    min-width: 80px;
+}
+
+.stat-center i {
     color: var(--neon-purple);
     font-size: 1.2rem;
 }
 
-.stat-info h3 {
-    margin: 0;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
+.stat-center span {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
 }
 
 .stat-value {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-weight: bold;
     color: var(--neon-purple);
+}
+
+.stat-left .stat-value {
+    color: var(--neon-blue);
+}
+
+.stat-right .stat-value {
+    color: var(--neon-pink);
+}
+
+.stat-left small, .stat-right small {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
 }
 
 /* Recent Games Section */
 .recent-games-section {
     padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .recent-games-section h3 {
     color: white;
     margin-bottom: 15px;
     font-size: 1.2rem;
+    text-align: center;
 }
 
-.games-list {
+.games-comparison {
     display: grid;
-    gap: 10px;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 15px;
+    align-items: start;
+}
+
+.games-column h4 {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.games-column.left h4 {
+    color: var(--neon-blue);
+}
+
+.games-column.right h4 {
+    color: var(--neon-pink);
+}
+
+.games-divider {
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--neon-purple), transparent);
+    min-height: 200px;
+    margin: 0 10px;
 }
 
 .game-item {
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
     transition: all 0.3s ease;
 }
 
-.game-item:hover {
-    transform: translateX(5px);
+.games-column.left .game-item {
+    border-left: 3px solid var(--neon-blue);
 }
 
-.game-item.perfect { border-left: 3px solid #FFD700; }
-.game-item.good { border-left: 3px solid var(--neon-blue); }
-.game-item.average { border-left: 3px solid var(--neon-purple); }
+.games-column.right .game-item {
+    border-right: 3px solid var(--neon-pink);
+}
+
+.game-item.perfect {
+    background: rgba(255, 215, 0, 0.1);
+}
+.game-item.good {
+    background: rgba(0, 255, 255, 0.1);
+}
+.game-item.average {
+    background: rgba(176, 38, 255, 0.1);
+}
 
 .game-info {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 3px;
+    margin-bottom: 5px;
 }
 
 .game-title {
     color: white;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .game-date {
     color: rgba(255, 255, 255, 0.5);
-    font-size: 0.8rem;
+    font-size: 0.7rem;
 }
 
 .game-score {
-    text-align: right;
+    text-align: center;
 }
 
 .points {
     color: var(--neon-purple);
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: bold;
 }
 
 .empty-games {
     text-align: center;
-    padding: 30px;
+    padding: 20px;
     color: rgba(255, 255, 255, 0.5);
 }
 
 .empty-games i {
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: var(--neon-purple);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
-/* Mobile Responsiveness */
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-    .players-comparison {
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
-        overflow-x: auto;
-        padding: 10px 0;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        margin: 0 -20px; /* Compensate for container padding */
-        padding: 0 20px; /* Add padding back to sides */
-        scroll-padding: 0 20px; /* Account for padding in snap points */
-    }
+.empty-games p {
+    font-size: 0.8rem;
+}
 
-    .player-card {
-        min-width: 85%;
-        flex: 0 0 85%;
-        scroll-snap-align: center;
-        margin-right: 15px; /* Space between cards */
-        transform: none; /* Remove hover transform on mobile */
-    }
-
-    .player-card:last-child {
-        margin-right: 0; /* Remove margin from last card */
-    }
-
-    /* Add scroll indicators */
-    .players-comparison::before,
-    .players-comparison::after {
-        content: '';
-        position: fixed;
-        top: 50%;
-        width: 30px;
-        height: 60px;
-        pointer-events: none;
-        z-index: 2;
-    }
-
-    .players-comparison::before {
-        left: 0;
-        background: linear-gradient(to right, var(--darker-bg), transparent);
-    }
-
-    .players-comparison::after {
-        right: 0;
-        background: linear-gradient(to left, var(--darker-bg), transparent);
-    }
-
-    /* Header adjustments */
-    .page-header {
-        justify-content: flex-start;
-        padding: 20px 0;
-        margin-bottom: 20px;
-        position: sticky;
-        top: 0;
-        background: var(--darker-bg);
-        z-index: 10;
-    }
-
-    .back-button {
-        position: relative;
-        margin-right: 15px;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+/* Desktop Adjustments */
+@media (min-width: 769px) {
+    .compare-container {
+        max-width: 600px;
+        padding: 30px;
     }
 
     .neon-text {
+        font-size: 2.2rem;
+    }
+
+    .players-header {
+        padding: 25px;
+    }
+
+    .player-avatar {
+        width: 55px;
+        height: 55px;
+    }
+
+    .player-avatar i {
         font-size: 1.8rem;
-        margin-left: 10px;
     }
 
-    .vs-badge {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        left: auto;
-        transform: none;
-        font-size: 0.9rem;
-        padding: 3px 12px;
-        display: block;
-        z-index: 11;
+    .stats-comparison {
+        padding: 25px;
     }
 
-    /* Stats Grid adjustments */
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-        padding: 15px;
-    }
-
-    .stat-item {
-        padding: 12px;
-        min-height: 80px;
-    }
-
-    .stat-icon {
-        width: 35px;
-        height: 35px;
-    }
-
-    .stat-info h3 {
-        font-size: 0.8rem;
+    .stat-row {
+        padding: 20px 0;
     }
 
     .stat-value {
-        font-size: 1.1rem;
+        font-size: 1.6rem;
     }
 
-    /* Recent Games adjustments */
-    .recent-games-section {
-        padding: 15px;
+    .games-comparison {
+        gap: 20px;
     }
 
-    .recent-games-section h3 {
-        font-size: 1.1rem;
-        margin-bottom: 10px;
-    }
-
-    .games-list {
-        gap: 8px;
-    }
-
-    .game-item {
-        padding: 12px;
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .game-info {
-        text-align: left;
-    }
-
-    .game-title {
-        font-size: 0.85rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .game-date {
-        font-size: 0.75rem;
-    }
-
-    .game-score {
-        text-align: right;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-    }
-
-    .points {
-        font-size: 1.1rem;
-    }
-
-    /* Empty state adjustments */
-    .empty-games {
-        padding: 20px;
-    }
-
-    .empty-games i {
-        font-size: 1.8rem;
-        margin-bottom: 8px;
-    }
-
-    .empty-games p {
-        font-size: 0.9rem;
-    }
-
-    /* Add pull-to-refresh indicator */
-    .players-comparison {
-        position: relative;
-    }
-
-    .players-comparison::after {
-        content: '';
-        position: absolute;
-        bottom: -20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 40px;
-        height: 2px;
-        background: var(--neon-purple);
-        border-radius: 2px;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .players-comparison:active::after {
-        opacity: 1;
+    .games-divider {
+        margin: 0 15px;
     }
 }
 
-/* Enhance scrollbar for webkit browsers */
-.players-comparison::-webkit-scrollbar {
-    height: 4px;
-}
-
-.players-comparison::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 2px;
-}
-
-.players-comparison::-webkit-scrollbar-thumb {
-    background: var(--neon-purple);
-    border-radius: 2px;
-}
-
-/* Maintain smooth transitions */
+/* Smooth transitions and animations */
 * {
     transition: all 0.3s ease;
 }
 
-/* Keep existing animations */
+/* Hover effects */
+.stat-row:hover {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+}
+
+.stat-row:hover .stat-center {
+    background: rgba(176, 38, 255, 0.2);
+    transform: scale(1.05);
+}
+
+/* Animations */
 @keyframes glow {
     0%, 100% { text-shadow: 0 0 10px rgba(176, 38, 255, 0.5); }
     50% { text-shadow: 0 0 20px rgba(176, 38, 255, 0.8); }
 }
 
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
-/* Add smooth transitions */
-* {
-    transition: all 0.3s ease;
+
+.comparison-layout {
+    animation: slideIn 0.5s ease-out;
 }
+
+.stat-row {
+    animation: slideIn 0.6s ease-out;
+}
+
+.stat-row:nth-child(2) { animation-delay: 0.1s; }
+.stat-row:nth-child(3) { animation-delay: 0.2s; }
+.stat-row:nth-child(4) { animation-delay: 0.3s; }
 </style>
 </div>
 {% endblock %}
