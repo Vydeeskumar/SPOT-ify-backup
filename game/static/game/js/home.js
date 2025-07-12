@@ -318,14 +318,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     const leaderboardHTML = `
                         <div class="daily-leaderboard mt-4" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px; opacity: 0; animation: fadeIn 0.5s ease forwards 0.9s;">
-                            <div class="leaderboard-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                <h5 style="color: var(--neon-blue); margin: 0;">
-                                    <i class="fas fa-trophy"></i> Today's Rankings
-                                </h5>
-                                <span style="color: var(--neon-purple);">
-                                    Your Rank: #${data.userRank}
-                                </span>
-                            </div>
 
                             <div class="leaderboard-toggle" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
                                 <span style="color: white;">View Leaderboard</span>
@@ -333,6 +325,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             </div>
 
                             <div id="leaderboard-content" style="display: none; transition: all 0.3s ease;">
+                                <h5 style="color: var(--neon-blue); margin: 0;">
+                                    <i class="fas fa-trophy"></i> Today's Rankings
+                                </h5>
+                                <span style="color: var(--neon-purple);">
+                                    Your Rank: #${data.userRank}
+                                </span>
 
 
                                 <div class="leaderboard-list" style="max-height: 300px; overflow-y: auto; margin-top: 10px;">

@@ -1600,22 +1600,18 @@
 
     <!-- Daily Leaderboard Section -->
     <div class="daily-leaderboard mt-4" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px;">
-        <div class="leaderboard-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <div class="leaderboard-toggle" id="leaderboard-toggle" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: white;">View Leaderboard</span>
+            <i class="fas fa-chevron-down" id="leaderboard-chevron" style="color: var(--neon-purple); transition: transform 0.3s ease;"></i>
+        </div>
+
+        <div id="leaderboard-content" style="display: none; transition: all 0.3s ease;">
             <h5 style="color: var(--neon-blue); margin: 0;">
                 <i class="fas fa-trophy"></i> Today's Rankings
             </h5>
             <span style="color: var(--neon-purple);">
                 Your Rank: #{{ user_daily_rank }}
             </span>
-        </div>
-        
-        <div class="leaderboard-toggle" id="leaderboard-toggle" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="color: white;">View Leaderboard</span>
-            <i class="fas fa-chevron-down" id="leaderboard-chevron" style="color: var(--neon-purple); transition: transform 0.3s ease;"></i>
-        </div>
-
-
-        <div id="leaderboard-content" style="display: none; transition: all 0.3s ease;">
             <div class="leaderboard-list" style="max-height: 300px; overflow-y: auto;">
                 {% for score in daily_scores %}
                 <div class="leaderboard-item" style="display: grid; grid-template-columns: auto 1fr auto auto; gap: 15px; padding: 10px; margin: 5px 0; background: rgba(176, 38, 255, 0.1); border-radius: 8px; {% if score.user == user %}border: 1px solid var(--neon-purple);{% endif %}">
