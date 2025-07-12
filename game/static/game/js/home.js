@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             // Fetch and display daily leaderboard immediately
-            fetch('/get-daily-rankings/')
+            fetch(`/${window.currentLanguage || 'tamil'}/get-daily-rankings/`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -342,7 +342,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                                 ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                                             </div>
                                             <div style="color: white;">
-                                                <a href="/profile/${score.username}" style="color: white; text-decoration: none; font-weight: bold;">
+                                                <a href="/${window.currentLanguage || 'tamil'}/profile/${score.username}" style="color: white; text-decoration: none; font-weight: bold;">
                                                     ${score.username}
                                                 </a>
                                             </div>
