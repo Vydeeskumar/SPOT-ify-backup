@@ -325,12 +325,14 @@ document.addEventListener('DOMContentLoaded', function () {
                             </div>
 
                             <div id="leaderboard-content" style="display: none; transition: all 0.3s ease;">
-                                <h5 style="color: var(--neon-blue); margin: 0;">
-                                    <i class="fas fa-trophy"></i> Today's Rankings
-                                </h5>
-                                <span style="color: var(--neon-purple);">
-                                    Your Rank: #${data.userRank}
-                                </span>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                    <h5 style="color: var(--neon-blue); margin: 0;">
+                                        <i class="fas fa-trophy"></i> Today's Rankings
+                                    </h5>
+                                    <span style="color: var(--neon-purple);">
+                                        Your Rank: #${data.userRank}
+                                    </span>
+                                </div>
 
 
                                 <div class="leaderboard-list" style="max-height: 300px; overflow-y: auto; margin-top: 10px;">

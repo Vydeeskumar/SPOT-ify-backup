@@ -1606,12 +1606,14 @@
         </div>
 
         <div id="leaderboard-content" style="display: none; transition: all 0.3s ease;">
-            <h5 style="color: var(--neon-blue); margin: 0;">
-                <i class="fas fa-trophy"></i> Today's Rankings
-            </h5>
-            <span style="color: var(--neon-purple);">
-                Your Rank: #{{ user_daily_rank }}
-            </span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h5 style="color: var(--neon-blue); margin: 0;">
+                    <i class="fas fa-trophy"></i> Today's Rankings
+                </h5>
+                <span style="color: var(--neon-purple);">
+                    Your Rank: #{{ user_daily_rank }}
+                </span>
+            </div>
             <div class="leaderboard-list" style="max-height: 300px; overflow-y: auto;">
                 {% for score in daily_scores %}
                 <div class="leaderboard-item" style="display: grid; grid-template-columns: auto 1fr auto auto; gap: 15px; padding: 10px; margin: 5px 0; background: rgba(176, 38, 255, 0.1); border-radius: 8px; {% if score.user == user %}border: 1px solid var(--neon-purple);{% endif %}">
