@@ -583,24 +583,30 @@ def remove_friend(request, friend_id, language='tamil'):
     return redirect('friends_list', language=language)
 
 @login_required
-def compare_scores(request, friend_id):
+def compare_scores(request, friend_id, language='tamil'):
+    current_language = language
     try:
         friend = User.objects.get(id=friend_id)
 
-        # Get user's best time attempt (lowest time with score > 0)
+        # Get user's best time attempt (lowest time with score > 0) for current language
         user_best_attempt = UserScore.objects.filter(
             user=request.user,
+            language=current_language,
             score__gt=0
         ).order_by('guess_time').first()
 
-        # Get friend's best time attempt
+        # Get friend's best time attempt for current language
         friend_best_attempt = UserScore.objects.filter(
             user=friend,
+            language=current_language,
             score__gt=0
         ).order_by('guess_time').first()
-        
-        # Get user's stats - exclude give-ups for average time
-        user_stats = UserScore.objects.filter(user=request.user).aggregate(
+
+        # Get user's stats - exclude give-ups for average time, filter by language
+        user_stats = UserScore.objects.filter(
+            user=request.user,
+            language=current_language
+        ).aggregate(
             total_score=Sum('score'),
             avg_time=Avg('guess_time', filter=Q(score__gt=0)),  # Only include successful attempts
             games_played=Count('id'),
@@ -608,33 +614,44 @@ def compare_scores(request, friend_id):
 
         user_stats['best_time'] = user_best_attempt.guess_time if user_best_attempt else 0
         user_stats['best_time_score'] = user_best_attempt.score if user_best_attempt else 0
-        
-        # Get friend's stats - exclude give-ups for average time
-        friend_stats = UserScore.objects.filter(user=friend).aggregate(
+
+        # Get friend's stats - exclude give-ups for average time, filter by language
+        friend_stats = UserScore.objects.filter(
+            user=friend,
+            language=current_language
+        ).aggregate(
             total_score=Sum('score'),
             avg_time=Avg('guess_time', filter=Q(score__gt=0)),  # Only include successful attempts
             games_played=Count('id'),
-            
+
         )
 
         friend_stats['best_time'] = friend_best_attempt.guess_time if friend_best_attempt else 0
         friend_stats['best_time_score'] = friend_best_attempt.score if friend_best_attempt else 0
         
-        # Get recent games
-        user_recent = UserScore.objects.filter(user=request.user).order_by('-attempt_date')[:5]
-        friend_recent = UserScore.objects.filter(user=friend).order_by('-attempt_date')[:5]
-        
+        # Get recent games for current language
+        user_recent = UserScore.objects.filter(
+            user=request.user,
+            language=current_language
+        ).order_by('-attempt_date')[:5]
+        friend_recent = UserScore.objects.filter(
+            user=friend,
+            language=current_language
+        ).order_by('-attempt_date')[:5]
+
         context = {
             'friend': friend,
             'user_stats': user_stats,
             'friend_stats': friend_stats,
             'user_recent': user_recent,
             'friend_recent': friend_recent,
+            'current_language': current_language,
+            'language_display': dict(LANGUAGE_CHOICES)[current_language],
         }
         return render(request, 'game/compare_scores.html', context)
     except User.DoesNotExist:
         messages.error(request, 'Friend not found.')
-        return redirect('friends_list')
+        return redirect('friends_list', language=current_language)
     
 @login_required
 def get_daily_rankings(request, language='tamil'):
@@ -867,7 +884,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 @login_required
-def archive_submit(request):
+def archive_submit(request, language='tamil'):
+    current_language = language
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
@@ -916,7 +934,8 @@ def archive_submit(request):
 
 @login_required
 @require_GET
-def giveup_archive(request):
+def giveup_archive(request, language='tamil'):
+    current_language = language
     song_id = request.GET.get('song_id')
     try:
         song = Song.objects.get(id=song_id)

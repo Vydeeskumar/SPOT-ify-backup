@@ -506,7 +506,7 @@ document.addEventListener('DOMContentLoaded', function () {
         giveUpBtn.addEventListener('click', async () => {
             if (confirm('Are you sure you want to give up? You will receive 0 points for today.')) {
                 try {
-                    const response = await fetch('/give-up/', {
+                    const response = await fetch(`/${window.currentLanguage || 'tamil'}/give-up/`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

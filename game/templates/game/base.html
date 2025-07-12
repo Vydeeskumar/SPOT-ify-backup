@@ -755,6 +755,11 @@
     {% include "game/chatbot.html" %}
     <script src="{% static 'game/js/chatbot.js' %}?v=125" defer></script>
 
+    <!-- Language variable for JavaScript -->
+    <script>
+        window.currentLanguage = '{{ current_language|default:"tamil" }}';
+    </script>
+
     <!-- Game logic script -->
     <script src="{% static 'game/js/home.js' %}?v=125" defer></script>
 {% endblock %}

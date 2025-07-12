@@ -46,7 +46,7 @@ function setupGameControls() {
     clearInterval(timerInterval);
 
     try {
-        const response = await fetch(`/giveup-archive/?song_id=${songId}`);
+        const response = await fetch(`/${window.currentLanguage || 'tamil'}/giveup-archive/?song_id=${songId}`);
         const data = await response.json();
 
         if (data.error) throw new Error(data.error);
@@ -110,7 +110,7 @@ async function handleGuess(e) {
     if (!guessInput.value.trim()) return alert('Enter a guess!');
 
     try {
-        const response = await fetch('/archive/submit/', {
+        const response = await fetch(`/${window.currentLanguage || 'tamil'}/archive/submit/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -212,7 +212,7 @@ function showResults(result) {
     let arrowsHTML = `
         <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
             ${prevDate ? `<a href="?date=${prevDate}" class="btn btn-sm btn-outline-warning"><i class="fas fa-chevron-left"></i></a>` : `<span></span>`}
-            <a href="/archive" class="btn btn-warning fw-bold"><i class="fas fa-archive"></i> Archive</a>
+            <a href="/${window.currentLanguage || 'tamil'}/archive" class="btn btn-warning fw-bold"><i class="fas fa-archive"></i> Archive</a>
             ${nextDate ? `<a href="?date=${nextDate}" class="btn btn-sm btn-outline-warning"><i class="fas fa-chevron-right"></i></a>` : `<span></span>`}
         </div>
     `;
@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!selectedDate) return;
 
         try {
-            const response = await fetch(`/load-archive-song?date=${selectedDate}`);
+            const response = await fetch(`/${window.currentLanguage || 'tamil'}/load-archive-song?date=${selectedDate}`);
             const data = await response.json();
 
             if (!data.success) {

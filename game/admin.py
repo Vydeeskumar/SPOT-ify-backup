@@ -295,13 +295,14 @@ def language_dashboard_simple(request):
     context['today_songs'] = today_songs
     return admin_render(request, 'admin/simple_language_dashboard.html', context)
 
-# Add URL to admin - simpler approach
-original_get_urls = admin.site.get_urls
+# Add custom admin view - simpler approach
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 
-def get_custom_urls():
-    custom_urls = [
-        admin_path('language-dashboard/', admin.site.admin_view(language_dashboard_simple), name='language_dashboard'),
-    ]
-    return original_get_urls() + custom_urls
+# Create a simple redirect view instead
+def admin_language_redirect(request):
+    """Redirect to a simple language management page"""
+    return HttpResponseRedirect('/admin/game/song/?language=tamil')
 
-admin.site.get_urls = get_custom_urls
+# Register as a simple admin action instead of custom URL
+# This avoids URL conflicts
