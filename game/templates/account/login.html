@@ -91,7 +91,7 @@
     </div>
 </div>
 
-<!-- Guest Login Modal -->
+<!-- Guest Login Modal - EXACT OLD WORKING VERSION -->
 <div class="modal fade" id="guestLoginModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -109,12 +109,12 @@
                     {% csrf_token %}
                     <div class="form-group">
                         <div class="input-wrapper">
-                            <input type="text" 
-                                   class="form-control neon-input" 
-                                   id="guestUsername" 
-                                   name="username" 
-                                   required 
-                                   pattern="[a-zA-Z0-9_]{3,15}" 
+                            <input type="text"
+                                   class="form-control neon-input"
+                                   id="guestUsername"
+                                   name="username"
+                                   required
+                                   pattern="[a-zA-Z0-9_]{3,15}"
                                    placeholder="Enter username (3-15 characters)">
                             <div class="input-glow"></div>
                         </div>
@@ -345,21 +345,72 @@
     opacity: 1;
 }
 
-/* Modal Styling */
+/* Modal Styling - EXACT OLD WORKING VERSION */
 .modal-content {
-    background: var(--darker-bg) !important;
-    border: 2px solid var(--neon-purple) !important;
-    border-radius: 20px !important;
-    backdrop-filter: blur(20px) !important;
-    z-index: 1060 !important;
+    background: var(--darker-bg);
+    border: 2px solid var(--neon-purple);
+    border-radius: 20px;
 }
 
-.modal {
-    z-index: 1055 !important;
+.modal-header {
+    border: none;
+    padding: 20px;
 }
 
-.modal-backdrop {
-    z-index: 1050 !important;
+.modal-title {
+    color: var(--neon-purple);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.guest-animation {
+    font-size: 3rem;
+    color: var(--neon-pink);
+    margin: 20px 0;
+    animation: float 3s ease-in-out infinite;
+}
+
+.input-wrapper {
+    position: relative;
+    margin: 20px 0;
+}
+
+.neon-input {
+    width: 100%;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--neon-purple);
+    border-radius: 10px;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.input-glow {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 12px;
+    background: var(--neon-purple);
+    opacity: 0;
+    transition: 0.3s;
+    z-index: -1;
+}
+
+.neon-input:focus + .input-glow {
+    opacity: 0.2;
+}
+
+.guest-note {
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    padding: 15px;
+    background: rgba(176, 38, 255, 0.1);
+    border-radius: 10px;
+    margin-top: 20px;
 }
 
 .modal-header {
@@ -498,51 +549,28 @@
 </style>
 
 <script>
-// Particles handled by pro-level system in base.html
-
-// Guest Login Modal
+// Guest Login Modal - EXACT OLD WORKING VERSION
 function showGuestLoginModal() {
-    try {
-        const modalElement = document.getElementById('guestLoginModal');
-        if (!modalElement) {
-            console.error('Guest login modal not found');
-            return;
-        }
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
-    } catch (error) {
-        console.error('Error showing guest login modal:', error);
-        alert('Error opening guest login. Please try again.');
-    }
+    const modal = new bootstrap.Modal(document.getElementById('guestLoginModal'));
+    modal.show();
 }
 
-// Form Handling
+// Form Handling - EXACT OLD WORKING VERSION
 document.getElementById('guestLoginForm')?.addEventListener('submit', function(e) {
     const username = document.getElementById('guestUsername').value;
     const submitBtn = document.getElementById('guestSubmitBtn');
 
-    console.log('Guest form submitted with username:', username);
-
-    if (!username || username.length < 3 || username.length > 15) {
+    if (username.length < 3 || username.length > 15) {
         e.preventDefault();
         alert('Username must be between 3 and 15 characters');
         return;
     }
 
-    // Check for valid characters
-    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-        e.preventDefault();
-        alert('Username can only contain letters, numbers, and underscores');
-        return;
-    }
-
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
-
-    console.log('Form validation passed, submitting...');
 });
 
-// Modal Reset
+// Modal Reset - EXACT OLD WORKING VERSION
 document.getElementById('guestLoginModal')?.addEventListener('hidden.bs.modal', function () {
     document.getElementById('guestLoginForm').reset();
     const submitBtn = document.getElementById('guestSubmitBtn');
