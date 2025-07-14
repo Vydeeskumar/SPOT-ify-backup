@@ -1155,7 +1155,7 @@ User asked:
             "Content-Type": "application/json"
         }
         payload = {
-            "model": "deepseek/deepseek-r1-0528",
+            "model": "meta-llama/llama-3.2-3b-instruct:free",
             "messages": [
                 {"role": "system", "content": zombie_prompt},
                 {"role": "user", "content": user_prompt}
