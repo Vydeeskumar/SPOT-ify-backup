@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="login-container">
-    <div class="particles" id="particles-js"></div>
+    <!-- Using pro-level particle system from base.html instead -->
     <div class="container position-relative">
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -162,15 +162,7 @@
     overflow: hidden;
 }
 
-/* Particles Background */
-.particles {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-}
+/* Particles handled by pro-level system in base.html */
 
 /* Main Card */
 .login-card {
@@ -506,43 +498,7 @@
 </style>
 
 <script>
-// Initialize particles
-document.addEventListener('DOMContentLoaded', function() {
-    particlesJS('particles-js', {
-        particles: {
-            number: { value: 80, density: { enable: true, value_area: 800 } },
-            color: { value: '#b026ff' },
-            shape: { type: 'circle' },
-            opacity: { value: 0.5, random: false },
-            size: { value: 3, random: true },
-            line_linked: {
-                enable: true,
-                distance: 150,
-                color: '#b026ff',
-                opacity: 0.4,
-                width: 1
-            },
-            move: {
-                enable: true,
-                speed: 2,
-                direction: 'none',
-                random: false,
-                straight: false,
-                out_mode: 'out',
-                bounce: false,
-            }
-        },
-        interactivity: {
-            detect_on: 'canvas',
-            events: {
-                onhover: { enable: true, mode: 'repulse' },
-                onclick: { enable: true, mode: 'push' },
-                resize: true
-            }
-        },
-        retina_detect: true
-    });
-});
+// Particles handled by pro-level system in base.html
 
 // Guest Login Modal
 function showGuestLoginModal() {
