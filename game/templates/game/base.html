@@ -141,6 +141,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
+            z-index: -1;
         }
 
         .particle {
@@ -198,6 +199,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
+            z-index: -1;
         }
 
         .orb {
@@ -821,28 +823,70 @@
             padding: 20px 25px;
         }
 
-        /* 🔧 Fix Modal Input Focus Issues */
-        .modal input, .modal textarea, .modal select {
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+        /* 🔧 COMPLETE MODAL ISOLATION - Override ALL pro-level effects */
+        .modal, .modal *, .modal *::before, .modal *::after {
+            transition: none !important;
+            transform: none !important;
+            filter: none !important;
+            backdrop-filter: none !important;
+            animation: none !important;
+        }
+
+        .modal input, .modal textarea, .modal select, .modal button {
             pointer-events: auto !important;
-            z-index: 1070 !important;
+            z-index: auto !important;
+            position: relative !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 2px solid #B026FF !important;
+            color: white !important;
+            padding: 12px 20px !important;
+            border-radius: 10px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
         }
 
         .modal input:focus, .modal textarea:focus, .modal select:focus {
-            outline: 0 !important;
-            border-color: var(--neon-purple) !important;
-            box-shadow: 0 0 0 0.2rem rgba(176, 38, 255, 0.25) !important;
+            outline: none !important;
+            border-color: #0096FF !important;
+            box-shadow: 0 0 10px rgba(0, 150, 255, 0.5) !important;
+            background: rgba(255, 255, 255, 0.15) !important;
+        }
+
+        .modal button {
+            cursor: pointer !important;
+            background: #B026FF !important;
+            border: none !important;
+            padding: 12px 24px !important;
+            border-radius: 10px !important;
+            color: white !important;
+            font-weight: bold !important;
+        }
+
+        .modal button:hover {
+            background: #0096FF !important;
+            transform: none !important;
+            box-shadow: none !important;
         }
 
         /* 🔧 Ensure Modal Backdrop Works */
         .modal-backdrop {
             background-color: rgba(0, 0, 0, 0.5) !important;
+            z-index: 1040 !important;
         }
 
-        /* 🔧 Fix Button Interactions in Modal */
-        .modal .btn {
-            pointer-events: auto !important;
+        .modal {
+            z-index: 1050 !important;
+        }
+
+        .modal-dialog {
+            z-index: 1060 !important;
+        }
+
+        .modal-content {
             z-index: 1070 !important;
+            background: rgba(18, 18, 18, 0.95) !important;
+            border: 2px solid #B026FF !important;
+            border-radius: 20px !important;
         }
 
         /* Footer */
@@ -1496,7 +1540,39 @@
             setTimeout(() => {
                 document.body.style.opacity = '1';
             }, 100);
+
+            // 🔧 CRITICAL: Ensure modals work properly
+            fixModalFunctionality();
         });
+
+        // 🔧 Fix Modal Functionality
+        function fixModalFunctionality() {
+            // Remove all pro-level classes from modal elements
+            document.querySelectorAll('.modal *').forEach(element => {
+                element.classList.remove('btn-pro', 'btn-magnetic', 'btn-ripple', 'glass-card-pro', 'floating-element');
+
+                // Remove all event listeners that might interfere
+                element.style.transition = 'none';
+                element.style.transform = 'none';
+                element.style.filter = 'none';
+            });
+
+            // Ensure modal inputs work
+            document.querySelectorAll('.modal input').forEach(input => {
+                input.style.pointerEvents = 'auto';
+                input.style.zIndex = 'auto';
+                input.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    this.focus();
+                });
+            });
+
+            // Ensure modal buttons work
+            document.querySelectorAll('.modal button').forEach(button => {
+                button.style.pointerEvents = 'auto';
+                button.style.zIndex = 'auto';
+            });
+        }
 
         // 🎵 Language Theme Switching
         function updateThemeColors(language) {
