@@ -105,7 +105,7 @@
                 <div class="guest-animation">
                     <i class="fas fa-gamepad"></i>
                 </div>
-                <form id="guestLoginForm" method="post" action="{% url 'guest_login' language=current_language|default:'tamil' %}">
+                <form id="guestLoginForm" method="post" action="{% url 'guest_login' %}">
                     {% csrf_token %}
                     <div class="form-group">
                         <div class="input-wrapper">
