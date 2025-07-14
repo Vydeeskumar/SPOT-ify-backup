@@ -127,7 +127,7 @@
                         {% endif %}
                     </div>
                     <div class="player">
-                        <a href="{% url 'public_profile' score.user__username language=current_language|default:'tamil' %}" class="profile-link">
+                        <a href="{% url 'public_profile' username=score.user__username language=current_language|default:'tamil' %}" class="profile-link">
                             {{ score.user__username }}
                         </a>
                     </div>
@@ -161,7 +161,7 @@
                         {% endif %}
                     </div>
                     <div class="player">
-                        <a href="{% url 'public_profile' score.user__username language=current_language|default:'tamil' %}" class="profile-link">
+                        <a href="{% url 'public_profile' username=score.user__username language=current_language|default:'tamil' %}" class="profile-link">
                             {{ score.user__username }}
                         </a>
                     </div>
@@ -195,7 +195,7 @@
                         {% endif %}
                     </div>
                     <div class="player">
-                        <a href="{% url 'public_profile' score.user__username language=current_language|default:'tamil' %}" class="profile-link">
+                        <a href="{% url 'public_profile' username=score.user__username language=current_language|default:'tamil' %}" class="profile-link">
                             {{ score.user__username }}
                         </a>
                     </div>
