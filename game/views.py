@@ -1146,6 +1146,10 @@ User asked:
         if not api_key:
             return JsonResponse({"reply": f"Oops {username}! My brain circuits are offline 🧠⚡ (API key missing)"})
 
+        # Debug: Check API key format (first/last 4 chars only for security)
+        key_preview = f"{api_key[:4]}...{api_key[-4:]}" if len(api_key) > 8 else "invalid_length"
+        print(f"Using API key: {key_preview}")
+
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
@@ -1184,7 +1188,19 @@ User asked:
 
         else:
             # Better error handling for API failures
-            error_msg = f"Sorry {username}! My zombie brain is having connection issues 🧠💤 (API Error: {response.status_code})"
+            try:
+                error_details = response.json()
+                error_info = error_details.get('error', {})
+                error_message = error_info.get('message', 'Unknown error')
+            except:
+                error_message = response.text[:100]
+
+            print(f"OpenRouter API Error {response.status_code}: {error_message}")
+
+            if response.status_code == 402:
+                error_msg = f"Sorry {username}! My brain needs more coffee ☕💸 (Credits needed - Error 402)"
+            else:
+                error_msg = f"Sorry {username}! My zombie brain is having connection issues 🧠💤 (API Error: {response.status_code})"
             return JsonResponse({"reply": error_msg})
 
     except Exception as e:
