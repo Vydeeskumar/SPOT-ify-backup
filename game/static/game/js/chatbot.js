@@ -96,12 +96,15 @@ async function sendZombiebotMessage() {
     const message = input.value.trim();
     if (!message) return;
 
+    console.log('🌐 Current language:', window.currentLanguage);
     appendZombiebotMessage('you', message);
     input.value = '';
     showTypingIndicator();
 
     try {
-        const response = await fetch(`/${window.currentLanguage || 'tamil'}/zombiebot/`, {
+        const chatbotUrl = `/${window.currentLanguage || 'tamil'}/zombiebot/`;
+        console.log('🤖 Calling chatbot URL:', chatbotUrl);
+        const response = await fetch(chatbotUrl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
