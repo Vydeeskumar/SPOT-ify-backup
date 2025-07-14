@@ -105,7 +105,7 @@
                 <div class="guest-animation">
                     <i class="fas fa-gamepad"></i>
                 </div>
-                <form id="guestLoginForm" method="post" action="{% url 'guest_login' %}">
+                <form id="guestLoginForm" method="post" action="{% url 'guest_login' language=current_language|default:'tamil' %}">
                     {% csrf_token %}
                     <div class="form-group">
                         <div class="input-wrapper">
@@ -355,9 +355,19 @@
 
 /* Modal Styling */
 .modal-content {
-    background: var(--darker-bg);
-    border: 2px solid var(--neon-purple);
-    border-radius: 20px;
+    background: var(--darker-bg) !important;
+    border: 2px solid var(--neon-purple) !important;
+    border-radius: 20px !important;
+    backdrop-filter: blur(20px) !important;
+    z-index: 1060 !important;
+}
+
+.modal {
+    z-index: 1055 !important;
+}
+
+.modal-backdrop {
+    z-index: 1050 !important;
 }
 
 .modal-header {
@@ -536,23 +546,44 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Guest Login Modal
 function showGuestLoginModal() {
-    const modal = new bootstrap.Modal(document.getElementById('guestLoginModal'));
-    modal.show();
+    try {
+        const modalElement = document.getElementById('guestLoginModal');
+        if (!modalElement) {
+            console.error('Guest login modal not found');
+            return;
+        }
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    } catch (error) {
+        console.error('Error showing guest login modal:', error);
+        alert('Error opening guest login. Please try again.');
+    }
 }
 
 // Form Handling
 document.getElementById('guestLoginForm')?.addEventListener('submit', function(e) {
     const username = document.getElementById('guestUsername').value;
     const submitBtn = document.getElementById('guestSubmitBtn');
-    
-    if (username.length < 3 || username.length > 15) {
+
+    console.log('Guest form submitted with username:', username);
+
+    if (!username || username.length < 3 || username.length > 15) {
         e.preventDefault();
         alert('Username must be between 3 and 15 characters');
         return;
     }
-    
+
+    // Check for valid characters
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+        e.preventDefault();
+        alert('Username can only contain letters, numbers, and underscores');
+        return;
+    }
+
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+
+    console.log('Form validation passed, submitting...');
 });
 
 // Modal Reset
