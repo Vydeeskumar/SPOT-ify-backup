@@ -154,8 +154,8 @@ SITE_ID = 1
 
 # Auth settings
 LOGIN_URL = 'account_login'
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = '/tamil/'
+LOGOUT_REDIRECT_URL = '/tamil/'
 
 # Allauth settings
 

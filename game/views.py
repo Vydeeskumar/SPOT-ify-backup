@@ -976,10 +976,14 @@ def calculate_points(seconds):
 
 
 @login_required
-def public_profile(request, username):
+def public_profile(request, username, language='tamil'):
+    current_language = language
     user = get_object_or_404(User, username=username)
     profile = get_object_or_404(UserProfile, user=user)
-    recent_scores = UserScore.objects.filter(user=user).order_by('-attempt_date')[:10]
+    recent_scores = UserScore.objects.filter(
+        user=user,
+        language=current_language
+    ).order_by('-attempt_date')[:10]
 
     is_friend = Friendship.objects.filter(user=request.user, friend=user).exists()
     request_sent = Friendship.objects.filter(user=request.user, friend=user).exists()
@@ -991,7 +995,9 @@ def public_profile(request, username):
         'public': True,
         'is_friend': is_friend,
         'request_sent': request_sent,
-        'profile_user': user  # alias for template
+        'profile_user': user,  # alias for template
+        'current_language': current_language,
+        'language_display': dict(LANGUAGE_CHOICES)[current_language],
     })
 
 

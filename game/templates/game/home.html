@@ -1645,7 +1645,7 @@
                         {% endif %}
                     </div>
                     <div style="color: white;">
-                        <a href="{% url 'public_profile' score.user.username %}"
+                        <a href="{% url 'public_profile' score.user.username language=current_language|default:'tamil' %}"
                             style="color: white; text-decoration: none; font-weight: bold;">
                             {{ score.user.username }}
                         </a>
