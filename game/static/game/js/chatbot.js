@@ -101,7 +101,7 @@ async function sendZombiebotMessage() {
     showTypingIndicator();
 
     try {
-        const response = await fetch("/zombiebot/", {
+        const response = await fetch(`/${window.currentLanguage || 'tamil'}/zombiebot/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

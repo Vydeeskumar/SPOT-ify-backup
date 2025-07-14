@@ -1039,7 +1039,8 @@ import random
 from decouple import config
 
 @csrf_exempt
-def zombiebot(request):
+def zombiebot(request, language='tamil'):
+    current_language = language
     if request.method != 'POST':
         return JsonResponse({"error": "Invalid request method"}, status=405)
 
