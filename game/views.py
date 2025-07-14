@@ -1142,8 +1142,12 @@ User asked:
 """
 
         # 🔌 Send to OpenRouter (DeepSeek)
+        api_key = config('OPENROUTER_API_KEY', default='')
+        if not api_key:
+            return JsonResponse({"reply": f"Oops {username}! My brain circuits are offline 🧠⚡ (API key missing)"})
+
         headers = {
-            "Authorization": f"Bearer {config('OPENROUTER_API_KEY')}",
+            "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         }
         payload = {
@@ -1179,10 +1183,12 @@ User asked:
             return JsonResponse({"reply": reply_text})
 
         else:
-            return JsonResponse({
-                "error": "OpenRouter request failed",
-                "details": response.text
-            }, status=500)
+            # Better error handling for API failures
+            error_msg = f"Sorry {username}! My zombie brain is having connection issues 🧠💤 (API Error: {response.status_code})"
+            return JsonResponse({"reply": error_msg})
 
     except Exception as e:
-        return JsonResponse({"error": "Server error", "details": str(e)}, status=500)
+        # Better error handling for server errors
+        error_msg = f"Oops {username}! Something went wrong in my circuits 🤖⚡ Please try again!"
+        print(f"Zombiebot error: {str(e)}")  # Log for debugging
+        return JsonResponse({"reply": error_msg})
