@@ -40,12 +40,12 @@
                                     </div>
                                 </div>
                                 <div class="friend-actions">
-                                    <a href="{% url 'compare_scores' friendship.friend.id %}" 
+                                    <a href="{% url 'compare_scores' friend_id=friendship.friend.id language=current_language|default:'tamil' %}"
                                        class="btn-compare">
                                         <i class="fas fa-chart-bar"></i>
                                         <span>Compare</span>
                                     </a>
-                                    <form method="post" action="{% url 'remove_friend' friendship.friend.id %}">
+                                    <form method="post" action="{% url 'remove_friend' friend_id=friendship.friend.id language=current_language|default:'tamil' %}">
                                         {% csrf_token %}
                                         <button type="submit" class="btn-remove">
                                             <i class="fas fa-user-minus"></i>
@@ -76,7 +76,7 @@
                     <h2>Add Friend</h2>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="{% url 'add_friend' %}" class="add-friend-form">
+                    <form method="post" action="{% url 'add_friend' language=current_language|default:'tamil' %}" class="add-friend-form">
                         {% csrf_token %}
                         <div class="input-wrapper">
                             <input type="text" 
@@ -108,7 +108,7 @@
                                 <i class="fas fa-user-circle"></i>
                                 <span>{{ user.username }}</span>
                             </div>
-                            <form method="post" action="{% url 'add_friend' %}">
+                            <form method="post" action="{% url 'add_friend' language=current_language|default:'tamil' %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="username" value="{{ user.username }}">
                                 <button type="submit" class="btn-suggest">
