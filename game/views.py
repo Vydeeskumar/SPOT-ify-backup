@@ -617,9 +617,17 @@ def give_up(request, language='tamil'):
             language=current_language
         )
 
-        # Update user profile
+        # Update user profile - reset language-specific streak on give up
         profile, created = UserProfile.objects.get_or_create(user=request.user)
-        profile.current_streak = 0  # Reset streak on give up
+
+        # Reset the correct language-specific streak
+        streak_field = f'{current_language}_current_streak'
+        setattr(profile, streak_field, 0)
+
+        # Also update legacy field if Tamil (for backward compatibility)
+        if current_language == 'tamil':
+            profile.current_streak = 0
+
         profile.save()
 
         return JsonResponse({
