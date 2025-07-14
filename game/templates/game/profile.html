@@ -13,7 +13,7 @@
                         {% if is_friend %}
                             <p style="margin-top: 10px; color: var(--neon-green); font-weight: bold;">✅ You are already friends</p>
                         {% else %}
-                            <form action="{% url 'send_friend_request' profile_user.username %}" method="post" style="margin-top: 10px;">
+                            <form action="{% url 'send_friend_request' username=profile_user.username language=current_language|default:'tamil' %}" method="post" style="margin-top: 10px;">
                                 {% csrf_token %}
                                 <button type="submit" class="btn-share-add">
                                     <i class="fas fa-user-plus"></i> Add Friend
@@ -469,7 +469,7 @@ toast.style.cssText = `
 <script>
 
 function shareProfile() {
-    const shareUrl = `https://webzombies.pythonanywhere.com/profile/{{ user.username }}/`;
+    const shareUrl = `https://webzombies.pythonanywhere.com/{{ current_language|default:'tamil' }}/profile/{{ user.username }}/`;
 
     if (navigator.share) {
         navigator.share({
@@ -485,7 +485,7 @@ function shareProfile() {
 
 
 function shareStreak() {
-    const shareUrl = `https://webzombies.pythonanywhere.com/profile/{{ user.username }}/`;
+    const shareUrl = `https://webzombies.pythonanywhere.com/{{ current_language|default:'tamil' }}/profile/{{ user.username }}/`;
 
     if (navigator.share) {
         navigator.share({

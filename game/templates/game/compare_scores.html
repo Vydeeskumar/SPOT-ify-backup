@@ -4,7 +4,7 @@
 <div class="compare-container">
     <!-- Page Header -->
     <div class="page-header">
-        <a href="{% url 'friends_list' %}" class="back-button">
+        <a href="{% url 'friends_list' language=current_language|default:'tamil' %}" class="back-button">
             <i class="fas fa-arrow-left"></i>
         </a>
         <h1 class="neon-text">Score Battle</h1>

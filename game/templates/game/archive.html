@@ -12,20 +12,20 @@
             {% if selected_date == today %}
                 <div class="text-center mt-5">
                     <h3 class="text-warning neon-text-soft">Nice try 😉 But you can't play today's song here!</h3>
-                    <a href="{% url 'archive' %}" class="btn btn-secondary mt-3">Pick Another Date</a>
+                    <a href="{% url 'archive' language=current_language|default:'tamil' %}" class="btn btn-secondary mt-3">Pick Another Date</a>
                 </div>
 
             {% elif selected_date < launch_date %}
                 <div class="text-center mt-5">
                     <h3 class="text-muted neon-text">Oops! SPOT-ify hadn’t even been born yet 🚼</h3>
                     <p class="text-light">Please select a date on or after May 20, 2024.</p>
-                    <a href="{% url 'archive' %}" class="btn btn-secondary mt-3">Pick Another Date</a>
+                    <a href="{% url 'archive' language=current_language|default:'tamil' %}" class="btn btn-secondary mt-3">Pick Another Date</a>
                 </div>
 
             {% elif selected_song %}
                 <div id="game-view">
                     <div class="archive-header mb-4">
-                        <a href="{% url 'archive' %}" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+                        <a href="{% url 'archive' language=current_language|default:'tamil' %}" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
                         <div class="archive-date-badge">
                             <i class="fas fa-calendar-alt"></i>
                             {{ selected_date|date:"F j, Y" }}
@@ -84,7 +84,7 @@
             {% else %}
                 <div class="text-center mt-5">
                     <h4 class="text-danger">Oops! No song found for this date.</h4>
-                    <a href="{% url 'archive' %}" class="btn btn-secondary mt-3">Try Another Date</a>
+                    <a href="{% url 'archive' language=current_language|default:'tamil' %}" class="btn btn-secondary mt-3">Try Another Date</a>
                 </div>
             {% endif %}
 

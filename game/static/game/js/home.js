@@ -759,7 +759,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return `🎵 SPOT-ify the Paatu\n` +
             `🎯 Score: ${score} points\n` +
             `🏆 Rank: #${rank}\n\n` +
-            `Play now: https://webzombies.pythonanywhere.com`;  // Your actual URL
+            `Play now: https://webzombies.pythonanywhere.com/${window.currentLanguage || 'tamil'}/`;  // Your actual URL
     }
 
     function getCurrentDay() {

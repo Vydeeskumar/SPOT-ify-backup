@@ -1002,12 +1002,12 @@ def public_profile(request, username, language='tamil'):
 
 
 @login_required
-def send_friend_request(request, username):
+def send_friend_request(request, username, language='tamil'):
     to_user = get_object_or_404(User, username=username)
 
     if to_user == request.user:
         messages.error(request, "You can't add yourself!")
-        return redirect('public_profile', username=username)
+        return redirect('public_profile', username=username, language=language)
 
     if Friendship.objects.filter(user=request.user, friend=to_user).exists():
         messages.info(request, "You're already friends!")
@@ -1015,7 +1015,7 @@ def send_friend_request(request, username):
         Friendship.objects.create(user=request.user, friend=to_user)
         messages.success(request, "Friend request sent!")
 
-    return redirect('public_profile', username=username)
+    return redirect('public_profile', username=username, language=language)
 
 
 
