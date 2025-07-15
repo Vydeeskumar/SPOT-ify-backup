@@ -4,28 +4,43 @@
 {% load socialaccount %}
 
 {% block content %}
-<div class="login-container">
-    <!-- Using pro-level particle system from base.html instead -->
+<div class="login-container" id="loginContainer">
     <div class="container position-relative">
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="login-card">
                     <div class="card-body text-center p-4">
-                        <!-- Animated Logo -->
+                        <!-- Animated Logo with Scrollable Language -->
                         <div class="logo-container mb-4">
                             <div class="neon-treble"></div>
-                            <h1 class="game-title">SPOT-ify the Paatu!</h1>
+                            <h1 class="game-title">
+                                SPOT-ify the
+                                <div class="language-scroller" id="languageScroller">
+                                    <div class="scroller-container">
+                                        <div class="scroller-item active" data-lang="tamil" data-redirect="/tamil/">
+                                            Paatu
+                                        </div>
+                                        <div class="scroller-item" data-lang="english" data-redirect="/english/">
+                                            Music
+                                        </div>
+                                        <div class="scroller-item" data-lang="hindi" data-redirect="/hindi/">
+                                            Song
+                                        </div>
+                                    </div>
+                                </div>
+                                !
+                            </h1>
                             <div class="neon-underline"></div>
                         </div>
-                        
-                        <p class="game-subtitle mb-4">
+
+                        <p class="game-subtitle mb-4" id="gameSubtitle">
                             <span class="typing-text">Guess Today's Tamil Song</span>
                             <span class="music-note">🎵</span>
                         </p>
                         
                         <!-- Google Sign In -->
                         <div class="auth-buttons">
-                            <a href="{% provider_login_url 'google' %}" class="btn-google">
+                            <a href="#" id="googleLoginBtn" class="btn-google">
                                 <div class="btn-content">
                                     <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
                                         <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
@@ -38,7 +53,7 @@
                                 <div class="btn-glow"></div>
                             </a>
 
-                            <button onclick="console.log('Button clicked'); try { const modal = new bootstrap.Modal(document.getElementById('guestLoginModal')); modal.show(); console.log('Modal shown'); } catch(e) { console.error('Error:', e); alert('Error: ' + e.message); }" class="btn-guest">
+                            <button onclick="showGuestLoginModal()" class="btn-guest" id="guestLoginBtn">
                                 <div class="btn-content">
                                     <i class="fas fa-user-circle"></i>
                                     <span>Play as Guest</span>
@@ -91,21 +106,21 @@
     </div>
 </div>
 
-<!-- Guest Login Modal - EXACT OLD WORKING VERSION -->
-<div class="modal fade" id="guestLoginModal" tabindex="-1">
+<!-- BULLETPROOF Guest Login Modal -->
+<div class="modal fade" id="guestLoginModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
                     <i class="fas fa-user-circle"></i> Play as Guest
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center">
                 <div class="guest-animation">
                     <i class="fas fa-gamepad"></i>
                 </div>
-                <form id="guestLoginForm" method="post" action="/tamil/guest-login/">
+                <form id="guestLoginForm" method="post">
                     {% csrf_token %}
                     <div class="form-group">
                         <div class="input-wrapper">
@@ -114,6 +129,7 @@
                                    id="guestUsername"
                                    name="username"
                                    required
+                                   autocomplete="off"
                                    pattern="[a-zA-Z0-9_]{3,15}"
                                    placeholder="Enter username (3-15 characters)">
                             <div class="input-glow"></div>
@@ -148,10 +164,28 @@
     --neon-purple: #B026FF;
     --neon-blue: #0096FF;
     --neon-pink: #FF69B4;
+    --neon-orange: #FF6B35;
     --dark-bg: #121212;
     --darker-bg: rgba(18, 18, 18, 0.95);
     --glow-purple: 0 0 10px rgba(176, 38, 255, 0.3);
     --glow-blue: 0 0 10px rgba(0, 150, 255, 0.3);
+    --glow-orange: 0 0 10px rgba(255, 107, 53, 0.3);
+}
+
+/* Dynamic Theme Variables */
+.theme-tamil {
+    --primary-color: var(--neon-purple);
+    --primary-glow: var(--glow-purple);
+}
+
+.theme-english {
+    --primary-color: var(--neon-blue);
+    --primary-glow: var(--glow-blue);
+}
+
+.theme-hindi {
+    --primary-color: var(--neon-orange);
+    --primary-glow: var(--glow-orange);
 }
 
 /* Main Container */
@@ -204,8 +238,72 @@
     font-weight: bold;
     margin: 0;
     position: relative;
-    text-shadow: 0 0 10px var(--neon-purple);
+    text-shadow: 0 0 10px var(--primary-color, var(--neon-purple));
     animation: textGlow 2s infinite alternate;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* 🎯 VERTICAL LANGUAGE SCROLLER */
+.language-scroller {
+    display: inline-block;
+    height: 60px;
+    width: 120px;
+    overflow: hidden;
+    position: relative;
+    border: 2px solid var(--primary-color, var(--neon-purple));
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    user-select: none;
+}
+
+.scroller-container {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+}
+
+.scroller-item {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.6);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.scroller-item.active {
+    color: var(--primary-color, var(--neon-purple));
+    text-shadow: 0 0 15px var(--primary-color, var(--neon-purple));
+    transform: scale(1.1);
+}
+
+.scroller-item:hover {
+    color: var(--primary-color, var(--neon-purple));
+    transform: scale(1.05);
+}
+
+/* Glow effect for active item */
+.scroller-item.active::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, var(--primary-color, var(--neon-purple))20, transparent 70%);
+    opacity: 0.2;
+    border-radius: 10px;
 }
 
 .neon-underline {
@@ -345,43 +443,111 @@
     opacity: 1;
 }
 
-/* Modal Styling - FORCE INTERACTION FIX */
+/* 🔧 BULLETPROOF MODAL STYLING */
 #guestLoginModal {
     z-index: 9999 !important;
     pointer-events: auto !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 #guestLoginModal * {
     pointer-events: auto !important;
+    position: relative !important;
 }
 
 .modal-backdrop {
     z-index: 9998 !important;
     pointer-events: auto !important;
+    background: rgba(0, 0, 0, 0.8) !important;
 }
 
-.modal-content {
-    background: var(--darker-bg) !important;
-    border: 2px solid var(--neon-purple) !important;
-    border-radius: 20px !important;
+.modal-dialog {
     z-index: 10000 !important;
     pointer-events: auto !important;
 }
 
-#guestUsername {
-    pointer-events: auto !important;
+.modal-content {
+    background: var(--darker-bg) !important;
+    border: 2px solid var(--primary-color, var(--neon-purple)) !important;
+    border-radius: 20px !important;
     z-index: 10001 !important;
+    pointer-events: auto !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5),
+                0 0 30px var(--primary-color, var(--neon-purple))30 !important;
+}
+
+.modal-header {
+    border: none !important;
+    padding: 20px !important;
+}
+
+.modal-title {
+    color: var(--primary-color, var(--neon-purple)) !important;
+    font-size: 1.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.guest-animation {
+    font-size: 3rem !important;
+    color: var(--neon-pink) !important;
+    margin: 20px 0 !important;
+    animation: float 3s ease-in-out infinite !important;
+}
+
+.input-wrapper {
+    position: relative !important;
+    margin: 20px 0 !important;
+}
+
+/* 🎯 WORKING INPUT STYLING */
+.neon-input {
+    width: 100% !important;
+    padding: 15px 20px !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 2px solid var(--primary-color, var(--neon-purple)) !important;
+    border-radius: 12px !important;
+    color: white !important;
+    font-size: 16px !important;
+    transition: all 0.3s ease !important;
+    outline: none !important;
+    pointer-events: auto !important;
+    z-index: 10002 !important;
     position: relative !important;
 }
 
-.btn-close {
-    pointer-events: auto !important;
-    z-index: 10001 !important;
+.neon-input:focus {
+    border-color: var(--neon-blue) !important;
+    box-shadow: 0 0 15px var(--neon-blue)50 !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    transform: scale(1.02) !important;
 }
 
-#guestSubmitBtn {
-    pointer-events: auto !important;
-    z-index: 10001 !important;
+.neon-input::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.input-glow {
+    position: absolute !important;
+    top: -2px !important;
+    left: -2px !important;
+    right: -2px !important;
+    bottom: -2px !important;
+    border-radius: 14px !important;
+    background: var(--primary-color, var(--neon-purple)) !important;
+    opacity: 0 !important;
+    transition: opacity 0.3s ease !important;
+    z-index: -1 !important;
+    pointer-events: none !important;
+}
+
+.neon-input:focus + .input-glow {
+    opacity: 0.3 !important;
 }
 
 .modal-header {
@@ -631,46 +797,168 @@
 </style>
 
 <script>
-// Guest Login Modal - EXACT OLD WORKING VERSION
-function showGuestLoginModal() {
-    console.log('showGuestLoginModal called');
-    try {
-        const modalElement = document.getElementById('guestLoginModal');
-        console.log('Modal element found:', modalElement);
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
-        console.log('Modal shown successfully');
-    } catch (error) {
-        console.error('Error showing modal:', error);
-        alert('Error opening guest login modal: ' + error.message);
-    }
+// 🚀 BULLETPROOF SCROLLABLE LOGIN SYSTEM
+let currentLanguage = 'tamil';
+let currentIndex = 0;
+const languages = [
+    { code: 'tamil', name: 'Paatu', redirect: '/tamil/', subtitle: 'Guess Today\'s Tamil Song', theme: 'theme-tamil' },
+    { code: 'english', name: 'Music', redirect: '/english/', subtitle: 'Guess Today\'s English Song', theme: 'theme-english' },
+    { code: 'hindi', name: 'Song', redirect: '/hindi/', subtitle: 'Guess Today\'s Hindi Song', theme: 'theme-hindi' }
+];
+
+// 🎯 Initialize Everything
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Initializing bulletproof login system');
+
+    initializeScroller();
+    initializeModal();
+    initializeButtons();
+
+    console.log('✅ All systems initialized');
+});
+
+// 🎮 Initialize Vertical Scroller
+function initializeScroller() {
+    const scroller = document.getElementById('languageScroller');
+    const container = scroller.querySelector('.scroller-container');
+
+    // Add scroll event listener
+    scroller.addEventListener('wheel', function(e) {
+        e.preventDefault();
+
+        if (e.deltaY > 0) {
+            // Scroll down
+            currentIndex = (currentIndex + 1) % languages.length;
+        } else {
+            // Scroll up
+            currentIndex = (currentIndex - 1 + languages.length) % languages.length;
+        }
+
+        updateScroller();
+    });
+
+    // Add click event for mobile
+    scroller.addEventListener('click', function() {
+        currentIndex = (currentIndex + 1) % languages.length;
+        updateScroller();
+    });
+
+    updateScroller();
 }
 
-// Form Handling - EXACT OLD WORKING VERSION
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, setting up form handler');
+// 🔄 Update Scroller Position and Theme
+function updateScroller() {
+    const container = document.querySelector('.scroller-container');
+    const items = document.querySelectorAll('.scroller-item');
+    const loginContainer = document.getElementById('loginContainer');
+    const subtitle = document.getElementById('gameSubtitle');
+
+    // Update transform
+    container.style.transform = `translateY(-${currentIndex * 60}px)`;
+
+    // Update active state
+    items.forEach((item, index) => {
+        item.classList.toggle('active', index === currentIndex);
+    });
+
+    // Update current language
+    currentLanguage = languages[currentIndex].code;
+
+    // Update theme
+    loginContainer.className = `login-container ${languages[currentIndex].theme}`;
+
+    // Update subtitle
+    subtitle.innerHTML = `
+        <span class="typing-text">${languages[currentIndex].subtitle}</span>
+        <span class="music-note">🎵</span>
+    `;
+
+    console.log(`🎯 Language changed to: ${currentLanguage}`);
+}
+
+// 🔧 Initialize Modal System
+function initializeModal() {
     const form = document.getElementById('guestLoginForm');
-    console.log('Form found:', form);
+    const input = document.getElementById('guestUsername');
 
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            console.log('Form submitted');
-            const username = document.getElementById('guestUsername').value;
-            const submitBtn = document.getElementById('guestSubmitBtn');
-            console.log('Username:', username);
+    // Ensure input is always clickable
+    input.addEventListener('click', function(e) {
+        e.stopPropagation();
+        this.focus();
+        console.log('📝 Input focused');
+    });
 
-            if (username.length < 3 || username.length > 15) {
-                e.preventDefault();
-                alert('Username must be between 3 and 15 characters');
-                return;
-            }
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
 
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
-            console.log('Form validation passed, submitting...');
+        const username = input.value.trim();
+        const submitBtn = document.getElementById('guestSubmitBtn');
+
+        console.log(`🎮 Guest login attempt: ${username} for ${currentLanguage}`);
+
+        if (username.length < 3 || username.length > 15) {
+            alert('Username must be between 3 and 15 characters');
+            return;
+        }
+
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            alert('Username can only contain letters, numbers, and underscores');
+            return;
+        }
+
+        // Update button
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+
+        // Submit to correct language endpoint
+        const actionUrl = `${languages[currentIndex].redirect}guest-login/`;
+        form.action = actionUrl;
+
+        console.log(`🚀 Submitting to: ${actionUrl}`);
+
+        // Submit form
+        form.submit();
+    });
+}
+
+// 🎯 Initialize Buttons
+function initializeButtons() {
+    const googleBtn = document.getElementById('googleLoginBtn');
+
+    // Update Google login to redirect to selected language
+    googleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const googleUrl = `{% provider_login_url 'google' %}?next=${languages[currentIndex].redirect}`;
+        window.location.href = googleUrl;
+        console.log(`🔗 Google login for ${currentLanguage}`);
+    });
+}
+
+// 🎭 Show Guest Login Modal
+function showGuestLoginModal() {
+    console.log('🎭 Opening guest login modal');
+
+    try {
+        const modalElement = document.getElementById('guestLoginModal');
+        const modal = new bootstrap.Modal(modalElement, {
+            backdrop: 'static',
+            keyboard: true
         });
+
+        modal.show();
+
+        // Focus input after modal is shown
+        modalElement.addEventListener('shown.bs.modal', function() {
+            document.getElementById('guestUsername').focus();
+            console.log('✅ Modal shown and input focused');
+        });
+
+    } catch (error) {
+        console.error('❌ Modal error:', error);
+        alert('Error opening guest login. Please refresh and try again.');
     }
-});
+}
 
 // Modal Reset - EXACT OLD WORKING VERSION
 document.getElementById('guestLoginModal')?.addEventListener('hidden.bs.modal', function () {
