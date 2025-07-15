@@ -69,22 +69,7 @@
                                 <div class="btn-glow"></div>
                             </button>
 
-                            <!-- SIMPLE DIRECT GUEST LOGIN -->
-                            <div style="margin-top: 20px; padding: 20px; background: rgba(0,0,0,0.8); border: 2px solid #B026FF; border-radius: 10px;">
-                                <h5 style="color: #B026FF; text-align: center; margin-bottom: 15px;">Quick Guest Login</h5>
-                                <form method="post" action="/tamil/guest-login/" style="display: flex; flex-direction: column; gap: 10px;">
-                                    {% csrf_token %}
-                                    <input type="text" name="username" placeholder="Enter username"
-                                           style="padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid #B026FF; color: white; border-radius: 5px;"
-                                           required minlength="3" maxlength="15">
-                                    <button type="submit"
-                                            style="padding: 12px; background: #B026FF; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;"
-                                            onmouseover="this.style.background='#0096FF'"
-                                            onmouseout="this.style.background='#B026FF'">
-                                        🎮 Start Playing Now
-                                    </button>
-                                </form>
-                            </div>
+
                         </div>
 
                         <!-- Alert Info -->
@@ -131,127 +116,183 @@
     </div>
 </div>
 
-<!-- ISOLATED WORKING Guest Login Modal -->
-<div class="modal fade" id="guestLoginModal" tabindex="-1" style="z-index: 9999 !important;">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="background: #1a1a1a !important; border: 2px solid #B026FF !important; color: white !important; z-index: 10000 !important; position: relative !important;">
-            <div class="modal-header" style="border: none !important;">
-                <h5 class="modal-title" style="color: #B026FF !important;">
-                    <i class="fas fa-user-circle"></i> Play as Guest
-                </h5>
-                <button type="button" class="btn-close btn-close-white" onclick="closeGuestModal()" style="z-index: 10001 !important; position: relative !important;"></button>
+<!-- CUSTOM PERFECT MODAL FROM SCRATCH -->
+<div id="customGuestModal" class="custom-modal-overlay" style="display: none;">
+    <div class="custom-modal-container">
+        <div class="custom-modal-content">
+            <div class="custom-modal-header">
+                <h3><i class="fas fa-user-circle"></i> Play as Guest</h3>
+                <button class="custom-close-btn" onclick="closeCustomModal()">&times;</button>
             </div>
-            <div class="modal-body" style="z-index: 10000 !important; position: relative !important;">
-                <form id="workingGuestForm" method="post" action="/tamil/guest-login/" style="z-index: 10000 !important; position: relative !important;">
+            <div class="custom-modal-body">
+                <form id="customGuestForm" method="post">
                     {% csrf_token %}
-                    <div class="mb-3">
+                    <div class="custom-input-group">
                         <input type="text"
-                               class="working-guest-input"
-                               id="workingUsername"
+                               id="customUsername"
                                name="username"
-                               autocomplete="username"
                                placeholder="Enter username (3-15 characters)"
-                               style="background: rgba(255,255,255,0.1) !important; border: 2px solid #B026FF !important; color: white !important; padding: 12px !important; width: 100% !important; z-index: 10001 !important; position: relative !important; pointer-events: auto !important;"
-                               required>
+                               autocomplete="username"
+                               required
+                               minlength="3"
+                               maxlength="15">
                     </div>
-                    <!-- NUCLEAR BUTTON SOLUTION -->
-                    <div id="nuclearButton" style="
-                        background: #B026FF !important;
-                        color: white !important;
-                        width: 100% !important;
-                        padding: 20px !important;
-                        border: 2px solid #B026FF !important;
-                        border-radius: 8px !important;
-                        z-index: 99999 !important;
-                        position: relative !important;
-                        pointer-events: auto !important;
-                        cursor: pointer !important;
-                        text-align: center !important;
-                        user-select: none !important;
-                        display: block !important;
-                        font-weight: bold !important;
-                        font-size: 16px !important;
-                        margin-top: 10px !important;
-                        transition: all 0.2s ease !important;
-                    " onclick="submitGuestForm()">
-                        <i class="fas fa-play" style="margin-right: 8px;"></i>Start Playing
-                    </div>
+                    <button type="button" class="custom-submit-btn" onclick="submitCustomForm()">
+                        <i class="fas fa-play"></i> Start Playing
+                    </button>
                 </form>
+                <div class="custom-modal-footer">
+                    <small><i class="fas fa-info-circle"></i> Guest scores aren't saved. Sign in with Google to save progress!</small>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-/* FORCE MODAL TO WORK */
-#guestLoginModal * {
-    pointer-events: auto !important;
-    z-index: 10000 !important;
-    position: relative !important;
+/* CUSTOM PERFECT MODAL STYLES */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
 }
 
-.working-guest-input:focus {
-    background: rgba(255,255,255,0.2) !important;
-    border-color: #0096FF !important;
-    box-shadow: 0 0 10px rgba(0, 150, 255, 0.5) !important;
-    outline: none !important;
+.custom-modal-container {
+    width: 90%;
+    max-width: 400px;
+    animation: modalSlideIn 0.3s ease-out;
 }
 
-/* COMPLETELY ISOLATED BUTTON STYLES */
-#nuclearButton {
-    background: #B026FF !important;
-    color: white !important;
-    width: 100% !important;
-    padding: 20px !important;
-    border: 2px solid #B026FF !important;
-    border-radius: 8px !important;
-    z-index: 99999 !important;
-    position: relative !important;
-    pointer-events: auto !important;
-    cursor: pointer !important;
-    text-align: center !important;
-    user-select: none !important;
-    display: block !important;
-    font-weight: bold !important;
-    font-size: 16px !important;
-    margin-top: 10px !important;
-    transition: all 0.2s ease !important;
+.custom-modal-content {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+    border: 2px solid #B026FF;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(176, 38, 255, 0.3);
+    overflow: hidden;
 }
 
-#nuclearButton:hover {
-    background: #0096FF !important;
-    transform: scale(1.02) !important;
-    cursor: pointer !important;
+.custom-modal-header {
+    padding: 20px;
+    background: rgba(176, 38, 255, 0.1);
+    border-bottom: 1px solid rgba(176, 38, 255, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-#nuclearButton:active {
-    background: #7B2CBF !important;
-    transform: scale(0.98) !important;
+.custom-modal-header h3 {
+    color: #B026FF;
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: bold;
 }
 
-/* OVERRIDE ANY GLOBAL BUTTON STYLES */
-#nuclearButton.btn,
-#nuclearButton.btn-pro,
-#nuclearButton.btn-magnetic,
-#nuclearButton.btn-ripple {
-    all: unset !important;
-    background: #B026FF !important;
-    color: white !important;
-    width: 100% !important;
-    padding: 20px !important;
-    border: 2px solid #B026FF !important;
-    border-radius: 8px !important;
-    z-index: 99999 !important;
-    position: relative !important;
-    pointer-events: auto !important;
-    cursor: pointer !important;
-    text-align: center !important;
-    user-select: none !important;
-    display: block !important;
-    font-weight: bold !important;
-    font-size: 16px !important;
-    margin-top: 10px !important;
-    transition: all 0.2s ease !important;
+.custom-close-btn {
+    background: none;
+    border: none;
+    color: #B026FF;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.custom-close-btn:hover {
+    background: rgba(176, 38, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.custom-modal-body {
+    padding: 25px;
+}
+
+.custom-input-group {
+    margin-bottom: 20px;
+}
+
+.custom-input-group input {
+    width: 100%;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(176, 38, 255, 0.5);
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.custom-input-group input:focus {
+    outline: none;
+    border-color: #0096FF;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 15px rgba(0, 150, 255, 0.3);
+}
+
+.custom-input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.custom-submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #B026FF 0%, #7B2CBF 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.custom-submit-btn:hover {
+    background: linear-gradient(135deg, #0096FF 0%, #B026FF 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 150, 255, 0.3);
+}
+
+.custom-submit-btn:active {
+    transform: translateY(0);
+}
+
+.custom-modal-footer {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.custom-modal-footer small {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 </style>
 
@@ -1060,42 +1101,27 @@ function updateScroller() {
     console.log(`🎯 EXACT MAPPING: ${currentLang.name} → ${currentLang.code} → ${currentLang.redirect}`);
 }
 
-// 🔧 WORKING GUEST LOGIN
+// 🔧 INITIALIZE CUSTOM MODAL
 function initializeModal() {
-    const form = document.getElementById('workingGuestForm');
-    const input = document.getElementById('workingUsername');
+    console.log('🎯 Initializing custom modal system...');
 
-    if (form && input) {
-        // Make sure input is focusable
-        input.style.pointerEvents = 'auto';
-        input.style.zIndex = '10001';
-
-        form.addEventListener('submit', function(e) {
-            const username = input.value.trim();
-
-            if (username.length < 3 || username.length > 15) {
-                e.preventDefault();
-                alert('Username must be between 3 and 15 characters');
-                input.focus();
-                return;
+    // Add click outside to close
+    const modal = document.getElementById('customGuestModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeCustomModal();
             }
-
-            // Update action URL based on current language
-            const actionUrl = `${languages[currentIndex].redirect}guest-login/`;
-            form.action = actionUrl;
-
-            console.log(`🎮 Submitting to: ${actionUrl}`);
         });
 
-        // Test input functionality
-        input.addEventListener('focus', function() {
-            console.log('✅ Input focused successfully!');
-            this.style.borderColor = '#0096FF';
+        // Add escape key to close
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.style.display === 'flex') {
+                closeCustomModal();
+            }
         });
 
-        input.addEventListener('input', function() {
-            console.log('✅ Input working:', this.value);
-        });
+        console.log('✅ Custom modal initialized');
     }
 }
 
@@ -1112,88 +1138,52 @@ function initializeButtons() {
     });
 }
 
-// SIMPLE GUEST LOGIN MODAL - NO BOOTSTRAP DEPENDENCY
+// CUSTOM PERFECT MODAL FUNCTIONS
 function showGuestLoginModal() {
-    console.log('🎮 Opening guest modal...');
-    const modal = document.getElementById('guestLoginModal');
+    console.log('🎮 Opening custom guest modal...');
+    const modal = document.getElementById('customGuestModal');
 
     if (modal) {
-        // Show modal manually
-        modal.style.display = 'block';
-        modal.style.zIndex = '99999';
-        modal.classList.add('show');
+        modal.style.display = 'flex';
 
-        // Add backdrop
-        const backdrop = document.createElement('div');
-        backdrop.className = 'modal-backdrop fade show';
-        backdrop.style.zIndex = '99998';
-        backdrop.id = 'guestModalBackdrop';
-        document.body.appendChild(backdrop);
-
-        // Focus input after a short delay
+        // Focus input after animation
         setTimeout(() => {
-            const input = document.getElementById('workingUsername');
-            const button = document.querySelector('.working-guest-btn');
-
+            const input = document.getElementById('customUsername');
             if (input) {
                 input.focus();
-                console.log('✅ Input focused');
+                console.log('✅ Custom input focused');
             }
+        }, 300);
 
-            // Add multiple button listeners for maximum compatibility
-            const buttons = [
-                document.querySelector('.working-guest-btn'),
-                document.getElementById('nuclearButton'),
-                document.getElementById('perfectButton')
-            ];
-
-            buttons.forEach((btn, index) => {
-                if (btn) {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log(`🎯 Button ${index} clicked via event listener!`);
-                        submitGuestForm();
-                    });
-
-                    // Also add mousedown as backup
-                    btn.addEventListener('mousedown', function(e) {
-                        console.log(`🎯 Button ${index} mousedown detected!`);
-                    });
-
-                    console.log(`✅ Button ${index} event listeners added`);
-                }
-            });
-        }, 100);
-
-        console.log('✅ Modal opened manually');
+        console.log('✅ Custom modal opened');
     } else {
-        console.error('❌ Modal not found');
+        console.error('❌ Custom modal not found');
     }
 }
 
-// Close modal function
-function closeGuestModal() {
-    const modal = document.getElementById('guestLoginModal');
-    const backdrop = document.getElementById('guestModalBackdrop');
+function closeCustomModal() {
+    console.log('🔒 Closing custom modal...');
+    const modal = document.getElementById('customGuestModal');
 
     if (modal) {
         modal.style.display = 'none';
-        modal.classList.remove('show');
-    }
 
-    if (backdrop) {
-        backdrop.remove();
+        // Clear form
+        const form = document.getElementById('customGuestForm');
+        if (form) {
+            form.reset();
+        }
+
+        console.log('✅ Custom modal closed');
     }
 }
 
-// Submit guest form manually
-function submitGuestForm() {
-    console.log('🎮 Submitting guest form...');
+function submitCustomForm() {
+    console.log('🎮 Submitting custom guest form...');
 
-    const form = document.getElementById('workingGuestForm');
-    const input = document.getElementById('workingUsername');
-    const button = document.querySelector('.working-guest-btn');
+    const form = document.getElementById('customGuestForm');
+    const input = document.getElementById('customUsername');
+    const button = document.querySelector('.custom-submit-btn');
 
     if (!form || !input) {
         console.error('❌ Form or input not found');
@@ -1216,21 +1206,13 @@ function submitGuestForm() {
     }
 
     // Update button to show loading
-    const buttons = [
-        document.querySelector('.working-guest-btn'),
-        document.getElementById('nuclearButton'),
-        document.getElementById('perfectButton')
-    ];
+    if (button) {
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        button.disabled = true;
+        button.style.pointerEvents = 'none';
+    }
 
-    buttons.forEach(btn => {
-        if (btn) {
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>Loading...';
-            btn.style.pointerEvents = 'none';
-            btn.style.opacity = '0.7';
-        }
-    });
-
-    // Set correct action URL
+    // Set correct action URL based on current language
     const actionUrl = `${languages[currentIndex].redirect}guest-login/`;
     form.action = actionUrl;
 
@@ -1239,6 +1221,8 @@ function submitGuestForm() {
     // Submit the form
     form.submit();
 }
+
+
 </script>
 </div>
 {% endblock content %}
