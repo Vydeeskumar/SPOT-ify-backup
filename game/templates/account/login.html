@@ -905,17 +905,19 @@ function initializeScroller() {
     // Start auto-scroll
     startAutoScroll();
 
-    // Arrow button controls
+    // Arrow button controls - PERFECT SNAPPING
     upArrow.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
         stopAutoScroll();
 
+        // Move to previous language
         currentIndex = (currentIndex - 1 + languages.length) % languages.length;
+        console.log(`⬆️ Up arrow: Moving to ${languages[currentIndex].name} (index: ${currentIndex})`);
         updateScroller();
 
-        // Restart auto-scroll after 3 seconds
-        setTimeout(startAutoScroll, 3000);
+        // Restart auto-scroll after 5 seconds
+        setTimeout(startAutoScroll, 5000);
     });
 
     downArrow.addEventListener('click', function(e) {
@@ -923,11 +925,13 @@ function initializeScroller() {
         e.stopPropagation();
         stopAutoScroll();
 
+        // Move to next language
         currentIndex = (currentIndex + 1) % languages.length;
+        console.log(`⬇️ Down arrow: Moving to ${languages[currentIndex].name} (index: ${currentIndex})`);
         updateScroller();
 
-        // Restart auto-scroll after 3 seconds
-        setTimeout(startAutoScroll, 3000);
+        // Restart auto-scroll after 5 seconds
+        setTimeout(startAutoScroll, 5000);
     });
 
     // Pause auto-scroll on hover over selector
@@ -958,14 +962,17 @@ function stopAutoScroll() {
     }
 }
 
-// 🔄 Update Scroller Position and Theme
+// 🔄 Update Scroller Position and Theme - FIXED VERSION
 function updateScroller() {
     const container = document.querySelector('.scroller-container');
     const items = document.querySelectorAll('.scroller-item');
     const loginContainer = document.getElementById('loginContainer');
     const subtitle = document.getElementById('gameSubtitle');
 
-    // Update transform
+    // Ensure currentIndex is within bounds
+    currentIndex = Math.max(0, Math.min(currentIndex, languages.length - 1));
+
+    // Update transform with perfect positioning
     container.style.transform = `translateY(-${currentIndex * 60}px)`;
 
     // Update active state
@@ -973,71 +980,49 @@ function updateScroller() {
         item.classList.toggle('active', index === currentIndex);
     });
 
-    // Update current language
-    currentLanguage = languages[currentIndex].code;
+    // Get current language data
+    const currentLang = languages[currentIndex];
+    currentLanguage = currentLang.code;
 
     // Update theme
-    loginContainer.className = `login-container ${languages[currentIndex].theme}`;
+    loginContainer.className = `login-container ${currentLang.theme}`;
 
     // Update subtitle
     subtitle.innerHTML = `
-        <span class="typing-text">${languages[currentIndex].subtitle}</span>
+        <span class="typing-text">${currentLang.subtitle}</span>
         <span class="music-note">🎵</span>
     `;
 
-    console.log(`🎯 Language changed to: ${currentLanguage}`);
+    console.log(`🎯 Language updated: ${currentLang.name} (${currentLanguage}) - Index: ${currentIndex}`);
+    console.log(`📍 Current language data:`, currentLang);
 }
 
-// 🔧 Initialize Modal System - FIXED VERSION
+// 🔧 SIMPLE MODAL SYSTEM
 function initializeModal() {
-    // This will be called when modal is opened, so we need to handle it dynamically
-    console.log('🔧 Modal system initialized');
-}
+    const form = document.getElementById('guestLoginForm');
+    const input = document.getElementById('guestUsername');
 
-// 🎯 Handle Form Submission (called dynamically)
-function handleFormSubmission(form, input) {
-    // Remove existing listeners to prevent duplicates
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
+    if (!form || !input) return;
 
-    const newInput = newForm.querySelector('#guestUsername');
-    const submitBtn = newForm.querySelector('#guestSubmitBtn');
-
-    // Ensure input is clickable and focusable
-    newInput.addEventListener('click', function(e) {
-        e.stopPropagation();
-        this.focus();
-        console.log('📝 Input clicked and focused');
-    });
-
-    // Handle Enter key in input
-    newInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            submitForm();
-        }
-    });
-
-    // Form submission
-    newForm.addEventListener('submit', function(e) {
+    // Simple form submission
+    form.addEventListener('submit', function(e) {
         e.preventDefault();
-        submitForm();
-    });
 
-    function submitForm() {
-        const username = newInput.value.trim();
+        const username = input.value.trim();
+        const submitBtn = document.getElementById('guestSubmitBtn');
 
-        console.log(`🎮 Guest login attempt: ${username} for ${currentLanguage}`);
+        console.log(`🎮 Guest login: ${username} for ${languages[currentIndex].name}`);
 
+        // Validation
         if (username.length < 3 || username.length > 15) {
             alert('Username must be between 3 and 15 characters');
-            newInput.focus();
+            input.focus();
             return;
         }
 
         if (!/^[a-zA-Z0-9_]+$/.test(username)) {
             alert('Username can only contain letters, numbers, and underscores');
-            newInput.focus();
+            input.focus();
             return;
         }
 
@@ -1045,17 +1030,24 @@ function handleFormSubmission(form, input) {
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
 
-        // Submit to correct language endpoint
+        // Set correct action URL
         const actionUrl = `${languages[currentIndex].redirect}guest-login/`;
-        newForm.action = actionUrl;
+        form.action = actionUrl;
 
         console.log(`🚀 Submitting to: ${actionUrl}`);
 
-        // Submit form
-        newForm.submit();
-    }
+        // Submit
+        form.submit();
+    });
 
-    return { form: newForm, input: newInput };
+    // Enter key support
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            form.dispatchEvent(new Event('submit'));
+        }
+    });
+
+    console.log('✅ Simple modal system initialized');
 }
 
 // 🎯 Initialize Buttons
@@ -1071,57 +1063,22 @@ function initializeButtons() {
     });
 }
 
-// 🎭 Show Guest Login Modal - FIXED VERSION
+// 🎭 SIMPLE WORKING GUEST LOGIN MODAL
 function showGuestLoginModal() {
     console.log('🎭 Opening guest login modal');
 
     try {
-        // Remove any existing modal backdrop
-        const existingBackdrops = document.querySelectorAll('.modal-backdrop');
-        existingBackdrops.forEach(backdrop => backdrop.remove());
-
-        // Get modal element
-        const modalElement = document.getElementById('guestLoginModal');
-
-        // Remove any existing event listeners to prevent memory leaks
-        const modalClone = modalElement.cloneNode(true);
-        modalElement.parentNode.replaceChild(modalClone, modalElement);
-
-        // Initialize modal with specific options
-        const modal = new bootstrap.Modal(modalClone, {
-            backdrop: true,
-            keyboard: true,
-            focus: true
-        });
-
-        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('guestLoginModal'));
         modal.show();
 
-        // Focus input after modal is shown
-        modalClone.addEventListener('shown.bs.modal', function() {
-            const usernameInput = document.getElementById('guestUsername');
-            if (usernameInput) {
-                setTimeout(() => {
-                    usernameInput.focus();
-                    console.log('✅ Input focused');
-                }, 300);
+        // Simple focus after modal opens
+        setTimeout(() => {
+            const input = document.getElementById('guestUsername');
+            if (input) {
+                input.focus();
+                console.log('✅ Input focused');
             }
-        });
-
-        // Ensure modal elements are clickable
-        const modalContent = modalClone.querySelector('.modal-content');
-        if (modalContent) {
-            modalContent.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        }
-
-        // Setup form handling
-        const form = modalClone.querySelector('#guestLoginForm');
-        const input = modalClone.querySelector('#guestUsername');
-        if (form && input) {
-            handleFormSubmission(form, input);
-        }
+        }, 500);
 
     } catch (error) {
         console.error('❌ Modal error:', error);
