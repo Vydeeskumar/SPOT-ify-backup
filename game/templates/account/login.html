@@ -137,9 +137,9 @@
                                style="background: rgba(255,255,255,0.1) !important; border: 2px solid #B026FF !important; color: white !important; padding: 12px !important; width: 100% !important; z-index: 10001 !important; position: relative !important; pointer-events: auto !important;"
                                required>
                     </div>
-                    <button type="button" onclick="submitGuestForm()" class="working-guest-btn" style="background: #B026FF !important; color: white !important; width: 100% !important; padding: 12px !important; border: none !important; border-radius: 4px !important; z-index: 10001 !important; position: relative !important; pointer-events: auto !important; cursor: pointer !important;">
+                    <div onclick="submitGuestForm()" class="working-guest-btn" style="background: #B026FF !important; color: white !important; width: 100% !important; padding: 12px !important; border: none !important; border-radius: 4px !important; z-index: 10002 !important; position: relative !important; pointer-events: auto !important; cursor: pointer !important; text-align: center !important; user-select: none !important; display: block !important;">
                         <i class="fas fa-play me-2"></i>Start Playing
-                    </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -164,6 +164,12 @@
 .working-guest-btn:hover {
     background: #0096FF !important;
     cursor: pointer !important;
+    transform: scale(1.02) !important;
+}
+
+.working-guest-btn:active {
+    background: #7B2CBF !important;
+    transform: scale(0.98) !important;
 }
 </style>
 
@@ -1045,9 +1051,20 @@ function showGuestLoginModal() {
         // Focus input after a short delay
         setTimeout(() => {
             const input = document.getElementById('workingUsername');
+            const button = document.querySelector('.working-guest-btn');
+
             if (input) {
                 input.focus();
                 console.log('✅ Input focused');
+            }
+
+            if (button) {
+                // Add click event listener as backup
+                button.addEventListener('click', function() {
+                    console.log('🎯 Button clicked via event listener!');
+                    submitGuestForm();
+                });
+                console.log('✅ Button event listener added');
             }
         }, 100);
 
