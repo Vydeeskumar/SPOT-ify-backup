@@ -38,7 +38,7 @@
                                 <div class="btn-glow"></div>
                             </a>
 
-                            <button onclick="showGuestLoginModal()" class="btn-guest">
+                            <button onclick="console.log('Button clicked'); try { const modal = new bootstrap.Modal(document.getElementById('guestLoginModal')); modal.show(); console.log('Modal shown'); } catch(e) { console.error('Error:', e); alert('Error: ' + e.message); }" class="btn-guest">
                                 <div class="btn-content">
                                     <i class="fas fa-user-circle"></i>
                                     <span>Play as Guest</span>
@@ -345,11 +345,43 @@
     opacity: 1;
 }
 
-/* Modal Styling - EXACT OLD WORKING VERSION */
+/* Modal Styling - FORCE INTERACTION FIX */
+#guestLoginModal {
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+}
+
+#guestLoginModal * {
+    pointer-events: auto !important;
+}
+
+.modal-backdrop {
+    z-index: 9998 !important;
+    pointer-events: auto !important;
+}
+
 .modal-content {
-    background: var(--darker-bg);
-    border: 2px solid var(--neon-purple);
-    border-radius: 20px;
+    background: var(--darker-bg) !important;
+    border: 2px solid var(--neon-purple) !important;
+    border-radius: 20px !important;
+    z-index: 10000 !important;
+    pointer-events: auto !important;
+}
+
+#guestUsername {
+    pointer-events: auto !important;
+    z-index: 10001 !important;
+    position: relative !important;
+}
+
+.btn-close {
+    pointer-events: auto !important;
+    z-index: 10001 !important;
+}
+
+#guestSubmitBtn {
+    pointer-events: auto !important;
+    z-index: 10001 !important;
 }
 
 .modal-header {
