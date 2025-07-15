@@ -137,8 +137,27 @@
                                style="background: rgba(255,255,255,0.1) !important; border: 2px solid #B026FF !important; color: white !important; padding: 12px !important; width: 100% !important; z-index: 10001 !important; position: relative !important; pointer-events: auto !important;"
                                required>
                     </div>
-                    <div onclick="submitGuestForm()" class="working-guest-btn" style="background: #B026FF !important; color: white !important; width: 100% !important; padding: 12px !important; border: none !important; border-radius: 4px !important; z-index: 10002 !important; position: relative !important; pointer-events: auto !important; cursor: pointer !important; text-align: center !important; user-select: none !important; display: block !important;">
-                        <i class="fas fa-play me-2"></i>Start Playing
+                    <!-- NUCLEAR BUTTON SOLUTION -->
+                    <div id="nuclearButton" style="
+                        background: #B026FF !important;
+                        color: white !important;
+                        width: 100% !important;
+                        padding: 15px !important;
+                        border: 2px solid #B026FF !important;
+                        border-radius: 8px !important;
+                        z-index: 99999 !important;
+                        position: relative !important;
+                        pointer-events: auto !important;
+                        cursor: pointer !important;
+                        text-align: center !important;
+                        user-select: none !important;
+                        display: block !important;
+                        font-weight: bold !important;
+                        font-size: 16px !important;
+                        margin-top: 10px !important;
+                        transition: all 0.2s ease !important;
+                    " onclick="submitGuestForm()" onmousedown="this.style.background='#7B2CBF'" onmouseup="this.style.background='#B026FF'" onmouseover="this.style.background='#0096FF'" onmouseout="this.style.background='#B026FF'">
+                        <i class="fas fa-play" style="margin-right: 8px;"></i>Start Playing
                     </div>
                 </form>
             </div>
@@ -1058,14 +1077,30 @@ function showGuestLoginModal() {
                 console.log('✅ Input focused');
             }
 
-            if (button) {
-                // Add click event listener as backup
-                button.addEventListener('click', function() {
-                    console.log('🎯 Button clicked via event listener!');
-                    submitGuestForm();
-                });
-                console.log('✅ Button event listener added');
-            }
+            // Add multiple button listeners for maximum compatibility
+            const buttons = [
+                document.querySelector('.working-guest-btn'),
+                document.getElementById('nuclearButton'),
+                document.getElementById('perfectButton')
+            ];
+
+            buttons.forEach((btn, index) => {
+                if (btn) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log(`🎯 Button ${index} clicked via event listener!`);
+                        submitGuestForm();
+                    });
+
+                    // Also add mousedown as backup
+                    btn.addEventListener('mousedown', function(e) {
+                        console.log(`🎯 Button ${index} mousedown detected!`);
+                    });
+
+                    console.log(`✅ Button ${index} event listeners added`);
+                }
+            });
         }, 100);
 
         console.log('✅ Modal opened manually');
@@ -1118,10 +1153,19 @@ function submitGuestForm() {
     }
 
     // Update button to show loading
-    if (button) {
-        button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Loading...';
-        button.disabled = true;
-    }
+    const buttons = [
+        document.querySelector('.working-guest-btn'),
+        document.getElementById('nuclearButton'),
+        document.getElementById('perfectButton')
+    ];
+
+    buttons.forEach(btn => {
+        if (btn) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>Loading...';
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.7';
+        }
+    });
 
     // Set correct action URL
     const actionUrl = `${languages[currentIndex].redirect}guest-login/`;
