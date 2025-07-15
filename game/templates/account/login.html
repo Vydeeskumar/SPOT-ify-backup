@@ -332,11 +332,11 @@
     width: 120px;
     overflow: hidden;
     position: relative;
-    border: 2px solid var(--primary-color, #B026FF);
+    border: 2px solid var(--primary-color, #B026FF) !important;
     border-radius: 15px;
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
-    box-shadow: 0 0 15px var(--primary-color, #B026FF)40;
+    box-shadow: 0 0 15px var(--primary-color, #B026FF)40 !important;
 }
 
 .perfect-scroller-track {
@@ -353,8 +353,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
-    font-weight: bold;
+    font-size: 1.6rem;
+    font-weight: 900;
     color: rgba(255, 255, 255, 0.6);
     transition: all 0.3s ease;
     position: relative;
@@ -362,11 +362,12 @@
     line-height: 1;
     flex-shrink: 0;
     box-sizing: border-box;
+    font-family: inherit;
 }
 
 .perfect-item.active {
-    color: var(--primary-color, #B026FF);
-    text-shadow: 0 0 15px var(--primary-color, #B026FF);
+    color: var(--primary-color, #B026FF) !important;
+    text-shadow: 0 0 15px var(--primary-color, #B026FF) !important;
     font-weight: 900;
     letter-spacing: 1px;
     transform: scale(1.05);
@@ -1202,6 +1203,12 @@ function updatePerfectScroller() {
     // Update theme
     if (loginContainer) {
         loginContainer.className = `login-container ${currentLang.theme}`;
+        console.log(`🎨 Theme updated to: ${currentLang.theme}`);
+
+        // Force CSS variable update
+        const computedStyle = getComputedStyle(loginContainer);
+        const primaryColor = computedStyle.getPropertyValue('--primary-color');
+        console.log(`🎯 Primary color is now: ${primaryColor}`);
     }
 
     // Update subtitle
