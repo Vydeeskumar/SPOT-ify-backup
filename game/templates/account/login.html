@@ -521,111 +521,70 @@
     opacity: 1;
 }
 
-/* 🔧 BULLETPROOF MODAL STYLING */
-#guestLoginModal {
-    z-index: 9999 !important;
-    pointer-events: auto !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-}
-
-#guestLoginModal * {
-    pointer-events: auto !important;
-    position: relative !important;
-}
-
-.modal-backdrop {
-    z-index: 9998 !important;
-    pointer-events: auto !important;
-    background: rgba(0, 0, 0, 0.8) !important;
-}
-
-.modal-dialog {
-    z-index: 10000 !important;
-    pointer-events: auto !important;
-}
-
+/* 🔧 SIMPLE WORKING MODAL STYLING */
 .modal-content {
-    background: var(--darker-bg) !important;
-    border: 2px solid var(--primary-color, var(--neon-purple)) !important;
-    border-radius: 20px !important;
-    z-index: 10001 !important;
-    pointer-events: auto !important;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5),
-                0 0 30px var(--primary-color, var(--neon-purple))30 !important;
+    background: var(--darker-bg);
+    border: 2px solid var(--primary-color, var(--neon-purple));
+    border-radius: 20px;
 }
 
 .modal-header {
-    border: none !important;
-    padding: 20px !important;
+    border: none;
+    padding: 20px;
 }
 
 .modal-title {
-    color: var(--primary-color, var(--neon-purple)) !important;
-    font-size: 1.5rem !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
+    color: var(--primary-color, var(--neon-purple));
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .guest-animation {
-    font-size: 3rem !important;
-    color: var(--neon-pink) !important;
-    margin: 20px 0 !important;
-    animation: float 3s ease-in-out infinite !important;
+    font-size: 3rem;
+    color: var(--neon-pink);
+    margin: 20px 0;
+    animation: float 3s ease-in-out infinite;
 }
 
 .input-wrapper {
-    position: relative !important;
-    margin: 20px 0 !important;
+    position: relative;
+    margin: 20px 0;
 }
 
-/* 🎯 WORKING INPUT STYLING */
 .neon-input {
-    width: 100% !important;
-    padding: 15px 20px !important;
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: 2px solid var(--primary-color, var(--neon-purple)) !important;
-    border-radius: 12px !important;
-    color: white !important;
-    font-size: 16px !important;
-    transition: all 0.3s ease !important;
-    outline: none !important;
-    pointer-events: auto !important;
-    z-index: 10002 !important;
-    position: relative !important;
+    width: 100%;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--primary-color, var(--neon-purple));
+    border-radius: 10px;
+    color: white;
+    transition: all 0.3s ease;
 }
 
 .neon-input:focus {
-    border-color: var(--neon-blue) !important;
-    box-shadow: 0 0 15px var(--neon-blue)50 !important;
-    background: rgba(255, 255, 255, 0.15) !important;
-    transform: scale(1.02) !important;
-}
-
-.neon-input::placeholder {
-    color: rgba(255, 255, 255, 0.6) !important;
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 10px rgba(0, 150, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+    outline: none;
 }
 
 .input-glow {
-    position: absolute !important;
-    top: -2px !important;
-    left: -2px !important;
-    right: -2px !important;
-    bottom: -2px !important;
-    border-radius: 14px !important;
-    background: var(--primary-color, var(--neon-purple)) !important;
-    opacity: 0 !important;
-    transition: opacity 0.3s ease !important;
-    z-index: -1 !important;
-    pointer-events: none !important;
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 12px;
+    background: var(--primary-color, var(--neon-purple));
+    opacity: 0;
+    transition: 0.3s;
+    z-index: -1;
 }
 
 .neon-input:focus + .input-glow {
-    opacity: 0.3 !important;
+    opacity: 0.2;
 }
 
 .modal-header {
@@ -997,57 +956,33 @@ function updateScroller() {
     console.log(`📍 Current language data:`, currentLang);
 }
 
-// 🔧 SIMPLE MODAL SYSTEM
+// 🔧 EXACT OLD WORKING FORM HANDLING
 function initializeModal() {
-    const form = document.getElementById('guestLoginForm');
-    const input = document.getElementById('guestUsername');
-
-    if (!form || !input) return;
-
-    // Simple form submission
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const username = input.value.trim();
+    document.getElementById('guestLoginForm')?.addEventListener('submit', function(e) {
+        const username = document.getElementById('guestUsername').value;
         const submitBtn = document.getElementById('guestSubmitBtn');
 
-        console.log(`🎮 Guest login: ${username} for ${languages[currentIndex].name}`);
-
-        // Validation
         if (username.length < 3 || username.length > 15) {
+            e.preventDefault();
             alert('Username must be between 3 and 15 characters');
-            input.focus();
             return;
         }
 
-        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-            alert('Username can only contain letters, numbers, and underscores');
-            input.focus();
-            return;
-        }
+        // Set correct action URL based on current language
+        const actionUrl = `${languages[currentIndex].redirect}guest-login/`;
+        this.action = actionUrl;
 
-        // Update button
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
-
-        // Set correct action URL
-        const actionUrl = `${languages[currentIndex].redirect}guest-login/`;
-        form.action = actionUrl;
-
-        console.log(`🚀 Submitting to: ${actionUrl}`);
-
-        // Submit
-        form.submit();
     });
 
-    // Enter key support
-    input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            form.dispatchEvent(new Event('submit'));
-        }
+    // Modal Reset
+    document.getElementById('guestLoginModal')?.addEventListener('hidden.bs.modal', function () {
+        document.getElementById('guestLoginForm').reset();
+        const submitBtn = document.getElementById('guestSubmitBtn');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span class="btn-content"><i class="fas fa-play"></i>Start Playing</span>';
     });
-
-    console.log('✅ Simple modal system initialized');
 }
 
 // 🎯 Initialize Buttons
@@ -1063,27 +998,10 @@ function initializeButtons() {
     });
 }
 
-// 🎭 SIMPLE WORKING GUEST LOGIN MODAL
+// 🎭 EXACT OLD WORKING VERSION
 function showGuestLoginModal() {
-    console.log('🎭 Opening guest login modal');
-
-    try {
-        const modal = new bootstrap.Modal(document.getElementById('guestLoginModal'));
-        modal.show();
-
-        // Simple focus after modal opens
-        setTimeout(() => {
-            const input = document.getElementById('guestUsername');
-            if (input) {
-                input.focus();
-                console.log('✅ Input focused');
-            }
-        }, 500);
-
-    } catch (error) {
-        console.error('❌ Modal error:', error);
-        alert('Error opening guest login. Please refresh and try again.');
-    }
+    const modal = new bootstrap.Modal(document.getElementById('guestLoginModal'));
+    modal.show();
 }
 
 // Modal Reset - EXACT OLD WORKING VERSION
