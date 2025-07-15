@@ -601,23 +601,43 @@
 <script>
 // Guest Login Modal - EXACT OLD WORKING VERSION
 function showGuestLoginModal() {
-    const modal = new bootstrap.Modal(document.getElementById('guestLoginModal'));
-    modal.show();
+    console.log('showGuestLoginModal called');
+    try {
+        const modalElement = document.getElementById('guestLoginModal');
+        console.log('Modal element found:', modalElement);
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+        console.log('Modal shown successfully');
+    } catch (error) {
+        console.error('Error showing modal:', error);
+        alert('Error opening guest login modal: ' + error.message);
+    }
 }
 
 // Form Handling - EXACT OLD WORKING VERSION
-document.getElementById('guestLoginForm')?.addEventListener('submit', function(e) {
-    const username = document.getElementById('guestUsername').value;
-    const submitBtn = document.getElementById('guestSubmitBtn');
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, setting up form handler');
+    const form = document.getElementById('guestLoginForm');
+    console.log('Form found:', form);
 
-    if (username.length < 3 || username.length > 15) {
-        e.preventDefault();
-        alert('Username must be between 3 and 15 characters');
-        return;
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            console.log('Form submitted');
+            const username = document.getElementById('guestUsername').value;
+            const submitBtn = document.getElementById('guestSubmitBtn');
+            console.log('Username:', username);
+
+            if (username.length < 3 || username.length > 15) {
+                e.preventDefault();
+                alert('Username must be between 3 and 15 characters');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+            console.log('Form validation passed, submitting...');
+        });
     }
-
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
 });
 
 // Modal Reset - EXACT OLD WORKING VERSION
