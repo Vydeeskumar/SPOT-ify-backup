@@ -114,21 +114,21 @@
     </div>
 </div>
 
-<!-- BULLETPROOF Guest Login Modal -->
-<div class="modal fade" id="guestLoginModal" tabindex="-1" aria-hidden="true">
+<!-- WORKING Guest Login Modal -->
+<div class="modal fade" id="guestLoginModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
                     <i class="fas fa-user-circle"></i> Play as Guest
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center">
                 <div class="guest-animation">
                     <i class="fas fa-gamepad"></i>
                 </div>
-                <form id="guestLoginForm" method="post">
+                <form id="guestLoginForm" method="post" action="/tamil/guest-login/">
                     {% csrf_token %}
                     <div class="form-group">
                         <div class="input-wrapper">
@@ -137,7 +137,6 @@
                                    id="guestUsername"
                                    name="username"
                                    required
-                                   autocomplete="off"
                                    pattern="[a-zA-Z0-9_]{3,15}"
                                    placeholder="Enter username (3-15 characters)">
                             <div class="input-glow"></div>
@@ -956,33 +955,9 @@ function updateScroller() {
     console.log(`📍 Current language data:`, currentLang);
 }
 
-// 🔧 EXACT OLD WORKING FORM HANDLING
+// 🔧 SIMPLE MODAL INITIALIZATION
 function initializeModal() {
-    document.getElementById('guestLoginForm')?.addEventListener('submit', function(e) {
-        const username = document.getElementById('guestUsername').value;
-        const submitBtn = document.getElementById('guestSubmitBtn');
-
-        if (username.length < 3 || username.length > 15) {
-            e.preventDefault();
-            alert('Username must be between 3 and 15 characters');
-            return;
-        }
-
-        // Set correct action URL based on current language
-        const actionUrl = `${languages[currentIndex].redirect}guest-login/`;
-        this.action = actionUrl;
-
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
-    });
-
-    // Modal Reset
-    document.getElementById('guestLoginModal')?.addEventListener('hidden.bs.modal', function () {
-        document.getElementById('guestLoginForm').reset();
-        const submitBtn = document.getElementById('guestSubmitBtn');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<span class="btn-content"><i class="fas fa-play"></i>Start Playing</span>';
-    });
+    console.log('🔧 Initializing modal system');
 }
 
 // 🎯 Initialize Buttons
@@ -998,13 +973,32 @@ function initializeButtons() {
     });
 }
 
-// 🎭 EXACT OLD WORKING VERSION
+// WORKING GUEST LOGIN
 function showGuestLoginModal() {
     const modal = new bootstrap.Modal(document.getElementById('guestLoginModal'));
     modal.show();
 }
 
-// Modal Reset - EXACT OLD WORKING VERSION
+// FORM SUBMISSION HANDLER
+document.getElementById('guestLoginForm')?.addEventListener('submit', function(e) {
+    const username = document.getElementById('guestUsername').value.trim();
+    const submitBtn = document.getElementById('guestSubmitBtn');
+
+    if (username.length < 3 || username.length > 15) {
+        e.preventDefault();
+        alert('Username must be between 3 and 15 characters');
+        return;
+    }
+
+    // Update action URL based on selected language
+    const actionUrl = `${languages[currentIndex].redirect}guest-login/`;
+    this.action = actionUrl;
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+});
+
+// Modal Reset
 document.getElementById('guestLoginModal')?.addEventListener('hidden.bs.modal', function () {
     document.getElementById('guestLoginForm').reset();
     const submitBtn = document.getElementById('guestSubmitBtn');
