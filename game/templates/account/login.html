@@ -142,7 +142,7 @@
                         background: #B026FF !important;
                         color: white !important;
                         width: 100% !important;
-                        padding: 15px !important;
+                        padding: 20px !important;
                         border: 2px solid #B026FF !important;
                         border-radius: 8px !important;
                         z-index: 99999 !important;
@@ -156,7 +156,7 @@
                         font-size: 16px !important;
                         margin-top: 10px !important;
                         transition: all 0.2s ease !important;
-                    " onclick="submitGuestForm()" onmousedown="this.style.background='#7B2CBF'" onmouseup="this.style.background='#B026FF'" onmouseover="this.style.background='#0096FF'" onmouseout="this.style.background='#B026FF'">
+                    " onclick="submitGuestForm()">
                         <i class="fas fa-play" style="margin-right: 8px;"></i>Start Playing
                     </div>
                 </form>
@@ -180,15 +180,61 @@
     outline: none !important;
 }
 
-.working-guest-btn:hover {
-    background: #0096FF !important;
+/* COMPLETELY ISOLATED BUTTON STYLES */
+#nuclearButton {
+    background: #B026FF !important;
+    color: white !important;
+    width: 100% !important;
+    padding: 20px !important;
+    border: 2px solid #B026FF !important;
+    border-radius: 8px !important;
+    z-index: 99999 !important;
+    position: relative !important;
+    pointer-events: auto !important;
     cursor: pointer !important;
-    transform: scale(1.02) !important;
+    text-align: center !important;
+    user-select: none !important;
+    display: block !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    margin-top: 10px !important;
+    transition: all 0.2s ease !important;
 }
 
-.working-guest-btn:active {
+#nuclearButton:hover {
+    background: #0096FF !important;
+    transform: scale(1.02) !important;
+    cursor: pointer !important;
+}
+
+#nuclearButton:active {
     background: #7B2CBF !important;
     transform: scale(0.98) !important;
+}
+
+/* OVERRIDE ANY GLOBAL BUTTON STYLES */
+#nuclearButton.btn,
+#nuclearButton.btn-pro,
+#nuclearButton.btn-magnetic,
+#nuclearButton.btn-ripple {
+    all: unset !important;
+    background: #B026FF !important;
+    color: white !important;
+    width: 100% !important;
+    padding: 20px !important;
+    border: 2px solid #B026FF !important;
+    border-radius: 8px !important;
+    z-index: 99999 !important;
+    position: relative !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    text-align: center !important;
+    user-select: none !important;
+    display: block !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    margin-top: 10px !important;
+    transition: all 0.2s ease !important;
 }
 </style>
 
