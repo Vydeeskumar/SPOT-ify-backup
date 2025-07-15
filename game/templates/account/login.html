@@ -15,24 +15,24 @@
                             <div class="neon-treble"></div>
                             <h1 class="game-title">
                                 SPOT-ify the
-                                <div class="language-selector">
-                                    <button class="scroller-arrow up-arrow" id="upArrow">
+                                <div class="perfect-language-selector">
+                                    <button class="perfect-arrow perfect-up" onclick="scrollLanguage(-1)">
                                         <i class="fas fa-chevron-up"></i>
                                     </button>
-                                    <div class="language-scroller" id="languageScroller">
-                                        <div class="scroller-container">
-                                            <div class="scroller-item active" data-lang="tamil" data-redirect="/tamil/">
+                                    <div class="perfect-scroller-window">
+                                        <div class="perfect-scroller-track" id="perfectScrollerTrack">
+                                            <div class="perfect-item active" data-index="0" data-lang="tamil" data-redirect="/tamil/">
                                                 Paatu
                                             </div>
-                                            <div class="scroller-item" data-lang="english" data-redirect="/english/">
+                                            <div class="perfect-item" data-index="1" data-lang="english" data-redirect="/english/">
                                                 Song
                                             </div>
-                                            <div class="scroller-item" data-lang="hindi" data-redirect="/hindi/">
+                                            <div class="perfect-item" data-index="2" data-lang="hindi" data-redirect="/hindi/">
                                                 Gaana
                                             </div>
                                         </div>
                                     </div>
-                                    <button class="scroller-arrow down-arrow" id="downArrow">
+                                    <button class="perfect-arrow perfect-down" onclick="scrollLanguage(1)">
                                         <i class="fas fa-chevron-down"></i>
                                     </button>
                                 </div>
@@ -293,6 +293,87 @@
         opacity: 1;
         transform: scale(1) translateY(0);
     }
+}
+
+/* PERFECT LANGUAGE SCROLLER - ZERO BLANK SPACES */
+.perfect-language-selector {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 10px;
+}
+
+.perfect-arrow {
+    background: none;
+    border: none;
+    color: #B026FF;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 8px;
+    transition: all 0.2s ease;
+    z-index: 10;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.perfect-arrow:hover {
+    color: #0096FF;
+    background: rgba(0, 150, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.perfect-scroller-window {
+    height: 60px;
+    width: 120px;
+    overflow: hidden;
+    position: relative;
+    border: 2px solid #B026FF;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+}
+
+.perfect-scroller-track {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateY(0px);
+}
+
+.perfect-item {
+    height: 60px;
+    width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.6);
+    transition: all 0.3s ease;
+    position: relative;
+    text-align: center;
+    line-height: 1;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.perfect-item.active {
+    color: #B026FF;
+    text-shadow: 0 0 15px #B026FF;
+    font-weight: 900;
+    letter-spacing: 1px;
+    transform: scale(1.05);
+}
+
+.perfect-item:not(.active) {
+    opacity: 0.7;
+    transform: scale(0.95);
 }
 </style>
 
@@ -1021,84 +1102,83 @@ const languages = [
     { code: 'hindi', name: 'Gaana', redirect: '/hindi/', subtitle: 'Guess Today\'s Hindi Song', theme: 'theme-hindi' }
 ];
 
-// 🎯 Initialize Everything - NO AUTO-SCROLL
+// 🎯 Initialize Everything - PERFECT SCROLLER
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Initializing simple login system');
+    console.log('🚀 Initializing perfect login system');
 
-    initializeScroller();
+    initializePerfectScroller();
     initializeModal();
     initializeButtons();
 
     console.log('✅ All systems initialized');
 });
 
-// 🎮 Simple Manual Language Selector
-function initializeScroller() {
-    const upArrow = document.getElementById('upArrow');
-    const downArrow = document.getElementById('downArrow');
+// 🎯 PERFECT SCROLLER SYSTEM
+let perfectCurrentIndex = 0;
 
-    // Arrow button controls - MANUAL ONLY
-    upArrow.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
+function initializePerfectScroller() {
+    console.log('🎯 Initializing perfect scroller...');
 
-        // Move to previous language
-        currentIndex = (currentIndex - 1 + languages.length) % languages.length;
-        console.log(`⬆️ Up arrow: Moving to ${languages[currentIndex].name} (index: ${currentIndex})`);
-        updateScroller();
-    });
+    // Set initial position
+    updatePerfectScroller();
 
-    downArrow.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        // Move to next language
-        currentIndex = (currentIndex + 1) % languages.length;
-        console.log(`⬇️ Down arrow: Moving to ${languages[currentIndex].name} (index: ${currentIndex})`);
-        updateScroller();
-    });
-
-    // Initialize with first language
-    updateScroller();
+    console.log('✅ Perfect scroller initialized');
 }
 
-// No auto-scroll functions needed
+function scrollLanguage(direction) {
+    console.log(`🔄 Scrolling ${direction > 0 ? 'down' : 'up'}`);
 
-// 🔄 Perfect Language Mapping
-function updateScroller() {
-    const container = document.querySelector('.scroller-container');
-    const items = document.querySelectorAll('.scroller-item');
+    // Update index with wrapping
+    if (direction > 0) {
+        perfectCurrentIndex = perfectCurrentIndex < languages.length - 1 ? perfectCurrentIndex + 1 : 0;
+    } else {
+        perfectCurrentIndex = perfectCurrentIndex > 0 ? perfectCurrentIndex - 1 : languages.length - 1;
+    }
+
+    updatePerfectScroller();
+
+    console.log(`🎯 Now showing: ${languages[perfectCurrentIndex].name}`);
+}
+
+function updatePerfectScroller() {
+    const track = document.getElementById('perfectScrollerTrack');
+    const items = document.querySelectorAll('.perfect-item');
     const loginContainer = document.getElementById('loginContainer');
     const subtitle = document.getElementById('gameSubtitle');
 
-    // Ensure currentIndex is within bounds
-    currentIndex = Math.max(0, Math.min(currentIndex, languages.length - 1));
+    if (!track || items.length === 0) {
+        console.error('❌ Perfect scroller elements not found');
+        return;
+    }
 
-    // Perfect positioning - exactly 60px per item
-    container.style.transform = `translateY(-${currentIndex * 60}px)`;
+    // Calculate EXACT position - each item is exactly 60px
+    const translateY = -perfectCurrentIndex * 60;
+    track.style.transform = `translateY(${translateY}px)`;
 
-    // Update active state
+    // Update active states
     items.forEach((item, index) => {
-        item.classList.remove('active');
-        if (index === currentIndex) {
-            item.classList.add('active');
-        }
+        item.classList.toggle('active', index === perfectCurrentIndex);
     });
 
     // Get current language data
-    const currentLang = languages[currentIndex];
+    const currentLang = languages[perfectCurrentIndex];
     currentLanguage = currentLang.code;
+    currentIndex = perfectCurrentIndex; // Keep old variable in sync
 
     // Update theme
-    loginContainer.className = `login-container ${currentLang.theme}`;
+    if (loginContainer) {
+        loginContainer.className = `login-container ${currentLang.theme}`;
+    }
 
-    // Update subtitle with exact mapping
-    subtitle.innerHTML = `
-        <span class="typing-text">${currentLang.subtitle}</span>
-        <span class="music-note">🎵</span>
-    `;
+    // Update subtitle
+    if (subtitle) {
+        subtitle.innerHTML = `
+            <span class="typing-text">${currentLang.subtitle}</span>
+            <span class="music-note">🎵</span>
+        `;
+    }
 
-    console.log(`🎯 EXACT MAPPING: ${currentLang.name} → ${currentLang.code} → ${currentLang.redirect}`);
+    console.log(`✅ PERFECT MAPPING: ${currentLang.name} → ${currentLang.code} → ${currentLang.redirect}`);
 }
 
 // 🔧 INITIALIZE CUSTOM MODAL
