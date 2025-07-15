@@ -114,47 +114,32 @@
     </div>
 </div>
 
-<!-- SIMPLE WORKING Guest Login Modal -->
+<!-- SUPER SIMPLE Guest Login Modal -->
 <div class="modal fade" id="guestLoginModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
+        <div class="modal-content" style="background: #1a1a1a; border: 2px solid #B026FF; color: white;">
+            <div class="modal-header" style="border: none;">
+                <h5 class="modal-title" style="color: #B026FF;">
                     <i class="fas fa-user-circle"></i> Play as Guest
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="text-center mb-3">
-                    <i class="fas fa-gamepad" style="font-size: 3rem; color: var(--neon-pink);"></i>
-                </div>
-
-                <form id="guestForm" method="post">
+                <form id="simpleGuestForm" method="post" action="/tamil/guest-login/">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="usernameInput" class="form-label">Username</label>
                         <input type="text"
-                               class="form-control guest-input"
-                               id="usernameInput"
+                               class="form-control"
+                               id="simpleUsername"
                                name="username"
                                placeholder="Enter username (3-15 characters)"
+                               style="background: rgba(255,255,255,0.1); border: 2px solid #B026FF; color: white; padding: 12px;"
                                required>
-                        <div class="form-text">Use letters, numbers, and underscores only</div>
                     </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary guest-submit-btn">
-                            <i class="fas fa-play me-2"></i>Start Playing
-                        </button>
-                    </div>
+                    <button type="submit" class="btn" style="background: #B026FF; color: white; width: 100%; padding: 12px;">
+                        <i class="fas fa-play me-2"></i>Start Playing
+                    </button>
                 </form>
-
-                <div class="text-center mt-3">
-                    <small class="text-muted">
-                        <i class="fas fa-info-circle"></i>
-                        Guest scores aren't saved. Sign in with Google to save progress!
-                    </small>
-                </div>
             </div>
         </div>
     </div>
@@ -333,29 +318,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: bold;
-    color: rgba(255, 255, 255, 0.5);
-    transition: all 0.5s ease;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
     position: relative;
-    padding: 0 15px;
+    padding: 0 10px;
+    line-height: 1;
 }
 
 .scroller-item.active {
     color: var(--primary-color, var(--neon-purple));
     text-shadow: 0 0 15px var(--primary-color, var(--neon-purple));
-    transform: scale(1.15);
+    transform: scale(1.1);
     letter-spacing: 1px;
 }
 
 .scroller-item:not(.active) {
-    filter: blur(1px);
+    opacity: 0.6;
 }
 
 .scroller-item:hover {
     color: var(--primary-color, var(--neon-purple));
     transform: scale(1.05);
-    filter: blur(0);
+    opacity: 1;
 }
 
 /* Glow effect for active item */
@@ -874,7 +860,6 @@
 // 🚀 BULLETPROOF SCROLLABLE LOGIN SYSTEM
 let currentLanguage = 'tamil';
 let currentIndex = 0;
-let autoScrollInterval;
 const languages = [
     { code: 'tamil', name: 'Paatu', redirect: '/tamil/', subtitle: 'Guess Today\'s Tamil Song', theme: 'theme-tamil' },
     { code: 'english', name: 'Song', redirect: '/english/', subtitle: 'Guess Today\'s English Song', theme: 'theme-english' },
@@ -961,62 +946,27 @@ function updateScroller() {
     console.log(`🎯 EXACT MAPPING: ${currentLang.name} → ${currentLang.code} → ${currentLang.redirect}`);
 }
 
-// 🔧 SIMPLE GUEST LOGIN SYSTEM
+// 🔧 SUPER SIMPLE GUEST LOGIN
 function initializeModal() {
-    const form = document.getElementById('guestForm');
-    const input = document.getElementById('usernameInput');
+    const form = document.getElementById('simpleGuestForm');
 
-    if (form && input) {
+    if (form) {
         form.addEventListener('submit', function(e) {
-            e.preventDefault();
+            const username = document.getElementById('simpleUsername').value.trim();
 
-            const username = input.value.trim();
-            const submitBtn = form.querySelector('.guest-submit-btn');
-
-            // Validation
             if (username.length < 3 || username.length > 15) {
+                e.preventDefault();
                 alert('Username must be between 3 and 15 characters');
-                input.focus();
                 return;
             }
 
-            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-                alert('Username can only contain letters, numbers, and underscores');
-                input.focus();
-                return;
-            }
-
-            // Set action URL based on current language
+            // Update action URL based on current language
             const actionUrl = `${languages[currentIndex].redirect}guest-login/`;
             form.action = actionUrl;
 
-            // Update button
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
-
-            console.log(`🎮 Submitting guest login: ${username} to ${actionUrl}`);
-
-            // Submit form
-            form.submit();
+            console.log(`🎮 Submitting to: ${actionUrl}`);
         });
     }
-
-    // Reset modal when closed
-    const modal = document.getElementById('guestLoginModal');
-    if (modal) {
-        modal.addEventListener('hidden.bs.modal', function() {
-            if (form) {
-                form.reset();
-                const submitBtn = form.querySelector('.guest-submit-btn');
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-play me-2"></i>Start Playing';
-                }
-            }
-        });
-    }
-
-    console.log('✅ Guest login system initialized');
 }
 
 // 🎯 Initialize Buttons
