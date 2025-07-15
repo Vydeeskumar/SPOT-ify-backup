@@ -15,18 +15,26 @@
                             <div class="neon-treble"></div>
                             <h1 class="game-title">
                                 SPOT-ify the
-                                <div class="language-scroller" id="languageScroller">
-                                    <div class="scroller-container">
-                                        <div class="scroller-item active" data-lang="tamil" data-redirect="/tamil/">
-                                            Paatu
-                                        </div>
-                                        <div class="scroller-item" data-lang="english" data-redirect="/english/">
-                                            Song
-                                        </div>
-                                        <div class="scroller-item" data-lang="hindi" data-redirect="/hindi/">
-                                            Gaana
+                                <div class="language-selector">
+                                    <button class="scroller-arrow up-arrow" id="upArrow">
+                                        <i class="fas fa-chevron-up"></i>
+                                    </button>
+                                    <div class="language-scroller" id="languageScroller">
+                                        <div class="scroller-container">
+                                            <div class="scroller-item active" data-lang="tamil" data-redirect="/tamil/">
+                                                Paatu
+                                            </div>
+                                            <div class="scroller-item" data-lang="english" data-redirect="/english/">
+                                                Song
+                                            </div>
+                                            <div class="scroller-item" data-lang="hindi" data-redirect="/hindi/">
+                                                Gaana
+                                            </div>
                                         </div>
                                     </div>
+                                    <button class="scroller-arrow down-arrow" id="downArrow">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
                                 </div>
                                 !
                             </h1>
@@ -247,7 +255,40 @@
     gap: 10px;
 }
 
-/* 🎯 ENHANCED VERTICAL LANGUAGE SCROLLER */
+/* 🎯 LANGUAGE SELECTOR WITH ARROWS */
+.language-selector {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.scroller-arrow {
+    width: 40px;
+    height: 25px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--primary-color, var(--neon-purple));
+    border-radius: 8px;
+    color: var(--primary-color, var(--neon-purple));
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.scroller-arrow:hover {
+    background: var(--primary-color, var(--neon-purple));
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px var(--primary-color, var(--neon-purple))50;
+}
+
+.scroller-arrow:active {
+    transform: scale(0.95);
+}
+
 .language-scroller {
     display: inline-block;
     height: 60px;
@@ -258,7 +299,6 @@
     border-radius: 15px;
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
-    cursor: pointer;
     user-select: none;
     box-shadow:
         0 0 15px var(--primary-color, var(--neon-purple))40,
@@ -856,36 +896,33 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ All systems initialized');
 });
 
-// 🎮 Initialize Vertical Scroller with Auto-Scroll
+// 🎮 Initialize Language Selector with Arrow Controls
 function initializeScroller() {
     const scroller = document.getElementById('languageScroller');
-    const container = scroller.querySelector('.scroller-container');
+    const upArrow = document.getElementById('upArrow');
+    const downArrow = document.getElementById('downArrow');
 
     // Start auto-scroll
     startAutoScroll();
 
-    // Add scroll event listener
-    scroller.addEventListener('wheel', function(e) {
+    // Arrow button controls
+    upArrow.addEventListener('click', function(e) {
         e.preventDefault();
+        e.stopPropagation();
         stopAutoScroll();
 
-        if (e.deltaY > 0) {
-            // Scroll down
-            currentIndex = (currentIndex + 1) % languages.length;
-        } else {
-            // Scroll up
-            currentIndex = (currentIndex - 1 + languages.length) % languages.length;
-        }
-
+        currentIndex = (currentIndex - 1 + languages.length) % languages.length;
         updateScroller();
 
         // Restart auto-scroll after 3 seconds
         setTimeout(startAutoScroll, 3000);
     });
 
-    // Add click event for easy cycling
-    scroller.addEventListener('click', function() {
+    downArrow.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         stopAutoScroll();
+
         currentIndex = (currentIndex + 1) % languages.length;
         updateScroller();
 
@@ -893,9 +930,10 @@ function initializeScroller() {
         setTimeout(startAutoScroll, 3000);
     });
 
-    // Pause auto-scroll on hover
-    scroller.addEventListener('mouseenter', stopAutoScroll);
-    scroller.addEventListener('mouseleave', function() {
+    // Pause auto-scroll on hover over selector
+    const selector = document.querySelector('.language-selector');
+    selector.addEventListener('mouseenter', stopAutoScroll);
+    selector.addEventListener('mouseleave', function() {
         setTimeout(startAutoScroll, 1000);
     });
 
@@ -950,34 +988,56 @@ function updateScroller() {
     console.log(`🎯 Language changed to: ${currentLanguage}`);
 }
 
-// 🔧 Initialize Modal System
+// 🔧 Initialize Modal System - FIXED VERSION
 function initializeModal() {
-    const form = document.getElementById('guestLoginForm');
-    const input = document.getElementById('guestUsername');
+    // This will be called when modal is opened, so we need to handle it dynamically
+    console.log('🔧 Modal system initialized');
+}
 
-    // Ensure input is always clickable
-    input.addEventListener('click', function(e) {
+// 🎯 Handle Form Submission (called dynamically)
+function handleFormSubmission(form, input) {
+    // Remove existing listeners to prevent duplicates
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+
+    const newInput = newForm.querySelector('#guestUsername');
+    const submitBtn = newForm.querySelector('#guestSubmitBtn');
+
+    // Ensure input is clickable and focusable
+    newInput.addEventListener('click', function(e) {
         e.stopPropagation();
         this.focus();
-        console.log('📝 Input focused');
+        console.log('📝 Input clicked and focused');
+    });
+
+    // Handle Enter key in input
+    newInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            submitForm();
+        }
     });
 
     // Form submission
-    form.addEventListener('submit', function(e) {
+    newForm.addEventListener('submit', function(e) {
         e.preventDefault();
+        submitForm();
+    });
 
-        const username = input.value.trim();
-        const submitBtn = document.getElementById('guestSubmitBtn');
+    function submitForm() {
+        const username = newInput.value.trim();
 
         console.log(`🎮 Guest login attempt: ${username} for ${currentLanguage}`);
 
         if (username.length < 3 || username.length > 15) {
             alert('Username must be between 3 and 15 characters');
+            newInput.focus();
             return;
         }
 
         if (!/^[a-zA-Z0-9_]+$/.test(username)) {
             alert('Username can only contain letters, numbers, and underscores');
+            newInput.focus();
             return;
         }
 
@@ -987,13 +1047,15 @@ function initializeModal() {
 
         // Submit to correct language endpoint
         const actionUrl = `${languages[currentIndex].redirect}guest-login/`;
-        form.action = actionUrl;
+        newForm.action = actionUrl;
 
         console.log(`🚀 Submitting to: ${actionUrl}`);
 
         // Submit form
-        form.submit();
-    });
+        newForm.submit();
+    }
+
+    return { form: newForm, input: newInput };
 }
 
 // 🎯 Initialize Buttons
@@ -1009,24 +1071,57 @@ function initializeButtons() {
     });
 }
 
-// 🎭 Show Guest Login Modal
+// 🎭 Show Guest Login Modal - FIXED VERSION
 function showGuestLoginModal() {
     console.log('🎭 Opening guest login modal');
 
     try {
+        // Remove any existing modal backdrop
+        const existingBackdrops = document.querySelectorAll('.modal-backdrop');
+        existingBackdrops.forEach(backdrop => backdrop.remove());
+
+        // Get modal element
         const modalElement = document.getElementById('guestLoginModal');
-        const modal = new bootstrap.Modal(modalElement, {
-            backdrop: 'static',
-            keyboard: true
+
+        // Remove any existing event listeners to prevent memory leaks
+        const modalClone = modalElement.cloneNode(true);
+        modalElement.parentNode.replaceChild(modalClone, modalElement);
+
+        // Initialize modal with specific options
+        const modal = new bootstrap.Modal(modalClone, {
+            backdrop: true,
+            keyboard: true,
+            focus: true
         });
 
+        // Show modal
         modal.show();
 
         // Focus input after modal is shown
-        modalElement.addEventListener('shown.bs.modal', function() {
-            document.getElementById('guestUsername').focus();
-            console.log('✅ Modal shown and input focused');
+        modalClone.addEventListener('shown.bs.modal', function() {
+            const usernameInput = document.getElementById('guestUsername');
+            if (usernameInput) {
+                setTimeout(() => {
+                    usernameInput.focus();
+                    console.log('✅ Input focused');
+                }, 300);
+            }
         });
+
+        // Ensure modal elements are clickable
+        const modalContent = modalClone.querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+
+        // Setup form handling
+        const form = modalClone.querySelector('#guestLoginForm');
+        const input = modalClone.querySelector('#guestUsername');
+        if (form && input) {
+            handleFormSubmission(form, input);
+        }
 
     } catch (error) {
         console.error('❌ Modal error:', error);
