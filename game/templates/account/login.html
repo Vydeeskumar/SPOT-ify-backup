@@ -114,7 +114,7 @@
     </div>
 </div>
 
-<!-- WORKING Guest Login Modal -->
+<!-- SIMPLE WORKING Guest Login Modal -->
 <div class="modal fade" id="guestLoginModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -124,41 +124,36 @@
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body text-center">
-                <div class="guest-animation">
-                    <i class="fas fa-gamepad"></i>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="fas fa-gamepad" style="font-size: 3rem; color: var(--neon-pink);"></i>
                 </div>
-                <form id="guestLoginForm" method="post" action="/tamil/guest-login/">
+
+                <form id="guestForm" method="post">
                     {% csrf_token %}
-                    <div class="form-group">
-                        <div class="input-wrapper">
-                            <input type="text"
-                                   class="form-control neon-input"
-                                   id="guestUsername"
-                                   name="username"
-                                   required
-                                   pattern="[a-zA-Z0-9_]{3,15}"
-                                   placeholder="Enter username (3-15 characters)">
-                            <div class="input-glow"></div>
-                        </div>
-                        <small class="form-text">
-                            <i class="fas fa-info-circle"></i>
-                            Use 3-15 characters, letters, numbers and underscore only
-                        </small>
+                    <div class="mb-3">
+                        <label for="usernameInput" class="form-label">Username</label>
+                        <input type="text"
+                               class="form-control guest-input"
+                               id="usernameInput"
+                               name="username"
+                               placeholder="Enter username (3-15 characters)"
+                               required>
+                        <div class="form-text">Use letters, numbers, and underscores only</div>
                     </div>
-                    <button type="submit" class="btn-submit" id="guestSubmitBtn">
-                        <span class="btn-content">
-                            <i class="fas fa-play"></i>
-                            Start Playing
-                        </span>
-                        <div class="btn-glow"></div>
-                    </button>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary guest-submit-btn">
+                            <i class="fas fa-play me-2"></i>Start Playing
+                        </button>
+                    </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <div class="guest-note">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span>Guest scores aren't saved. Sign in with Google to save your progress!</span>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i>
+                        Guest scores aren't saved. Sign in with Google to save progress!
+                    </small>
                 </div>
             </div>
         </div>
@@ -697,6 +692,49 @@
     margin-top: 20px;
 }
 
+/* SIMPLE GUEST LOGIN STYLING */
+.guest-input {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 2px solid var(--primary-color, var(--neon-purple)) !important;
+    border-radius: 8px !important;
+    color: white !important;
+    padding: 12px !important;
+    transition: all 0.3s ease !important;
+}
+
+.guest-input:focus {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: var(--neon-blue) !important;
+    box-shadow: 0 0 10px rgba(0, 150, 255, 0.5) !important;
+    color: white !important;
+    outline: none !important;
+}
+
+.guest-input::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.guest-submit-btn {
+    background: var(--primary-color, var(--neon-purple)) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 12px 24px !important;
+    font-weight: bold !important;
+    transition: all 0.3s ease !important;
+}
+
+.guest-submit-btn:hover {
+    background: var(--neon-blue) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 15px rgba(0, 150, 255, 0.3) !important;
+}
+
+.guest-submit-btn:disabled {
+    opacity: 0.7 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
 .modal-header {
     border: none;
     padding: 20px;
@@ -843,9 +881,9 @@ const languages = [
     { code: 'hindi', name: 'Gaana', redirect: '/hindi/', subtitle: 'Guess Today\'s Hindi Song', theme: 'theme-hindi' }
 ];
 
-// 🎯 Initialize Everything
+// 🎯 Initialize Everything - NO AUTO-SCROLL
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Initializing bulletproof login system');
+    console.log('🚀 Initializing simple login system');
 
     initializeScroller();
     initializeModal();
@@ -854,73 +892,39 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ All systems initialized');
 });
 
-// 🎮 Initialize Language Selector with Arrow Controls
+// 🎮 Simple Manual Language Selector
 function initializeScroller() {
-    const scroller = document.getElementById('languageScroller');
     const upArrow = document.getElementById('upArrow');
     const downArrow = document.getElementById('downArrow');
 
-    // Start auto-scroll
-    startAutoScroll();
-
-    // Arrow button controls - PERFECT SNAPPING
+    // Arrow button controls - MANUAL ONLY
     upArrow.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        stopAutoScroll();
 
         // Move to previous language
         currentIndex = (currentIndex - 1 + languages.length) % languages.length;
         console.log(`⬆️ Up arrow: Moving to ${languages[currentIndex].name} (index: ${currentIndex})`);
         updateScroller();
-
-        // Restart auto-scroll after 5 seconds
-        setTimeout(startAutoScroll, 5000);
     });
 
     downArrow.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        stopAutoScroll();
 
         // Move to next language
         currentIndex = (currentIndex + 1) % languages.length;
         console.log(`⬇️ Down arrow: Moving to ${languages[currentIndex].name} (index: ${currentIndex})`);
         updateScroller();
-
-        // Restart auto-scroll after 5 seconds
-        setTimeout(startAutoScroll, 5000);
     });
 
-    // Pause auto-scroll on hover over selector
-    const selector = document.querySelector('.language-selector');
-    selector.addEventListener('mouseenter', stopAutoScroll);
-    selector.addEventListener('mouseleave', function() {
-        setTimeout(startAutoScroll, 1000);
-    });
-
+    // Initialize with first language
     updateScroller();
 }
 
-// 🔄 Auto-Scroll Functions
-function startAutoScroll() {
-    stopAutoScroll(); // Clear any existing interval
-    autoScrollInterval = setInterval(function() {
-        currentIndex = (currentIndex + 1) % languages.length;
-        updateScroller();
-    }, 2500); // Change every 2.5 seconds
-    console.log('🔄 Auto-scroll started');
-}
+// No auto-scroll functions needed
 
-function stopAutoScroll() {
-    if (autoScrollInterval) {
-        clearInterval(autoScrollInterval);
-        autoScrollInterval = null;
-        console.log('⏸️ Auto-scroll stopped');
-    }
-}
-
-// 🔄 Update Scroller Position and Theme - FIXED VERSION
+// 🔄 Perfect Language Mapping
 function updateScroller() {
     const container = document.querySelector('.scroller-container');
     const items = document.querySelectorAll('.scroller-item');
@@ -930,12 +934,15 @@ function updateScroller() {
     // Ensure currentIndex is within bounds
     currentIndex = Math.max(0, Math.min(currentIndex, languages.length - 1));
 
-    // Update transform with perfect positioning
+    // Perfect positioning - exactly 60px per item
     container.style.transform = `translateY(-${currentIndex * 60}px)`;
 
     // Update active state
     items.forEach((item, index) => {
-        item.classList.toggle('active', index === currentIndex);
+        item.classList.remove('active');
+        if (index === currentIndex) {
+            item.classList.add('active');
+        }
     });
 
     // Get current language data
@@ -945,19 +952,71 @@ function updateScroller() {
     // Update theme
     loginContainer.className = `login-container ${currentLang.theme}`;
 
-    // Update subtitle
+    // Update subtitle with exact mapping
     subtitle.innerHTML = `
         <span class="typing-text">${currentLang.subtitle}</span>
         <span class="music-note">🎵</span>
     `;
 
-    console.log(`🎯 Language updated: ${currentLang.name} (${currentLanguage}) - Index: ${currentIndex}`);
-    console.log(`📍 Current language data:`, currentLang);
+    console.log(`🎯 EXACT MAPPING: ${currentLang.name} → ${currentLang.code} → ${currentLang.redirect}`);
 }
 
-// 🔧 SIMPLE MODAL INITIALIZATION
+// 🔧 SIMPLE GUEST LOGIN SYSTEM
 function initializeModal() {
-    console.log('🔧 Initializing modal system');
+    const form = document.getElementById('guestForm');
+    const input = document.getElementById('usernameInput');
+
+    if (form && input) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = input.value.trim();
+            const submitBtn = form.querySelector('.guest-submit-btn');
+
+            // Validation
+            if (username.length < 3 || username.length > 15) {
+                alert('Username must be between 3 and 15 characters');
+                input.focus();
+                return;
+            }
+
+            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                alert('Username can only contain letters, numbers, and underscores');
+                input.focus();
+                return;
+            }
+
+            // Set action URL based on current language
+            const actionUrl = `${languages[currentIndex].redirect}guest-login/`;
+            form.action = actionUrl;
+
+            // Update button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+
+            console.log(`🎮 Submitting guest login: ${username} to ${actionUrl}`);
+
+            // Submit form
+            form.submit();
+        });
+    }
+
+    // Reset modal when closed
+    const modal = document.getElementById('guestLoginModal');
+    if (modal) {
+        modal.addEventListener('hidden.bs.modal', function() {
+            if (form) {
+                form.reset();
+                const submitBtn = form.querySelector('.guest-submit-btn');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-play me-2"></i>Start Playing';
+                }
+            }
+        });
+    }
+
+    console.log('✅ Guest login system initialized');
 }
 
 // 🎯 Initialize Buttons
@@ -973,38 +1032,11 @@ function initializeButtons() {
     });
 }
 
-// WORKING GUEST LOGIN
+// SIMPLE GUEST LOGIN MODAL
 function showGuestLoginModal() {
     const modal = new bootstrap.Modal(document.getElementById('guestLoginModal'));
     modal.show();
 }
-
-// FORM SUBMISSION HANDLER
-document.getElementById('guestLoginForm')?.addEventListener('submit', function(e) {
-    const username = document.getElementById('guestUsername').value.trim();
-    const submitBtn = document.getElementById('guestSubmitBtn');
-
-    if (username.length < 3 || username.length > 15) {
-        e.preventDefault();
-        alert('Username must be between 3 and 15 characters');
-        return;
-    }
-
-    // Update action URL based on selected language
-    const actionUrl = `${languages[currentIndex].redirect}guest-login/`;
-    this.action = actionUrl;
-
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
-});
-
-// Modal Reset
-document.getElementById('guestLoginModal')?.addEventListener('hidden.bs.modal', function () {
-    document.getElementById('guestLoginForm').reset();
-    const submitBtn = document.getElementById('guestSubmitBtn');
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = '<span class="btn-content"><i class="fas fa-play"></i>Start Playing</span>';
-});
 </script>
 </div>
 {% endblock content %}
