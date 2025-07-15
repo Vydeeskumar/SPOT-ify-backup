@@ -105,7 +105,7 @@
                 <div class="guest-animation">
                     <i class="fas fa-gamepad"></i>
                 </div>
-                <form id="guestLoginForm" method="post" action="{% url 'guest_login' %}">
+                <form id="guestLoginForm" method="post" action="/tamil/guest-login/">
                     {% csrf_token %}
                     <div class="form-group">
                         <div class="input-wrapper">
@@ -402,6 +402,56 @@
 
 .neon-input:focus + .input-glow {
     opacity: 0.2;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 12px 24px;
+    background: var(--neon-purple);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin: 20px 0;
+}
+
+.btn-submit:hover {
+    background: var(--neon-blue);
+    transform: translateY(-2px);
+}
+
+.btn-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: 0.5s;
+}
+
+.btn-submit:hover .btn-glow {
+    transform: translateX(100%);
 }
 
 .guest-note {
