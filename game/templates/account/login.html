@@ -137,7 +137,7 @@
                                style="background: rgba(255,255,255,0.1) !important; border: 2px solid #B026FF !important; color: white !important; padding: 12px !important; width: 100% !important; z-index: 10001 !important; position: relative !important; pointer-events: auto !important;"
                                required>
                     </div>
-                    <button type="submit" class="working-guest-btn" style="background: #B026FF !important; color: white !important; width: 100% !important; padding: 12px !important; border: none !important; border-radius: 4px !important; z-index: 10001 !important; position: relative !important; pointer-events: auto !important;">
+                    <button type="button" onclick="submitGuestForm()" class="working-guest-btn" style="background: #B026FF !important; color: white !important; width: 100% !important; padding: 12px !important; border: none !important; border-radius: 4px !important; z-index: 10001 !important; position: relative !important; pointer-events: auto !important; cursor: pointer !important;">
                         <i class="fas fa-play me-2"></i>Start Playing
                     </button>
                 </form>
@@ -1070,6 +1070,50 @@ function closeGuestModal() {
     if (backdrop) {
         backdrop.remove();
     }
+}
+
+// Submit guest form manually
+function submitGuestForm() {
+    console.log('🎮 Submitting guest form...');
+
+    const form = document.getElementById('workingGuestForm');
+    const input = document.getElementById('workingUsername');
+    const button = document.querySelector('.working-guest-btn');
+
+    if (!form || !input) {
+        console.error('❌ Form or input not found');
+        return;
+    }
+
+    const username = input.value.trim();
+
+    // Validation
+    if (username.length < 3 || username.length > 15) {
+        alert('Username must be between 3 and 15 characters');
+        input.focus();
+        return;
+    }
+
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+        alert('Username can only contain letters, numbers, and underscores');
+        input.focus();
+        return;
+    }
+
+    // Update button to show loading
+    if (button) {
+        button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Loading...';
+        button.disabled = true;
+    }
+
+    // Set correct action URL
+    const actionUrl = `${languages[currentIndex].redirect}guest-login/`;
+    form.action = actionUrl;
+
+    console.log(`🚀 Submitting to: ${actionUrl} with username: ${username}`);
+
+    // Submit the form
+    form.submit();
 }
 </script>
 </div>
