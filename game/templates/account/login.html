@@ -68,6 +68,23 @@
                                 </div>
                                 <div class="btn-glow"></div>
                             </button>
+
+                            <!-- SIMPLE DIRECT GUEST LOGIN -->
+                            <div style="margin-top: 20px; padding: 20px; background: rgba(0,0,0,0.8); border: 2px solid #B026FF; border-radius: 10px;">
+                                <h5 style="color: #B026FF; text-align: center; margin-bottom: 15px;">Quick Guest Login</h5>
+                                <form method="post" action="/tamil/guest-login/" style="display: flex; flex-direction: column; gap: 10px;">
+                                    {% csrf_token %}
+                                    <input type="text" name="username" placeholder="Enter username"
+                                           style="padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid #B026FF; color: white; border-radius: 5px;"
+                                           required minlength="3" maxlength="15">
+                                    <button type="submit"
+                                            style="padding: 12px; background: #B026FF; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;"
+                                            onmouseover="this.style.background='#0096FF'"
+                                            onmouseout="this.style.background='#B026FF'">
+                                        🎮 Start Playing Now
+                                    </button>
+                                </form>
+                            </div>
                         </div>
 
                         <!-- Alert Info -->
