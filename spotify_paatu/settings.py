@@ -71,7 +71,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'allauth.account.middleware.AccountMiddleware',
     'game.middleware.WWWRedirectMiddleware',
-    'game.middleware.LanguageRedirectMiddleware',  # Simple language redirect
+    # 'game.middleware.LanguageRedirectMiddleware',  # DISABLED - might be causing spinning
 ]
 
 ROOT_URLCONF = "spotify_paatu.urls"
