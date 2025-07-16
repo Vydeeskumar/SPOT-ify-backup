@@ -71,6 +71,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'allauth.account.middleware.AccountMiddleware',
     'game.middleware.WWWRedirectMiddleware',
+    'game.middleware.LanguageRedirectMiddleware',  # Simple language redirect
 ]
 
 ROOT_URLCONF = "spotify_paatu.urls"
@@ -154,13 +155,10 @@ SITE_ID = 1
 
 # Auth settings
 LOGIN_URL = 'account_login'
-LOGIN_REDIRECT_URL = '/login-redirect/'  # Use our custom redirect
+LOGIN_REDIRECT_URL = '/tamil/'  # Back to simple approach
 LOGOUT_REDIRECT_URL = '/tamil/'
 
 # Allauth settings
-ACCOUNT_ADAPTER = 'game.adapters.CustomAccountAdapter'
-SOCIALACCOUNT_ADAPTER = 'game.adapters.CustomSocialAccountAdapter'
-
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'

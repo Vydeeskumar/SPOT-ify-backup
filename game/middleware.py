@@ -21,3 +21,34 @@ class WWWRedirectMiddleware:
             non_secure_url = url.replace('https://', 'http://')
             return redirect(non_secure_url)
         return self.get_response(request)
+
+
+class LanguageRedirectMiddleware:
+    """Simple middleware to redirect after Google OAuth based on stored language"""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+
+        # Check if this is a redirect to Tamil after login
+        if (response.status_code == 302 and
+            response.url == '/tamil/' and
+            request.user.is_authenticated):
+
+            # Check if we have a stored language preference
+            stored_language = request.session.get('selected_language')
+            if stored_language and stored_language != 'tamil':
+                language_redirects = {
+                    'english': '/english/',
+                    'hindi': '/hindi/'
+                }
+                redirect_url = language_redirects.get(stored_language)
+                if redirect_url:
+                    print(f"🔗 Middleware redirecting from Tamil to: {redirect_url}")
+                    # Clear the stored language to avoid future redirects
+                    del request.session['selected_language']
+                    return redirect(redirect_url)
+
+        return response
