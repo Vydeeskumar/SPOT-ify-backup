@@ -321,6 +321,19 @@
     justify-content: center;
 }
 
+/* INDIVIDUAL ARROW COLORS FOR EACH THEME */
+.theme-tamil .perfect-arrow {
+    color: #B026FF !important;
+}
+
+.theme-english .perfect-arrow {
+    color: #0096FF !important;
+}
+
+.theme-hindi .perfect-arrow {
+    color: #FF6B35 !important;
+}
+
 .perfect-arrow:hover {
     color: var(--neon-blue);
     background: rgba(0, 150, 255, 0.1);
@@ -689,6 +702,19 @@
     animation: lineGlow 2s infinite alternate;
 }
 
+/* INDIVIDUAL UNDERLINE COLORS FOR EACH THEME */
+.theme-tamil .neon-underline {
+    background: #B026FF !important;
+}
+
+.theme-english .neon-underline {
+    background: #0096FF !important;
+}
+
+.theme-hindi .neon-underline {
+    background: #FF6B35 !important;
+}
+
 /* Subtitle */
 .game-subtitle {
     color: var(--primary-color, var(--neon-blue)) !important;
@@ -700,6 +726,25 @@
     color: var(--primary-color, var(--neon-blue)) !important;
     border-right: 2px solid var(--primary-color, var(--neon-blue)) !important;
     animation: typing 3.5s steps(30, end), blink-caret .75s step-end infinite;
+}
+
+/* INDIVIDUAL SUBTITLE COLORS FOR EACH THEME */
+.theme-tamil .game-subtitle,
+.theme-tamil .typing-text {
+    color: #B026FF !important;
+    border-right-color: #B026FF !important;
+}
+
+.theme-english .game-subtitle,
+.theme-english .typing-text {
+    color: #0096FF !important;
+    border-right-color: #0096FF !important;
+}
+
+.theme-hindi .game-subtitle,
+.theme-hindi .typing-text {
+    color: #FF6B35 !important;
+    border-right-color: #FF6B35 !important;
 }
 
 .music-note {
