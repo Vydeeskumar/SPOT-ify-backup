@@ -1344,9 +1344,16 @@ function initializeButtons() {
     // Update Google login to redirect to selected language
     googleBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        const googleUrl = `{% provider_login_url 'google' %}?next=${languages[currentIndex].redirect}`;
+        const currentLang = languages[perfectCurrentIndex]; // Use perfectCurrentIndex
+        const googleUrl = `{% provider_login_url 'google' %}?next=${currentLang.redirect}`;
+
+        console.log(`🔗 Google login debug:`);
+        console.log(`   Current Index: ${perfectCurrentIndex}`);
+        console.log(`   Current Language: ${currentLang.code}`);
+        console.log(`   Redirect URL: ${currentLang.redirect}`);
+        console.log(`   Full Google URL: ${googleUrl}`);
+
         window.location.href = googleUrl;
-        console.log(`🔗 Google login for ${currentLanguage}`);
     });
 }
 
