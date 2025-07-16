@@ -21,13 +21,13 @@
                                     </button>
                                     <div class="perfect-scroller-window">
                                         <div class="perfect-scroller-track" id="perfectScrollerTrack">
-                                            <div class="perfect-item active" data-index="0" data-lang="tamil" data-redirect="/tamil/">
+                                            <div class="perfect-item perfect-tamil active" data-index="0" data-lang="tamil" data-redirect="/tamil/">
                                                 Paatu
                                             </div>
-                                            <div class="perfect-item" data-index="1" data-lang="english" data-redirect="/english/">
+                                            <div class="perfect-item perfect-english" data-index="1" data-lang="english" data-redirect="/english/">
                                                 Song
                                             </div>
-                                            <div class="perfect-item" data-index="2" data-lang="hindi" data-redirect="/hindi/">
+                                            <div class="perfect-item perfect-hindi" data-index="2" data-lang="hindi" data-redirect="/hindi/">
                                                 Gaana
                                             </div>
                                         </div>
@@ -409,6 +409,51 @@
         opacity: 0.4;
         transform: translate(-50%, -50%) scale(1.1);
     }
+}
+
+/* INDIVIDUAL LANGUAGE COLORS FOR SCROLLER ITEMS */
+.perfect-tamil.active {
+    color: #B026FF !important;
+    text-shadow: 0 0 15px #B026FF !important;
+}
+
+.perfect-english.active {
+    color: #0096FF !important;
+    text-shadow: 0 0 15px #0096FF !important;
+}
+
+.perfect-hindi.active {
+    color: #FF6B35 !important;
+    text-shadow: 0 0 15px #FF6B35 !important;
+}
+
+/* INDIVIDUAL BORDER COLORS FOR SCROLLER WINDOW */
+.theme-tamil .perfect-scroller-window {
+    border-color: #B026FF !important;
+    box-shadow: 0 0 15px #B026FF40 !important;
+}
+
+.theme-english .perfect-scroller-window {
+    border-color: #0096FF !important;
+    box-shadow: 0 0 15px #0096FF40 !important;
+}
+
+.theme-hindi .perfect-scroller-window {
+    border-color: #FF6B35 !important;
+    box-shadow: 0 0 15px #FF6B3540 !important;
+}
+
+/* INDIVIDUAL GLOW EFFECTS */
+.perfect-tamil.active::before {
+    background: radial-gradient(circle, #B026FF20, transparent 70%) !important;
+}
+
+.perfect-english.active::before {
+    background: radial-gradient(circle, #0096FF20, transparent 70%) !important;
+}
+
+.perfect-hindi.active::before {
+    background: radial-gradient(circle, #FF6B3520, transparent 70%) !important;
 }
 </style>
 
