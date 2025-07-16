@@ -670,9 +670,15 @@ def guest_login(request, language='tamil'):
         if authenticated_user:
             login(request, authenticated_user, backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, f'Welcome, {username}! You are playing as a guest.')
+            # Debug logging
+            print(f"🎯 Guest login successful for {username}, redirecting to /{language}/")
+            print(f"🔐 User authenticated: {authenticated_user.is_authenticated}")
             # Redirect to the correct language home page
             return redirect(f'/{language}/')
+        else:
+            print(f"❌ Authentication failed for guest user {username}")
 
+    print(f"❌ Guest login failed, redirecting to account_login")
     return redirect('account_login')
 
 @login_required
