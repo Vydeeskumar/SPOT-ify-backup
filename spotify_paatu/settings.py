@@ -158,6 +158,8 @@ LOGIN_REDIRECT_URL = '/login-redirect/'  # Use our custom redirect
 LOGOUT_REDIRECT_URL = '/tamil/'
 
 # Allauth settings
+ACCOUNT_ADAPTER = 'game.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'game.adapters.CustomSocialAccountAdapter'
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_LOGOUT_ON_GET = True

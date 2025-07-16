@@ -41,6 +41,8 @@ def custom_login_redirect(request):
     """Custom login redirect that respects the ?next= parameter for language selection"""
     next_url = request.GET.get('next', '/tamil/')
     print(f"🔗 Custom login redirect: next={next_url}")
+    print(f"🔗 Full request URL: {request.get_full_path()}")
+    print(f"🔗 User authenticated: {request.user.is_authenticated}")
 
     # Validate that the next URL is one of our supported languages
     valid_redirects = ['/tamil/', '/english/', '/hindi/']
@@ -50,6 +52,21 @@ def custom_login_redirect(request):
     else:
         print(f"❌ Invalid redirect, defaulting to Tamil: {next_url}")
         return redirect('/tamil/')
+
+@csrf_exempt
+def store_language(request):
+    """Store selected language in session for Google OAuth redirect"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            language = data.get('language', 'tamil')
+            request.session['selected_language'] = language
+            print(f"🔗 Stored language in session: {language}")
+            return JsonResponse({'success': True})
+        except Exception as e:
+            print(f"❌ Error storing language: {e}")
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Invalid method'}, status=405)
 
 def get_language_from_request(request):
     """Extract language from URL path"""

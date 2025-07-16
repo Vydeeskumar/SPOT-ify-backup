@@ -1345,15 +1345,33 @@ function initializeButtons() {
     googleBtn.addEventListener('click', function(e) {
         e.preventDefault();
         const currentLang = languages[perfectCurrentIndex]; // Use perfectCurrentIndex
-        const googleUrl = `{% provider_login_url 'google' %}?next=${currentLang.redirect}`;
 
-        console.log(`🔗 Google login debug:`);
-        console.log(`   Current Index: ${perfectCurrentIndex}`);
-        console.log(`   Current Language: ${currentLang.code}`);
-        console.log(`   Redirect URL: ${currentLang.redirect}`);
-        console.log(`   Full Google URL: ${googleUrl}`);
+        // Store selected language in session via AJAX
+        fetch('/store-language/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                'language': currentLang.code
+            })
+        }).then(() => {
+            // After storing language, proceed with Google login
+            const googleUrl = `{% provider_login_url 'google' %}?next=${currentLang.redirect}`;
 
-        window.location.href = googleUrl;
+            console.log(`🔗 Google login debug:`);
+            console.log(`   Current Index: ${perfectCurrentIndex}`);
+            console.log(`   Current Language: ${currentLang.code}`);
+            console.log(`   Redirect URL: ${currentLang.redirect}`);
+            console.log(`   Full Google URL: ${googleUrl}`);
+
+            window.location.href = googleUrl;
+        }).catch(() => {
+            // If storing fails, still proceed with Google login
+            const googleUrl = `{% provider_login_url 'google' %}?next=${currentLang.redirect}`;
+            window.location.href = googleUrl;
+        });
     });
 }
 
