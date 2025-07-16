@@ -638,7 +638,7 @@
 .neon-underline {
     width: 50%;
     height: 2px;
-    background: var(--neon-purple);
+    background: var(--primary-color, var(--neon-purple)) !important;
     margin: 10px auto;
     position: relative;
     animation: lineGlow 2s infinite alternate;
@@ -646,13 +646,14 @@
 
 /* Subtitle */
 .game-subtitle {
-    color: var(--neon-blue);
+    color: var(--primary-color, var(--neon-blue)) !important;
     font-size: 1.2rem;
     opacity: 0.9;
 }
 
 .typing-text {
-    border-right: 2px solid var(--neon-blue);
+    color: var(--primary-color, var(--neon-blue)) !important;
+    border-right: 2px solid var(--primary-color, var(--neon-blue)) !important;
     animation: typing 3.5s steps(30, end), blink-caret .75s step-end infinite;
 }
 
