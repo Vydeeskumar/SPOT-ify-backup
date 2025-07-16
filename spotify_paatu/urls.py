@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from game.views import google_site_verification, sitemap_view, robots_txt, language_redirect
+from game.views import google_site_verification, sitemap_view, robots_txt, language_redirect, custom_login_redirect
 
 
 urlpatterns = [
@@ -15,6 +15,9 @@ urlpatterns = [
 
     # Default redirect to Tamil (backward compatibility)
     path('', language_redirect, name='language_redirect'),
+
+    # Custom login redirect for language selection
+    path('login-redirect/', custom_login_redirect, name='custom_login_redirect'),
 
     # Other URLs
     path('accounts/', include('allauth.urls')),

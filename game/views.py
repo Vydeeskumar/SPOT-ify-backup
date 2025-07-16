@@ -37,6 +37,20 @@ def language_redirect(request):
     """Redirect root URL to Tamil version for backward compatibility"""
     return redirect('/tamil/')
 
+def custom_login_redirect(request):
+    """Custom login redirect that respects the ?next= parameter for language selection"""
+    next_url = request.GET.get('next', '/tamil/')
+    print(f"🔗 Custom login redirect: next={next_url}")
+
+    # Validate that the next URL is one of our supported languages
+    valid_redirects = ['/tamil/', '/english/', '/hindi/']
+    if next_url in valid_redirects:
+        print(f"✅ Valid redirect to: {next_url}")
+        return redirect(next_url)
+    else:
+        print(f"❌ Invalid redirect, defaulting to Tamil: {next_url}")
+        return redirect('/tamil/')
+
 def get_language_from_request(request):
     """Extract language from URL path"""
     # Get language from URL resolver kwargs
