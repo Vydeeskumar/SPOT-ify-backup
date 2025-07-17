@@ -155,7 +155,7 @@ SITE_ID = 1
 
 # Auth settings
 LOGIN_URL = 'account_login'
-LOGIN_REDIRECT_URL = '/google-redirect/'  # Use our safe redirect view
+LOGIN_REDIRECT_URL = '/tamil/'  # Back to Tamil - don't break guest login!
 LOGOUT_REDIRECT_URL = '/tamil/'
 
 # Allauth settings
