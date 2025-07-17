@@ -71,22 +71,18 @@ def store_language(request):
     return JsonResponse({'error': 'Invalid method'}, status=405)
 
 def google_login_redirect(request):
-    """Handle redirect after Google login based on stored language"""
+    """Handle redirect after Google login - EXACT same approach as guest login"""
     stored_language = request.session.get('selected_language', 'tamil')
     print(f"🔗 Google login redirect: stored_language={stored_language}")
+    print(f"🔐 User authenticated: {request.user.is_authenticated}")
 
     # Clear the stored language
     if 'selected_language' in request.session:
         del request.session['selected_language']
 
-    # Redirect to the correct language
-    language_redirects = {
-        'tamil': '/tamil/',
-        'english': '/english/',
-        'hindi': '/hindi/'
-    }
-    redirect_url = language_redirects.get(stored_language, '/tamil/')
-    print(f"✅ Redirecting to: {redirect_url}")
+    # EXACT same redirect logic as guest login
+    redirect_url = f'/{stored_language}/'
+    print(f"🎯 Google login successful, redirecting to {redirect_url}")
     return redirect(redirect_url)
 
 def get_language_from_request(request):
