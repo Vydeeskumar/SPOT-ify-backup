@@ -645,14 +645,19 @@
             border-radius: 10px !important;
             padding: 8px 0 !important;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
-            z-index: 9999 !important;
+            z-index: 10000 !important;
             position: absolute !important;
             right: 0 !important;
             left: auto !important;
-            top: 100% !important;
+            top: calc(100% + 5px) !important;
             transform: none !important;
             min-width: 200px !important;
-            margin-top: 5px !important;
+            margin-top: 0 !important;
+            display: none !important;
+        }
+
+        .language-dropdown.show {
+            display: block !important;
         }
 
         .language-dropdown .dropdown-item {
@@ -690,6 +695,15 @@
             position: relative !important;
         }
 
+        /* Ensure navbar doesn't clip dropdown */
+        .navbar {
+            overflow: visible !important;
+        }
+
+        .navbar-collapse {
+            overflow: visible !important;
+        }
+
         /* Ensure dropdown parent has relative positioning */
         .nav-item.dropdown {
             position: relative !important;
@@ -698,7 +712,8 @@
         /* Mobile responsive adjustments */
         @media (max-width: 768px) {
             .language-dropdown {
-                left: -50px !important;
+                right: 0 !important;
+                left: auto !important;
                 min-width: 180px !important;
             }
         }
