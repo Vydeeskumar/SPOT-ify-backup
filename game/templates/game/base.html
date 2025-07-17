@@ -664,9 +664,9 @@
         }
 
         .language-menu {
-            position: fixed;
-            top: 80px;
-            left: 20px;
+            position: absolute;
+            top: calc(100% + 5px);
+            right: 0;
             background: var(--darker-bg);
             border: 2px solid var(--primary-color);
             border-radius: 10px;
@@ -694,6 +694,10 @@
             text-decoration: none;
             transition: all 0.3s ease;
             cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
         }
 
         .language-option:hover {
@@ -1393,6 +1397,52 @@
     <!-- Language variable for JavaScript -->
     <script>
         window.currentLanguage = '{{ current_language|default:"tamil" }}';
+    </script>
+
+    <!-- Language dropdown functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const languageToggle = document.querySelector('.language-toggle');
+            const languageMenu = document.querySelector('.language-menu');
+
+            if (languageToggle && languageMenu) {
+                languageToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    languageMenu.classList.toggle('show');
+                });
+
+                // Handle language option clicks
+                const languageOptions = document.querySelectorAll('.language-option');
+                languageOptions.forEach(option => {
+                    option.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const language = this.dataset.language;
+                        if (language) {
+                            // Redirect to the appropriate language page
+                            if (language === 'tamil') {
+                                window.location.href = '/game/tamil/';
+                            } else if (language === 'english') {
+                                window.location.href = '/game/english/';
+                            } else if (language === 'hindi') {
+                                window.location.href = '/game/hindi/';
+                            }
+                        }
+
+                        languageMenu.classList.remove('show');
+                    });
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!languageToggle.contains(e.target) && !languageMenu.contains(e.target)) {
+                        languageMenu.classList.remove('show');
+                    }
+                });
+            }
+        });
     </script>
 
     <!-- Game logic script -->
