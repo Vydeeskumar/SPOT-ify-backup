@@ -125,7 +125,7 @@
                 <button class="custom-close-btn" onclick="closeCustomModal()">&times;</button>
             </div>
             <div class="custom-modal-body">
-                <form id="customGuestForm" method="post">
+                <form id="customGuestForm" method="post" onsubmit="return false;">
                     {% csrf_token %}
                     <div class="custom-input-group">
                         <input type="text"
@@ -135,7 +135,8 @@
                                autocomplete="username"
                                required
                                minlength="3"
-                               maxlength="15">
+                               maxlength="15"
+                               onkeypress="handleEnterKey(event)">
                     </div>
                     <button type="button" class="custom-submit-btn" onclick="submitCustomForm()">
                         <i class="fas fa-play"></i> Start Playing
@@ -1412,6 +1413,15 @@ function closeCustomModal() {
         }
 
         console.log('✅ Custom modal closed');
+    }
+}
+
+// Handle ENTER key press in username input
+function handleEnterKey(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent default form submission
+        submitCustomForm(); // Call our custom submit function
+        console.log('🎮 ENTER key pressed, submitting form...');
     }
 }
 
