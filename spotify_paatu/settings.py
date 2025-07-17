@@ -71,7 +71,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'allauth.account.middleware.AccountMiddleware',
     'game.middleware.WWWRedirectMiddleware',
-    # 'game.middleware.LanguageRedirectMiddleware',  # DISABLED - might be causing spinning
+    'game.middleware.LanguageRedirectMiddleware',  # Re-enabled with signal-based approach
 ]
 
 ROOT_URLCONF = "spotify_paatu.urls"
@@ -155,7 +155,7 @@ SITE_ID = 1
 
 # Auth settings
 LOGIN_URL = 'account_login'
-LOGIN_REDIRECT_URL = '/tamil/'  # Back to Tamil - don't break guest login!
+LOGIN_REDIRECT_URL = '/tamil/'  # Keep Tamil to not break guest login
 LOGOUT_REDIRECT_URL = '/tamil/'
 
 # Allauth settings

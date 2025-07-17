@@ -29,11 +29,34 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from allauth.socialaccount.signals import pre_social_login
 from django.dispatch import receiver
+from django.contrib.auth.signals import user_logged_in
 
 
 
 
 LAUNCH_DATE = date(2025, 6, 24)
+
+# Signal handler to intercept Google logins
+@receiver(user_logged_in)
+def handle_user_login(sender, request, user, **kwargs):
+    """Intercept all user logins and redirect Google logins to correct language"""
+    print(f"🔥 USER LOGIN SIGNAL TRIGGERED!")
+    print(f"🔥 User: {user.username}")
+    print(f"🔥 Request path: {request.path}")
+    print(f"🔥 Request GET: {request.GET}")
+    print(f"🔥 Session keys: {list(request.session.keys())}")
+
+    # Check if this is a Google login (social account login)
+    if '/accounts/google/login/callback/' in request.path or 'google' in str(request.path):
+        stored_language = request.session.get('selected_language', 'tamil')
+        print(f"🔥 GOOGLE LOGIN DETECTED! Stored language: {stored_language}")
+
+        if stored_language and stored_language != 'tamil':
+            # Store a flag to redirect after login
+            request.session['redirect_after_login'] = f'/{stored_language}/'
+            print(f"🔥 Set redirect flag: /{stored_language}/")
+
+    print(f"🔥 Signal handler complete")
 
 def language_redirect(request):
     """Redirect root URL to Tamil version for backward compatibility"""
@@ -75,6 +98,9 @@ def google_login_redirect(request):
     stored_language = request.session.get('selected_language', 'tamil')
     print(f"🔗 Google login redirect: stored_language={stored_language}")
     print(f"🔐 User authenticated: {request.user.is_authenticated}")
+    print(f"🔗 Request path: {request.path}")
+    print(f"🔗 Request GET params: {request.GET}")
+    print(f"🔗 Request META: {request.META.get('HTTP_REFERER', 'No referer')}")
 
     # Clear the stored language
     if 'selected_language' in request.session:
@@ -84,6 +110,32 @@ def google_login_redirect(request):
     redirect_url = f'/{stored_language}/'
     print(f"🎯 Google login successful, redirecting to {redirect_url}")
     return redirect(redirect_url)
+
+# Direct Google callback interceptor
+def google_callback_interceptor(request):
+    """Intercept Google OAuth callback and redirect to correct language"""
+    print(f"🔍 GOOGLE CALLBACK INTERCEPTED!")
+    print(f"🔍 Request path: {request.path}")
+    print(f"🔍 Request GET params: {request.GET}")
+    print(f"🔍 Request META: {request.META.get('HTTP_REFERER', 'No referer')}")
+
+    # Get stored language from session
+    stored_language = request.session.get('selected_language', 'tamil')
+    print(f"🔍 Stored language: {stored_language}")
+
+    # Clear the stored language
+    if 'selected_language' in request.session:
+        del request.session['selected_language']
+
+    # Redirect to the correct language
+    redirect_url = f'/{stored_language}/'
+    print(f"🔍 Redirecting to: {redirect_url}")
+
+    # Continue with original flow by redirecting to allauth callback
+    # with a special parameter that our adapter will recognize
+    callback_url = f"{request.path}?{request.GET.urlencode()}&language_override={stored_language}"
+    print(f"🔍 Continuing to: {callback_url}")
+    return redirect(callback_url)
 
 def get_language_from_request(request):
     """Extract language from URL path"""

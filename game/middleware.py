@@ -24,7 +24,7 @@ class WWWRedirectMiddleware:
 
 
 class LanguageRedirectMiddleware:
-    """Simple middleware to redirect after Google OAuth based on stored language"""
+    """Simple middleware to redirect after Google OAuth based on redirect flag"""
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -32,23 +32,16 @@ class LanguageRedirectMiddleware:
     def __call__(self, request):
         response = self.get_response(request)
 
-        # Check if this is a redirect to Tamil after login
-        if (response.status_code == 302 and
-            response.url == '/tamil/' and
-            request.user.is_authenticated):
+        # Check if we have a redirect flag set by the signal
+        redirect_url = request.session.get('redirect_after_login')
+        if redirect_url and request.user.is_authenticated:
+            print(f"🔥 MIDDLEWARE: Found redirect flag: {redirect_url}")
 
-            # Check if we have a stored language preference
-            stored_language = request.session.get('selected_language')
-            if stored_language and stored_language != 'tamil':
-                language_redirects = {
-                    'english': '/english/',
-                    'hindi': '/hindi/'
-                }
-                redirect_url = language_redirects.get(stored_language)
-                if redirect_url:
-                    print(f"🔗 Middleware redirecting from Tamil to: {redirect_url}")
-                    # Clear the stored language to avoid future redirects
-                    del request.session['selected_language']
-                    return redirect(redirect_url)
+            # Check if this is a redirect to Tamil after login
+            if response.status_code == 302 and response.url == '/tamil/':
+                print(f"🔥 MIDDLEWARE: Intercepting Tamil redirect, redirecting to: {redirect_url}")
+                # Clear the redirect flag
+                del request.session['redirect_after_login']
+                return redirect(redirect_url)
 
         return response
