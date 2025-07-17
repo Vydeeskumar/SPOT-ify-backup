@@ -640,18 +640,23 @@
         }
 
         .language-dropdown {
-            background: var(--darker-bg);
-            border: 2px solid var(--primary-color);
-            border-radius: 10px;
-            padding: 8px 0;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            background: var(--darker-bg) !important;
+            border: 2px solid var(--primary-color) !important;
+            border-radius: 10px !important;
+            padding: 8px 0 !important;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+            z-index: 9999 !important;
+            position: absolute !important;
         }
 
         .language-dropdown .dropdown-item {
-            color: white;
-            padding: 12px 20px;
-            transition: all 0.3s ease;
-            border-radius: 0;
+            color: white !important;
+            padding: 12px 20px !important;
+            transition: all 0.3s ease !important;
+            border-radius: 0 !important;
+            pointer-events: auto !important;
+            cursor: pointer !important;
+            text-decoration: none !important;
         }
 
         .language-dropdown .dropdown-item:hover {
@@ -1516,6 +1521,23 @@
         if (currentLang) {
             updateThemeColors(currentLang[1]);
         }
+
+        // Fix language dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🌐 Initializing language dropdown...');
+
+            const dropdownItems = document.querySelectorAll('.language-dropdown .dropdown-item');
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    console.log('🌐 Language dropdown item clicked:', this.href);
+                    // Ensure the click goes through
+                    e.stopPropagation();
+                    window.location.href = this.href;
+                });
+            });
+
+            console.log('✅ Language dropdown initialized with', dropdownItems.length, 'items');
+        });
     </script>
 
 </body>
