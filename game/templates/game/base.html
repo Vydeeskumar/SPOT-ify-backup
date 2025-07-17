@@ -664,15 +664,15 @@
         }
 
         .language-menu {
-            position: absolute;
-            top: calc(100% + 5px);
-            left: 0;
+            position: fixed;
+            top: 80px;
+            left: 20px;
             background: var(--darker-bg);
             border: 2px solid var(--primary-color);
             border-radius: 10px;
             padding: 8px 0;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-            z-index: 10000;
+            z-index: 99999;
             min-width: 220px;
             opacity: 0;
             visibility: hidden;
