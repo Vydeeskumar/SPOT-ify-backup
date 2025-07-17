@@ -27,6 +27,8 @@ import requests
 import re
 from django.contrib import messages
 from django.shortcuts import redirect
+from allauth.socialaccount.signals import pre_social_login
+from django.dispatch import receiver
 
 
 
@@ -67,6 +69,25 @@ def store_language(request):
             print(f"❌ Error storing language: {e}")
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Invalid method'}, status=405)
+
+def google_login_redirect(request):
+    """Handle redirect after Google login based on stored language"""
+    stored_language = request.session.get('selected_language', 'tamil')
+    print(f"🔗 Google login redirect: stored_language={stored_language}")
+
+    # Clear the stored language
+    if 'selected_language' in request.session:
+        del request.session['selected_language']
+
+    # Redirect to the correct language
+    language_redirects = {
+        'tamil': '/tamil/',
+        'english': '/english/',
+        'hindi': '/hindi/'
+    }
+    redirect_url = language_redirects.get(stored_language, '/tamil/')
+    print(f"✅ Redirecting to: {redirect_url}")
+    return redirect(redirect_url)
 
 def get_language_from_request(request):
     """Extract language from URL path"""
