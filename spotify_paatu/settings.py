@@ -159,6 +159,9 @@ LOGIN_REDIRECT_URL = '/tamil/'  # Back to Tamil - don't break guest login!
 LOGOUT_REDIRECT_URL = '/tamil/'
 
 # Allauth settings
+ACCOUNT_ADAPTER = 'game.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'game.adapters.CustomSocialAccountAdapter'
+
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
