@@ -30,18 +30,28 @@ class LanguageRedirectMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        response = self.get_response(request)
-
-        # Check if we have a redirect flag set by the signal
+        # Check BEFORE processing the response
         redirect_url = request.session.get('redirect_after_login')
         if redirect_url and request.user.is_authenticated:
             print(f"🔥 MIDDLEWARE: Found redirect flag: {redirect_url}")
+            print(f"🔥 MIDDLEWARE: Current path: {request.path}")
 
-            # Check if this is a redirect to Tamil after login
-            if response.status_code == 302 and response.url == '/tamil/':
-                print(f"🔥 MIDDLEWARE: Intercepting Tamil redirect, redirecting to: {redirect_url}")
+            # If we're on the Tamil page and have a redirect flag, redirect immediately
+            if request.path == '/tamil/' or request.path == '/tamil':
+                print(f"🔥 MIDDLEWARE: On Tamil page, redirecting to: {redirect_url}")
                 # Clear the redirect flag
                 del request.session['redirect_after_login']
+                return redirect(redirect_url)
+
+        response = self.get_response(request)
+
+        # Also check after response for redirect responses
+        if redirect_url and request.user.is_authenticated:
+            if response.status_code == 302 and '/tamil/' in str(response.url):
+                print(f"🔥 MIDDLEWARE: Intercepting Tamil redirect response, redirecting to: {redirect_url}")
+                # Clear the redirect flag
+                if 'redirect_after_login' in request.session:
+                    del request.session['redirect_after_login']
                 return redirect(redirect_url)
 
         return response
