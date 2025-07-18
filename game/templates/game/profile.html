@@ -434,8 +434,7 @@ toast.style.cssText = `
     font-size: 0.95rem;
     min-width: 140px;
     box-shadow:
-        0 4px 15px rgba(0, 212, 255, 0.4),
-        inset 0 0 0 2px rgba(0, 212, 255, 0.6);
+        0 4px 15px rgba(0, 212, 255, 0.4);
     outline: none !important;
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
@@ -532,6 +531,27 @@ button.btn-add-friend {
     background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 150, 255, 0.25)) !important;
     border: none !important;
     color: #00d4ff !important;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4) !important;
+}
+
+/* Remove all possible outlines and borders */
+.btn-add-friend,
+.btn-add-friend:focus,
+.btn-add-friend:active,
+.btn-add-friend:hover {
+    border: none !important;
+    outline: none !important;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4) !important;
+}
+
+.btn-add-friend:focus {
+    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.6) !important;
+}
+
+.btn-add-friend:hover {
+    box-shadow:
+        0 8px 25px rgba(0, 212, 255, 0.4),
+        0 0 30px rgba(0, 212, 255, 0.3) !important;
 }
 
 /* 🎯 Friend Status Badge */
