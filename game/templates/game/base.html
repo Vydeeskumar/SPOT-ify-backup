@@ -1239,7 +1239,7 @@
     {% load socialaccount %}
     <nav class="navbar navbar-expand-lg navbar-dark custom-navbar glass-nav px-3">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'home' %}">
+            <a class="navbar-brand" href="{% url 'home' language=current_language|default:'tamil' %}">
                 {% if current_language == 'tamil' %}
                     <i class="fas fa-music"></i> SPOT-ify the Paatu
                 {% elif current_language == 'english' %}
