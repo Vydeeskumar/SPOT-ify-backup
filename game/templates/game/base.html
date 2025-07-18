@@ -1286,12 +1286,8 @@
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'profile' language=current_language|default:'tamil' %}">
                                 <i class="fas fa-user"></i> Profile
-                                {% if current_language == 'tamil' and user.userprofile.tamil_current_streak > 0 %}
-                                    <span class="streak-badge ms-1">🔥 {{ user.userprofile.tamil_current_streak }}</span>
-                                {% elif current_language == 'english' and user.userprofile.english_current_streak > 0 %}
-                                    <span class="streak-badge ms-1">🔥 {{ user.userprofile.english_current_streak }}</span>
-                                {% elif current_language == 'hindi' and user.userprofile.hindi_current_streak > 0 %}
-                                    <span class="streak-badge ms-1">🔥 {{ user.userprofile.hindi_current_streak }}</span>
+                                {% if current_streak and current_streak > 0 %}
+                                    <span class="streak-badge ms-1">🔥 {{ current_streak }}</span>
                                 {% endif %}
                             </a>
                         </li>

@@ -306,6 +306,9 @@ def home(request, language='tamil'):
     # Get language-specific stats
     language_stats = profile.get_stats_for_language(current_language)
 
+    # Calculate accurate streaks from database
+    current_streak, longest_streak = calculate_streaks_from_db(request.user, current_language)
+
     # Initialize context with basic data
     context = {
         'today_song': today_song,
@@ -317,8 +320,8 @@ def home(request, language='tamil'):
             language=current_language
         ).first() if user_already_played else None,
         'give_up': False,
-        'current_streak': language_stats['current_streak'],
-        'longest_streak': language_stats['longest_streak'],
+        'current_streak': current_streak,
+        'longest_streak': longest_streak,
         'current_language': current_language,
         'language_display': dict(LANGUAGE_CHOICES)[current_language],
     }
@@ -457,6 +460,7 @@ def profile(request, language='tamil'):
         'current_language': current_language,
         'language_display': dict(LANGUAGE_CHOICES)[current_language],
         'language_stats': language_stats,
+        'current_streak': current_streak,
     }
     return render(request, 'game/profile.html', context)
 
@@ -685,6 +689,11 @@ def leaderboard(request, language='tamil'):
         'alltime': alltime_all.count()
     }
 
+    # Get current streak for navbar display
+    current_streak = 0
+    if request.user.is_authenticated:
+        current_streak, _ = calculate_streaks_from_db(request.user, current_language)
+
     context = {
         'weekly_scores': weekly_scores,
         'monthly_scores': monthly_scores,
@@ -698,6 +707,7 @@ def leaderboard(request, language='tamil'):
         'month_start': month_start,
         'current_language': current_language,
         'language_display': dict(LANGUAGE_CHOICES)[current_language],
+        'current_streak': current_streak,
     }
 
     return render(request, 'game/leaderboard.html', context)
@@ -1073,6 +1083,11 @@ def archive(request, language='tamil'):
             print("Archive guess error:", str(e))
             user_guess_result = {'error': str(e)}
 
+    # Get current streak for navbar display
+    current_streak = 0
+    if request.user.is_authenticated:
+        current_streak, _ = calculate_streaks_from_db(request.user, current_language)
+
     context = {
         'selected_date': selected_date,
         'selected_song': selected_song,
@@ -1082,6 +1097,7 @@ def archive(request, language='tamil'):
         'date_error': date_error,  # Pass to template
         'current_language': current_language,
         'language_display': dict(LANGUAGE_CHOICES)[current_language],
+        'current_streak': current_streak,
     }
     return render(request, 'game/archive.html', context)
 
@@ -1325,6 +1341,7 @@ def public_profile(request, username, language='tamil'):
         'current_language': current_language,
         'language_display': dict(LANGUAGE_CHOICES)[current_language],
         'language_stats': language_stats,
+        'current_streak': current_streak,
     })
 
 @login_required
