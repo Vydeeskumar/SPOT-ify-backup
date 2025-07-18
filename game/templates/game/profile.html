@@ -11,12 +11,19 @@
                     <h5 class="mb-0">{{ user.username }}'s Profile</h5>
                     {% if public and profile_user != request.user %}
                         {% if is_friend %}
-                            <p style="margin-top: 10px; color: var(--neon-green); font-weight: bold;">✅ You are already friends</p>
+                            <div class="friend-status-badge">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Friends</span>
+                            </div>
                         {% else %}
-                            <form action="{% url 'send_friend_request' username=profile_user.username language=current_language|default:'tamil' %}" method="post" style="margin-top: 10px;">
+                            <form action="{% url 'send_friend_request' username=profile_user.username language=current_language|default:'tamil' %}" method="post" style="margin-top: 15px;">
                                 {% csrf_token %}
-                                <button type="submit" class="btn-share-add">
-                                    <i class="fas fa-user-plus"></i> Add Friend
+                                <button type="submit" class="btn-add-friend">
+                                    <div class="btn-content">
+                                        <i class="fas fa-user-plus"></i>
+                                        <span>Add Friend</span>
+                                    </div>
+                                    <div class="btn-glow"></div>
                                 </button>
                             </form>
 
@@ -412,47 +419,124 @@ toast.style.cssText = `
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 `;
 
-.btn-share-add {
-    background: rgba(0, 255, 140, 0.1);
-    border: 2px solid var(--neon-green);
-    color: var(--neon-green);
-    padding: 10px 20px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    font-weight: bold;
-    justify-content: center;
-}
-
-.btn-share-add:hover {
-    background: var(--neon-green);
+/* 🎮 Modern Add Friend Button */
+.btn-add-friend {
+    position: relative;
+    background: linear-gradient(135deg, rgba(176, 38, 255, 0.1), rgba(0, 150, 255, 0.1));
+    border: 2px solid transparent;
+    background-clip: padding-box;
     color: white;
-    box-shadow: 0 0 15px rgba(0, 255, 140, 0.4);
-    transform: scale(1.05);
+    padding: 0;
+    border-radius: 15px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 600;
+    font-size: 0.95rem;
+    min-width: 140px;
+    box-shadow:
+        0 4px 15px rgba(176, 38, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-.btn-share-add {
-    background: rgba(0, 255, 140, 0.1);
-    border: 2px solid var(--neon-green);
-    color: var(--neon-green);
-    padding: 10px 20px;
-    border-radius: 10px;
+.btn-add-friend::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--primary-color), var(--neon-blue));
+    border-radius: 13px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.btn-content {
+    position: relative;
+    z-index: 2;
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-weight: bold;
     justify-content: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 13px;
+    backdrop-filter: blur(10px);
     transition: all 0.3s ease;
-    box-shadow: 0 0 10px rgba(0, 255, 140, 0.4);
 }
 
-.btn-share-add:hover {
-    background: var(--neon-green);
-    color: black;
-    box-shadow: 0 0 15px rgba(0, 255, 140, 0.6);
-    transform: scale(1.05);
+.btn-content i {
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+.btn-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(176, 38, 255, 0.4), transparent);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.4s ease;
+    z-index: 1;
+}
+
+.btn-add-friend:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow:
+        0 8px 25px rgba(176, 38, 255, 0.4),
+        0 0 30px rgba(176, 38, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-add-friend:hover::before {
+    opacity: 1;
+}
+
+.btn-add-friend:hover .btn-content {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.btn-add-friend:hover .btn-content i {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.btn-add-friend:hover .btn-glow {
+    width: 100px;
+    height: 100px;
+}
+
+.btn-add-friend:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* 🎯 Friend Status Badge */
+.friend-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(0, 255, 140, 0.15), rgba(0, 200, 100, 0.15));
+    border: 2px solid var(--neon-green);
+    color: var(--neon-green);
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: 15px;
+    box-shadow:
+        0 4px 15px rgba(0, 255, 140, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.friend-status-badge i {
+    font-size: 1.1rem;
+    filter: drop-shadow(0 0 5px rgba(0, 255, 140, 0.5));
 }
 
 
