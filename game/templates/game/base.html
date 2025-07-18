@@ -959,8 +959,139 @@
             box-shadow: 0 0 10px rgba(255, 0, 228, 0.1);
         }
 
+        /* 🌍 Floating Language Orb Styles */
+        .floating-language-orb {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--neon-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 9999;
+            box-shadow:
+                0 4px 20px rgba(176, 38, 255, 0.4),
+                0 0 40px rgba(176, 38, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: orbFloat 3s ease-in-out infinite;
+        }
+
+        .floating-language-orb:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow:
+                0 8px 30px rgba(176, 38, 255, 0.6),
+                0 0 60px rgba(176, 38, 255, 0.4);
+        }
+
+        .orb-content {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .orb-icon {
+            font-size: 1.2rem;
+            color: white;
+            position: absolute;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .orb-text {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .floating-language-orb:hover .orb-icon {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .floating-language-orb:hover .orb-text {
+            transform: scale(1.2);
+        }
+
+        .orb-tooltip {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .floating-language-orb:hover .orb-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        @keyframes orbFloat {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-10px) rotate(180deg);
+            }
+        }
+
+        /* Language-specific orb colors */
+        .floating-language-orb.tamil {
+            background: linear-gradient(135deg, #8B45FF, #FF6B9D);
+            box-shadow:
+                0 4px 20px rgba(139, 69, 255, 0.4),
+                0 0 40px rgba(139, 69, 255, 0.2);
+        }
+
+        .floating-language-orb.english {
+            background: linear-gradient(135deg, #0096FF, #00D4FF);
+            box-shadow:
+                0 4px 20px rgba(0, 150, 255, 0.4),
+                0 0 40px rgba(0, 150, 255, 0.2);
+        }
+
+        .floating-language-orb.hindi {
+            background: linear-gradient(135deg, #FF8C00, #FFB347);
+            box-shadow:
+                0 4px 20px rgba(255, 140, 0, 0.4),
+                0 0 40px rgba(255, 140, 0, 0.2);
+        }
+
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
+            .floating-language-orb {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+            }
+
+            .orb-text {
+                font-size: 1.2rem;
+            }
+
+            .orb-icon {
+                font-size: 1rem;
+            }
+
             .navbar {
                 padding: 10px 0;
             }
@@ -1124,47 +1255,7 @@
            
 
             <div class="collapse navbar-collapse mt-2 mt-lg-0" id="navbarNavDropdown">
-                <!-- Language Switcher -->
-                <div class="navbar-nav me-auto">
-                    <div class="custom-language-switcher">
-                        <div class="current-language" onclick="toggleLanguageMenu()">
-                            <i class="fas fa-globe"></i>
-                            {% if current_language == 'tamil' %}
-                                <span class="language-text">Paatu</span>
-                            {% elif current_language == 'english' %}
-                                <span class="language-text">Song</span>
-                            {% elif current_language == 'hindi' %}
-                                <span class="language-text">Gaana</span>
-                            {% else %}
-                                <span class="language-text">Paatu</span>
-                            {% endif %}
-                            <i class="fas fa-chevron-down arrow-icon"></i>
-                        </div>
-                        <div class="language-menu" id="languageMenu">
-                            <a href="/tamil/" class="language-option {% if current_language == 'tamil' %}active{% endif %}">
-                                <i class="fas fa-music"></i>
-                                <div class="option-content">
-                                    <span class="option-title">SPOT-ify the Paatu</span>
-                                    <small class="option-subtitle">Tamil Songs</small>
-                                </div>
-                            </a>
-                            <a href="/english/" class="language-option {% if current_language == 'english' %}active{% endif %}">
-                                <i class="fas fa-headphones"></i>
-                                <div class="option-content">
-                                    <span class="option-title">SPOT-ify the Song</span>
-                                    <small class="option-subtitle">English Songs</small>
-                                </div>
-                            </a>
-                            <a href="/hindi/" class="language-option {% if current_language == 'hindi' %}active{% endif %}">
-                                <i class="fas fa-microphone"></i>
-                                <div class="option-content">
-                                    <span class="option-title">SPOT-ify the Gaana</span>
-                                    <small class="option-subtitle">Hindi Songs</small>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+
 
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
@@ -1251,6 +1342,35 @@
             {% block content %}{% endblock %}
         </div>
     </main>
+
+    <!-- 🌍 Floating Language Orb -->
+    <div class="floating-language-orb" id="languageOrb">
+        <div class="orb-content">
+            <i class="orb-icon fas fa-globe"></i>
+            <span class="orb-text" id="orbText">
+                {% if current_language == 'tamil' %}
+                    T
+                {% elif current_language == 'english' %}
+                    E
+                {% elif current_language == 'hindi' %}
+                    H
+                {% else %}
+                    T
+                {% endif %}
+            </span>
+        </div>
+        <div class="orb-tooltip" id="orbTooltip">
+            {% if current_language == 'tamil' %}
+                Switch to English
+            {% elif current_language == 'english' %}
+                Switch to Hindi
+            {% elif current_language == 'hindi' %}
+                Switch to Tamil
+            {% else %}
+                Switch to English
+            {% endif %}
+        </div>
+    </div>
 
     <footer class="footer">
         <div class="container">
@@ -1399,49 +1519,75 @@
         window.currentLanguage = '{{ current_language|default:"tamil" }}';
     </script>
 
-    <!-- Language dropdown functionality -->
+    <!-- 🌍 Floating Language Orb functionality -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const languageToggle = document.querySelector('.language-toggle');
-            const languageMenu = document.querySelector('.language-menu');
+            const languageOrb = document.getElementById('languageOrb');
+            const orbText = document.getElementById('orbText');
+            const orbTooltip = document.getElementById('orbTooltip');
 
-            if (languageToggle && languageMenu) {
-                languageToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    languageMenu.classList.toggle('show');
-                });
+            // Language cycle: Tamil → English → Hindi → Tamil
+            const languages = {
+                'tamil': {
+                    next: 'english',
+                    url: '/english/',
+                    text: 'E',
+                    tooltip: 'Switch to English',
+                    class: 'english'
+                },
+                'english': {
+                    next: 'hindi',
+                    url: '/hindi/',
+                    text: 'H',
+                    tooltip: 'Switch to Hindi',
+                    class: 'hindi'
+                },
+                'hindi': {
+                    next: 'tamil',
+                    url: '/tamil/',
+                    text: 'T',
+                    tooltip: 'Switch to Tamil',
+                    class: 'tamil'
+                }
+            };
 
-                // Handle language option clicks
-                const languageOptions = document.querySelectorAll('.language-option');
-                languageOptions.forEach(option => {
-                    option.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
+            // Set initial orb class based on current language
+            const currentLang = window.currentLanguage || 'tamil';
+            languageOrb.classList.add(currentLang);
 
-                        const language = this.dataset.language;
-                        if (language) {
-                            // Redirect to the appropriate language page
-                            if (language === 'tamil') {
-                                window.location.href = '/game/tamil/';
-                            } else if (language === 'english') {
-                                window.location.href = '/game/english/';
-                            } else if (language === 'hindi') {
-                                window.location.href = '/game/hindi/';
-                            }
-                        }
+            // Handle orb click
+            languageOrb.addEventListener('click', function(e) {
+                e.preventDefault();
 
-                        languageMenu.classList.remove('show');
-                    });
-                });
+                // Add click animation
+                this.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
 
-                // Close dropdown when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!languageToggle.contains(e.target) && !languageMenu.contains(e.target)) {
-                        languageMenu.classList.remove('show');
-                    }
-                });
-            }
+                // Get next language info
+                const nextLangInfo = languages[currentLang];
+                if (nextLangInfo) {
+                    // Smooth transition effect
+                    orbText.style.opacity = '0';
+                    orbTooltip.style.opacity = '0';
+
+                    setTimeout(() => {
+                        // Navigate to next language
+                        window.location.href = nextLangInfo.url;
+                    }, 200);
+                }
+            });
+
+            // Add hover sound effect (optional)
+            languageOrb.addEventListener('mouseenter', function() {
+                // You can add a subtle hover sound here if desired
+                this.style.animationDuration = '1s';
+            });
+
+            languageOrb.addEventListener('mouseleave', function() {
+                this.style.animationDuration = '3s';
+            });
         });
     </script>
 
