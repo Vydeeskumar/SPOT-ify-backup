@@ -423,7 +423,7 @@ toast.style.cssText = `
 .btn-add-friend {
     position: relative;
     background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 150, 255, 0.25)) !important;
-    border: 2px solid #00d4ff !important;
+    border: none !important;
     color: #00d4ff !important;
     padding: 0;
     border-radius: 15px;
@@ -435,7 +435,7 @@ toast.style.cssText = `
     min-width: 140px;
     box-shadow:
         0 4px 15px rgba(0, 212, 255, 0.4),
-        inset 0 1px 0 rgba(0, 255, 255, 0.3);
+        inset 0 0 0 2px rgba(0, 212, 255, 0.6);
     outline: none !important;
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
@@ -530,7 +530,7 @@ toast.style.cssText = `
 /* Override any default button styles */
 button.btn-add-friend {
     background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 150, 255, 0.25)) !important;
-    border: 2px solid #00d4ff !important;
+    border: none !important;
     color: #00d4ff !important;
 }
 
@@ -539,23 +539,21 @@ button.btn-add-friend {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: linear-gradient(135deg, rgba(0, 255, 140, 0.15), rgba(0, 200, 100, 0.15));
-    border: 2px solid var(--neon-green);
-    color: var(--neon-green);
+    background: linear-gradient(135deg, rgba(255, 165, 0, 0.15), rgba(255, 140, 0, 0.15));
+    border: 2px solid #ffa500;
+    color: #ffa500;
     padding: 10px 16px;
     border-radius: 12px;
     font-weight: 600;
     font-size: 0.9rem;
     margin-top: 15px;
     box-shadow:
-        0 4px 15px rgba(0, 255, 140, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        0 4px 15px rgba(255, 165, 0, 0.2);
     backdrop-filter: blur(10px);
 }
 
 .friend-status-badge i {
     font-size: 1.1rem;
-    filter: drop-shadow(0 0 5px rgba(0, 255, 140, 0.5));
 }
 
 
