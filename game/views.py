@@ -1214,6 +1214,9 @@ def public_profile(request, username, language='tamil'):
         language=current_language
     ).order_by('-attempt_date')[:10]
 
+    # Get language-specific stats for public profile
+    language_stats = profile.get_stats_for_language(current_language)
+
     is_friend = Friendship.objects.filter(user=request.user, friend=user).exists()
     request_sent = Friendship.objects.filter(user=request.user, friend=user).exists()
 
@@ -1227,6 +1230,7 @@ def public_profile(request, username, language='tamil'):
         'profile_user': user,  # alias for template
         'current_language': current_language,
         'language_display': dict(LANGUAGE_CHOICES)[current_language],
+        'language_stats': language_stats,
     })
 
 @login_required

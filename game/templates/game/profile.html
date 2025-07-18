@@ -54,21 +54,21 @@
                             <div class="stat-box">
                                 <i class="fas fa-star"></i>
                                 <h6>Total Points</h6>
-                                <p>{{ profile.total_points }}</p>
+                                <p>{{ language_stats.total_points|default:0 }}</p>
                             </div>
                         </div>
                         <div class="col-md-4 mb-3">
                             <div class="stat-box">
                                 <i class="fas fa-music"></i>
                                 <h6>Songs Solved</h6>
-                                <p>{{ profile.total_songs_solved }}</p>
+                                <p>{{ language_stats.total_songs_solved|default:0 }}</p>
                             </div>
                         </div>
                         <div class="col-md-4 mb-3">
                             <div class="stat-box">
                                 <i class="fas fa-clock"></i>
                                 <h6>Avg Time</h6>
-                                <p>{{ profile.average_time|floatformat:1 }}s</p>
+                                <p>{{ language_stats.average_time|floatformat:1|default:"0.0" }}s</p>
                             </div>
                         </div>
                     </div>
