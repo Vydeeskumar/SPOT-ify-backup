@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from datetime import timedelta
-from django.db.models import Sum, Avg, Count, Max
+from django.db.models import Sum, Avg, Count, Max, Q
 from django.http import JsonResponse
 from django.contrib import messages
 from .models import Song, UserScore, UserProfile, Friendship, DailySong, LANGUAGE_CHOICES
@@ -400,19 +400,24 @@ def profile(request, language='tamil'):
         monthly_songs=Count('id')
     )
 
-    # Get all-time statistics for current language
+    # Get all-time statistics for current language (same as compare friends)
     all_time_stats = UserScore.objects.filter(
         user=request.user,
         language=current_language
     ).aggregate(
         total_points=Sum('score'),
         avg_score=Avg('score'),
-        avg_time=Avg('guess_time'),
+        avg_time=Avg('guess_time', filter=Q(score__gt=0)),  # Only successful attempts
         total_songs=Count('id')
     )
 
-    # Get language-specific stats
+    # Get language-specific stats from UserProfile model
     language_stats = profile.get_stats_for_language(current_language)
+
+    # Override language_stats with actual database values for accuracy
+    language_stats['total_points'] = all_time_stats['total_points'] or 0
+    language_stats['total_songs_solved'] = all_time_stats['total_songs'] or 0
+    language_stats['average_time'] = all_time_stats['avg_time'] or 0
 
     # Calculate success rate for current language
     total_attempts = UserScore.objects.filter(user=request.user, language=current_language).count()
@@ -1216,6 +1221,21 @@ def public_profile(request, username, language='tamil'):
 
     # Get language-specific stats for public profile
     language_stats = profile.get_stats_for_language(current_language)
+
+    # Get accurate stats from database (same as compare friends)
+    db_stats = UserScore.objects.filter(
+        user=user,
+        language=current_language
+    ).aggregate(
+        total_points=Sum('score'),
+        avg_time=Avg('guess_time', filter=Q(score__gt=0)),
+        total_songs=Count('id')
+    )
+
+    # Override with accurate database values
+    language_stats['total_points'] = db_stats['total_points'] or 0
+    language_stats['total_songs_solved'] = db_stats['total_songs'] or 0
+    language_stats['average_time'] = db_stats['avg_time'] or 0
 
     is_friend = Friendship.objects.filter(user=request.user, friend=user).exists()
     request_sent = Friendship.objects.filter(user=request.user, friend=user).exists()
