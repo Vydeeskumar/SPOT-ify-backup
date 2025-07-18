@@ -310,11 +310,23 @@ async function loadArchiveLeaderboard(result) {
     const leaderboardDiv = document.getElementById('archive-leaderboard');
 
     try {
+        // Ensure date is in YYYY-MM-DD format
+        let formattedDate = playDate;
+        if (playDate && !playDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            // If playDate is not in YYYY-MM-DD format, try to convert it
+            const date = new Date(playDate);
+            if (!isNaN(date.getTime())) {
+                formattedDate = date.toISOString().split('T')[0];
+            }
+        }
+
         const url = `/${window.currentLanguage || 'tamil'}/archive-leaderboard/?` +
-            `date=${playDate}&user_rank=${result.rank}&user_points=${result.points}&user_time=${result.time_taken}`;
+            `date=${formattedDate}&user_rank=${result.rank}&user_points=${result.points}&user_time=${result.time_taken}`;
 
         console.log('Loading leaderboard from:', url);
-        console.log('Parameters:', { playDate, rank: result.rank, points: result.points, time: result.time_taken });
+        console.log('Original playDate:', playDate);
+        console.log('Formatted date:', formattedDate);
+        console.log('Parameters:', { formattedDate, rank: result.rank, points: result.points, time: result.time_taken });
 
         const response = await fetch(url);
         const data = await response.json();
