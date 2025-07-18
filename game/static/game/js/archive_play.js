@@ -311,10 +311,10 @@ async function loadArchiveLeaderboard(result) {
 
     try {
         const url = `/${window.currentLanguage || 'tamil'}/archive-leaderboard/?` +
-            `song_id=${songId}&date=${playDate}&user_rank=${result.rank}&user_points=${result.points}&user_time=${result.time_taken}`;
+            `date=${playDate}&user_rank=${result.rank}&user_points=${result.points}&user_time=${result.time_taken}`;
 
         console.log('Loading leaderboard from:', url);
-        console.log('Parameters:', { songId, playDate, rank: result.rank, points: result.points, time: result.time_taken });
+        console.log('Parameters:', { playDate, rank: result.rank, points: result.points, time: result.time_taken });
 
         const response = await fetch(url);
         const data = await response.json();

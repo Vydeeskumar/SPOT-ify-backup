@@ -1226,16 +1226,18 @@ def giveup_archive(request, language='tamil'):
 def get_archive_leaderboard(request, language='tamil'):
     """Get actual leaderboard for a specific archive date"""
     current_language = language
-    song_id = request.GET.get('song_id')
     date_str = request.GET.get('date')
     user_rank = int(request.GET.get('user_rank', 0))
     user_points = int(request.GET.get('user_points', 0))
     user_time = float(request.GET.get('user_time', 0))
 
     try:
-        # Get the song by spotify_id (not database id)
-        song = Song.objects.get(spotify_id=song_id)
+        # Get the song by date and language (more reliable than song_id)
         selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        song = Song.objects.get(
+            display_date=selected_date,
+            language=current_language
+        )
 
         # Get actual players from that date
         actual_players = UserScore.objects.filter(
