@@ -422,10 +422,9 @@ toast.style.cssText = `
 /* 🎮 Modern Add Friend Button */
 .btn-add-friend {
     position: relative;
-    background: linear-gradient(135deg, rgba(176, 38, 255, 0.1), rgba(0, 150, 255, 0.1));
-    border: 2px solid transparent;
-    background-clip: padding-box;
-    color: white;
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 150, 255, 0.15));
+    border: 2px solid #00d4ff;
+    color: #00d4ff;
     padding: 0;
     border-radius: 15px;
     cursor: pointer;
@@ -435,8 +434,8 @@ toast.style.cssText = `
     font-size: 0.95rem;
     min-width: 140px;
     box-shadow:
-        0 4px 15px rgba(176, 38, 255, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        0 4px 15px rgba(0, 212, 255, 0.3),
+        inset 0 1px 0 rgba(0, 255, 255, 0.2);
 }
 
 .btn-add-friend::before {
@@ -446,7 +445,7 @@ toast.style.cssText = `
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, var(--primary-color), var(--neon-blue));
+    background: linear-gradient(135deg, #00d4ff, #0096ff);
     border-radius: 13px;
     z-index: -1;
     opacity: 0;
@@ -478,7 +477,7 @@ toast.style.cssText = `
     left: 50%;
     width: 0;
     height: 0;
-    background: radial-gradient(circle, rgba(176, 38, 255, 0.4), transparent);
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.4), transparent);
     border-radius: 50%;
     transform: translate(-50%, -50%);
     transition: all 0.4s ease;
@@ -488,9 +487,9 @@ toast.style.cssText = `
 .btn-add-friend:hover {
     transform: translateY(-2px) scale(1.02);
     box-shadow:
-        0 8px 25px rgba(176, 38, 255, 0.4),
-        0 0 30px rgba(176, 38, 255, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        0 8px 25px rgba(0, 212, 255, 0.4),
+        0 0 30px rgba(0, 212, 255, 0.3),
+        inset 0 1px 0 rgba(0, 255, 255, 0.2);
 }
 
 .btn-add-friend:hover::before {
@@ -498,8 +497,8 @@ toast.style.cssText = `
 }
 
 .btn-add-friend:hover .btn-content {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
+    background: rgba(0, 255, 255, 0.1);
+    color: #00ffff;
 }
 
 .btn-add-friend:hover .btn-content i {
