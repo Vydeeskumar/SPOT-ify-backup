@@ -1233,8 +1233,8 @@ def get_archive_leaderboard(request, language='tamil'):
     user_time = float(request.GET.get('user_time', 0))
 
     try:
-        # Get the song
-        song = Song.objects.get(id=song_id)
+        # Get the song by spotify_id (not database id)
+        song = Song.objects.get(spotify_id=song_id)
         selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
 
         # Get actual players from that date

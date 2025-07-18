@@ -310,15 +310,22 @@ async function loadArchiveLeaderboard(result) {
     const leaderboardDiv = document.getElementById('archive-leaderboard');
 
     try {
-        const response = await fetch(`/${window.currentLanguage || 'tamil'}/archive-leaderboard/?` +
-            `song_id=${songId}&date=${playDate}&user_rank=${result.rank}&user_points=${result.points}&user_time=${result.time_taken}`);
+        const url = `/${window.currentLanguage || 'tamil'}/archive-leaderboard/?` +
+            `song_id=${songId}&date=${playDate}&user_rank=${result.rank}&user_points=${result.points}&user_time=${result.time_taken}`;
 
+        console.log('Loading leaderboard from:', url);
+        console.log('Parameters:', { songId, playDate, rank: result.rank, points: result.points, time: result.time_taken });
+
+        const response = await fetch(url);
         const data = await response.json();
+
+        console.log('Leaderboard response:', data);
 
         if (data.success) {
             displayLeaderboard(data.leaderboard, data.date);
         } else {
-            leaderboardDiv.innerHTML = '<div class="leaderboard-error">Failed to load leaderboard</div>';
+            console.error('Leaderboard error:', data.error);
+            leaderboardDiv.innerHTML = `<div class="leaderboard-error">Failed to load leaderboard: ${data.error || 'Unknown error'}</div>`;
         }
     } catch (error) {
         console.error('Error loading leaderboard:', error);
