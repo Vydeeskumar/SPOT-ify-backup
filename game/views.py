@@ -419,6 +419,11 @@ def profile(request, language='tamil'):
     language_stats['total_songs_solved'] = all_time_stats['total_songs'] or 0
     language_stats['average_time'] = all_time_stats['avg_time'] or 0
 
+    # Calculate accurate streaks from database
+    current_streak, longest_streak = calculate_streaks_from_db(request.user, current_language)
+    language_stats['current_streak'] = current_streak
+    language_stats['longest_streak'] = longest_streak
+
     # Calculate success rate for current language
     total_attempts = UserScore.objects.filter(user=request.user, language=current_language).count()
     if total_attempts > 0:
@@ -1209,6 +1214,70 @@ def calculate_points(seconds):
     elif seconds <= 60: return 2
     else: return 1
 
+def calculate_streaks_from_db(user, language):
+    """Calculate current and longest streaks directly from database"""
+    from datetime import timedelta
+
+    # Get all user scores for this language, ordered by date
+    scores = UserScore.objects.filter(
+        user=user,
+        language=language
+    ).order_by('attempt_date__date').values_list('attempt_date__date', 'score')
+
+    if not scores:
+        return 0, 0
+
+    # Convert to list of (date, score) tuples
+    score_list = list(scores)
+
+    # Group by date (in case multiple attempts per day, take the latest)
+    daily_scores = {}
+    for date, score in score_list:
+        daily_scores[date] = score  # This will keep the last score for each date
+
+    # Sort dates
+    sorted_dates = sorted(daily_scores.keys())
+
+    current_streak = 0
+    longest_streak = 0
+    temp_streak = 0
+
+    # Calculate streaks
+    for i, date in enumerate(sorted_dates):
+        score = daily_scores[date]
+
+        if score > 0:  # Successful attempt
+            if i == 0:  # First date
+                temp_streak = 1
+            else:
+                prev_date = sorted_dates[i-1]
+                if date == prev_date + timedelta(days=1):  # Consecutive day
+                    temp_streak += 1
+                else:  # Gap in dates
+                    temp_streak = 1
+        else:  # Give up (score = 0)
+            temp_streak = 0
+
+        # Update longest streak
+        longest_streak = max(longest_streak, temp_streak)
+
+    # Current streak is the streak ending on the most recent date
+    today = timezone.now().date()
+    if sorted_dates:
+        last_date = sorted_dates[-1]
+        last_score = daily_scores[last_date]
+
+        if last_score > 0:  # Last game was successful
+            # Check if it's recent enough to count as current streak
+            if last_date >= today - timedelta(days=1):  # Today or yesterday
+                current_streak = temp_streak
+            else:
+                current_streak = 0  # Too old
+        else:
+            current_streak = 0  # Last game was a give-up
+
+    return current_streak, longest_streak
+
 @login_required
 def public_profile(request, username, language='tamil'):
     current_language = language
@@ -1236,6 +1305,11 @@ def public_profile(request, username, language='tamil'):
     language_stats['total_points'] = db_stats['total_points'] or 0
     language_stats['total_songs_solved'] = db_stats['total_songs'] or 0
     language_stats['average_time'] = db_stats['avg_time'] or 0
+
+    # Calculate accurate streaks from database
+    current_streak, longest_streak = calculate_streaks_from_db(user, current_language)
+    language_stats['current_streak'] = current_streak
+    language_stats['longest_streak'] = longest_streak
 
     is_friend = Friendship.objects.filter(user=request.user, friend=user).exists()
     request_sent = Friendship.objects.filter(user=request.user, friend=user).exists()
