@@ -1222,6 +1222,80 @@ def giveup_archive(request, language='tamil'):
         'total_players': total_players
     })
 
+@login_required
+def get_archive_leaderboard(request, language='tamil'):
+    """Get actual leaderboard for a specific archive date"""
+    current_language = language
+    song_id = request.GET.get('song_id')
+    date_str = request.GET.get('date')
+    user_rank = int(request.GET.get('user_rank', 0))
+    user_points = int(request.GET.get('user_points', 0))
+    user_time = float(request.GET.get('user_time', 0))
+
+    try:
+        # Get the song
+        song = Song.objects.get(id=song_id)
+        selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+
+        # Get actual players from that date
+        actual_players = UserScore.objects.filter(
+            song=song,
+            attempt_date__date=selected_date,
+            language=current_language
+        ).order_by('-score', 'guess_time')[:5]
+
+        # Build leaderboard with hypothetical user inserted
+        leaderboard = []
+        user_inserted = False
+
+        for i, player_score in enumerate(actual_players):
+            current_rank = i + 1
+
+            # Insert user's hypothetical score at correct position
+            if not user_inserted and user_rank <= current_rank:
+                leaderboard.append({
+                    'rank': user_rank,
+                    'username': '[YOU]',
+                    'score': user_points,
+                    'time': user_time,
+                    'is_hypothetical': True
+                })
+                user_inserted = True
+
+                # Adjust current player's rank if needed
+                if user_rank == current_rank:
+                    current_rank += 1
+
+            leaderboard.append({
+                'rank': current_rank,
+                'username': player_score.user.username,
+                'score': player_score.score,
+                'time': player_score.guess_time,
+                'is_hypothetical': False
+            })
+
+        # If user rank is beyond top 5, add them at the end
+        if not user_inserted:
+            leaderboard.append({
+                'rank': user_rank,
+                'username': '[YOU]',
+                'score': user_points,
+                'time': user_time,
+                'is_hypothetical': True
+            })
+
+        return JsonResponse({
+            'success': True,
+            'leaderboard': leaderboard[:5],  # Limit to 5 entries
+            'date': date_str
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
+
 def calculate_points(seconds):
     if seconds <= 10: return 8
     elif seconds <= 20: return 5

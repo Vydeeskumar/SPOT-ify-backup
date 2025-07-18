@@ -16,6 +16,7 @@ urlpatterns = [
     path('archive/submit/', views.archive_submit, name='archive_submit'),
     path('load-archive-song/', views.load_archive_song, name='load_archive_song'),
     path('giveup-archive/', views.giveup_archive, name='giveup_archive'),
+    path('archive-leaderboard/', views.get_archive_leaderboard, name='archive_leaderboard'),
     path('profile/<str:username>/', views.public_profile, name='public_profile'),
     path('zombiebot/', views.zombiebot, name='zombiebot'),
     path('send-friend-request/<str:username>/', views.send_friend_request, name='send_friend_request'),

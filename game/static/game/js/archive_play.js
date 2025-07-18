@@ -252,6 +252,18 @@ function showResults(result) {
             </div>
         </div>
 
+        <div class="leaderboard-section">
+            <button id="toggle-leaderboard" class="toggle-leaderboard-btn">
+                <i class="fas fa-trophy"></i>
+                <span>Show Leaderboard</span>
+            </button>
+            <div id="archive-leaderboard" class="archive-leaderboard" style="display: none;">
+                <div class="leaderboard-loading">
+                    <i class="fas fa-spinner fa-spin"></i> Loading leaderboard...
+                </div>
+            </div>
+        </div>
+
         ${arrowsHTML}
     </div>`;
 
@@ -263,6 +275,87 @@ function showResults(result) {
         revealAudio.volume = 0.8;
         revealAudio.play().catch(() => {});
     }
+
+    // Add leaderboard toggle functionality
+    setupLeaderboardToggle(result);
+}
+
+function setupLeaderboardToggle(result) {
+    const toggleBtn = document.getElementById('toggle-leaderboard');
+    const leaderboardDiv = document.getElementById('archive-leaderboard');
+    let isLeaderboardLoaded = false;
+
+    toggleBtn.addEventListener('click', async () => {
+        const isVisible = leaderboardDiv.style.display !== 'none';
+
+        if (isVisible) {
+            // Hide leaderboard
+            leaderboardDiv.style.display = 'none';
+            toggleBtn.innerHTML = '<i class="fas fa-trophy"></i><span>Show Leaderboard</span>';
+        } else {
+            // Show leaderboard
+            leaderboardDiv.style.display = 'block';
+            toggleBtn.innerHTML = '<i class="fas fa-trophy"></i><span>Hide Leaderboard</span>';
+
+            // Load leaderboard if not already loaded
+            if (!isLeaderboardLoaded) {
+                await loadArchiveLeaderboard(result);
+                isLeaderboardLoaded = true;
+            }
+        }
+    });
+}
+
+async function loadArchiveLeaderboard(result) {
+    const leaderboardDiv = document.getElementById('archive-leaderboard');
+
+    try {
+        const response = await fetch(`/${window.currentLanguage || 'tamil'}/archive-leaderboard/?` +
+            `song_id=${songId}&date=${playDate}&user_rank=${result.rank}&user_points=${result.points}&user_time=${result.time_taken}`);
+
+        const data = await response.json();
+
+        if (data.success) {
+            displayLeaderboard(data.leaderboard, data.date);
+        } else {
+            leaderboardDiv.innerHTML = '<div class="leaderboard-error">Failed to load leaderboard</div>';
+        }
+    } catch (error) {
+        console.error('Error loading leaderboard:', error);
+        leaderboardDiv.innerHTML = '<div class="leaderboard-error">Error loading leaderboard</div>';
+    }
+}
+
+function displayLeaderboard(leaderboard, date) {
+    const leaderboardDiv = document.getElementById('archive-leaderboard');
+
+    let html = `
+        <div class="leaderboard-header">
+            <h5><i class="fas fa-calendar-alt"></i> ${new Date(date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            })}</h5>
+        </div>
+        <div class="leaderboard-list">
+    `;
+
+    leaderboard.forEach(entry => {
+        const isHypothetical = entry.is_hypothetical;
+        const rowClass = isHypothetical ? 'leaderboard-row hypothetical-entry' : 'leaderboard-row';
+
+        html += `
+            <div class="${rowClass}">
+                <div class="rank-col">#${entry.rank}</div>
+                <div class="username-col">${entry.username}</div>
+                <div class="score-col">${entry.score}pts</div>
+                <div class="time-col">${entry.time.toFixed(1)}s</div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    leaderboardDiv.innerHTML = html;
 }
 
 
