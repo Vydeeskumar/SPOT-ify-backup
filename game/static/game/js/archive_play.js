@@ -453,6 +453,36 @@ async function setupArchiveNavigation() {
 
 async function loadArchiveDate(dateStr) {
     try {
+        console.log('Loading archive date:', dateStr);
+
+        // STOP ALL AUDIO IMMEDIATELY
+        const snippet = document.getElementById('song-snippet');
+        const revealAudio = document.getElementById('reveal-snippet');
+
+        if (snippet) {
+            snippet.pause();
+            snippet.currentTime = 0;
+        }
+        if (revealAudio) {
+            revealAudio.pause();
+            revealAudio.currentTime = 0;
+        }
+
+        // Stop any playing audio globally
+        document.querySelectorAll('audio').forEach(audio => {
+            audio.pause();
+            audio.currentTime = 0;
+        });
+
+        // Clear any timers
+        if (window.timerInterval) {
+            clearInterval(window.timerInterval);
+            window.timerInterval = null;
+        }
+        if (window.startTime) {
+            window.startTime = null;
+        }
+
         // Show loading state
         const gameView = document.getElementById('game-view');
         const resultContainer = document.getElementById('result-container');
@@ -460,34 +490,59 @@ async function loadArchiveDate(dateStr) {
         gameView.style.display = 'block';
         resultContainer.style.display = 'none';
 
-        // Reset game state
-        document.getElementById('guess-input').value = '';
-        document.getElementById('timer').textContent = '00:00';
+        // Reset ALL game state with null checks
+        const guessInput = document.getElementById('guess-input');
+        const timer = document.getElementById('timer');
+
+        if (guessInput) guessInput.value = '';
+        if (timer) timer.textContent = '00:00';
+
+        // Reset play button
+        const playBtn = document.getElementById('playPauseBtn');
+        if (playBtn) {
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            playBtn.classList.remove('playing');
+        }
 
         // Load new song
         const response = await fetch(`/${window.currentLanguage || 'tamil'}/load-archive-song?date=${dateStr}`);
         const data = await response.json();
+
+        console.log('Load response:', data);
 
         if (!data.success) {
             alert(data.message);
             return;
         }
 
-        // Update song details
-        document.getElementById('song-title').textContent = data.title;
-        document.getElementById('song-artist').textContent = data.artist;
-        document.getElementById('song-movie').textContent = data.movie;
-        document.getElementById('song-image').src = data.image;
+        // Update song details with null checks
+        const titleEl = document.getElementById('song-title');
+        const artistEl = document.getElementById('song-artist');
+        const movieEl = document.getElementById('song-movie');
+        const imageEl = document.getElementById('song-image');
 
-        // Update audio
-        const snippet = document.getElementById('song-snippet');
+        if (titleEl) titleEl.textContent = data.title;
+        if (artistEl) artistEl.textContent = data.artist;
+        if (movieEl) movieEl.textContent = data.movie;
+        if (imageEl) imageEl.src = data.image;
+
+        // Update audio sources and reset
         snippet.src = data.snippet_url;
         snippet.load();
+        snippet.pause(); // Ensure it's paused
+
+        if (revealAudio) {
+            revealAudio.src = data.reveal_audio_url;
+            revealAudio.load();
+            revealAudio.pause(); // Ensure it's paused
+        }
 
         // Update global variables
         window.songId = data.song_id;
         window.revealSnippet = data.reveal_audio_url;
         window.playDate = dateStr;
+
+        console.log('Updated playDate to:', window.playDate);
 
         // Update URL without page reload
         const newUrl = `/${window.currentLanguage || 'tamil'}/archive/?date=${dateStr}`;
@@ -504,11 +559,13 @@ async function loadArchiveDate(dateStr) {
             dateDisplay.innerHTML = `<i class="fas fa-calendar-alt"></i> ${displayDate}`;
         }
 
-        // Reset timer
-        if (window.timerInterval) {
-            clearInterval(window.timerInterval);
+        // Update date input if it exists
+        const dateInput = document.getElementById('archive-date');
+        if (dateInput) {
+            dateInput.value = dateStr;
         }
-        window.startTime = null;
+
+        console.log('Successfully loaded new date:', dateStr);
 
     } catch (error) {
         console.error('Error loading archive date:', error);
