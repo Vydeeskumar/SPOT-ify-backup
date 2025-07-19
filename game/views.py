@@ -1125,6 +1125,7 @@ def load_archive_song(request, language='tamil'):
     if not song:
         return JsonResponse({'success': False, 'message': 'No song found for that date'}, status=404)
 
+    print(f"Load archive song - Date: {selected_date}, Song: {song.title} (DB ID: {song.id}, Spotify: {song.spotify_id})")
 
     return JsonResponse({
         'success': True,
@@ -1191,7 +1192,10 @@ def archive_submit(request, language='tamil'):
         play_date = data.get('play_date')
         time_taken = float(data.get('time_taken', 999))
 
+        print(f"Archive submit received - song_id: {song_id}, play_date: {play_date}, guess: {user_guess}")
+
         song = Song.objects.get(id=song_id)
+        print(f"Found song in DB: {song.title} (ID: {song.id}, Spotify: {song.spotify_id})")
         is_correct, _ = check_answer(user_guess, song.title, spotify_id, song)
 
         if is_correct:
