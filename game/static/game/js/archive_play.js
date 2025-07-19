@@ -264,6 +264,17 @@ function showResults(result) {
             </div>
         </div>
 
+        <div class="archive-navigation">
+            <button id="prev-date-btn" class="nav-date-btn">
+                <i class="fas fa-chevron-left"></i>
+                <span>Previous Day</span>
+            </button>
+            <button id="next-date-btn" class="nav-date-btn">
+                <i class="fas fa-chevron-right"></i>
+                <span>Next Day</span>
+            </button>
+        </div>
+
         ${arrowsHTML}
     </div>`;
 
@@ -278,6 +289,9 @@ function showResults(result) {
 
     // Add leaderboard toggle functionality
     setupLeaderboardToggle(result);
+
+    // Add navigation functionality
+    setupArchiveNavigation();
 }
 
 function setupLeaderboardToggle(result) {
@@ -375,6 +389,107 @@ function displayLeaderboard(leaderboard, date) {
 
     html += '</div>';
     leaderboardDiv.innerHTML = html;
+}
+
+function setupArchiveNavigation() {
+    const prevBtn = document.getElementById('prev-date-btn');
+    const nextBtn = document.getElementById('next-date-btn');
+
+    if (!prevBtn || !nextBtn) return;
+
+    // Calculate previous and next dates
+    const currentDate = new Date(playDate);
+    const prevDate = new Date(currentDate);
+    prevDate.setDate(currentDate.getDate() - 1);
+
+    const nextDate = new Date(currentDate);
+    nextDate.setDate(currentDate.getDate() + 1);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Format dates for display and API
+    const prevDateStr = prevDate.toISOString().split('T')[0];
+    const nextDateStr = nextDate.toISOString().split('T')[0];
+
+    // Update button text with actual dates
+    prevBtn.innerHTML = `<i class="fas fa-chevron-left"></i><span>${prevDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>`;
+    nextBtn.innerHTML = `<i class="fas fa-chevron-right"></i><span>${nextDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>`;
+
+    // Disable next button if it would be today or future
+    if (nextDate >= today) {
+        nextBtn.disabled = true;
+        nextBtn.classList.add('disabled');
+    }
+
+    // Add click handlers
+    prevBtn.addEventListener('click', () => loadArchiveDate(prevDateStr));
+    nextBtn.addEventListener('click', () => loadArchiveDate(nextDateStr));
+}
+
+async function loadArchiveDate(dateStr) {
+    try {
+        // Show loading state
+        const gameView = document.getElementById('game-view');
+        const resultContainer = document.getElementById('result-container');
+
+        gameView.style.display = 'block';
+        resultContainer.style.display = 'none';
+
+        // Reset game state
+        document.getElementById('guess-input').value = '';
+        document.getElementById('timer').textContent = '00:00';
+
+        // Load new song
+        const response = await fetch(`/${window.currentLanguage || 'tamil'}/load-archive-song?date=${dateStr}`);
+        const data = await response.json();
+
+        if (!data.success) {
+            alert(data.message);
+            return;
+        }
+
+        // Update song details
+        document.getElementById('song-title').textContent = data.title;
+        document.getElementById('song-artist').textContent = data.artist;
+        document.getElementById('song-movie').textContent = data.movie;
+        document.getElementById('song-image').src = data.image;
+
+        // Update audio
+        const snippet = document.getElementById('song-snippet');
+        snippet.src = data.snippet_url;
+        snippet.load();
+
+        // Update global variables
+        window.songId = data.song_id;
+        window.revealSnippet = data.reveal_audio_url;
+        window.playDate = dateStr;
+
+        // Update URL without page reload
+        const newUrl = `/${window.currentLanguage || 'tamil'}/archive/?date=${dateStr}`;
+        window.history.pushState({date: dateStr}, '', newUrl);
+
+        // Update date display in header
+        const dateDisplay = document.querySelector('.archive-date-badge');
+        if (dateDisplay) {
+            const displayDate = new Date(dateStr).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            dateDisplay.innerHTML = `<i class="fas fa-calendar-alt"></i> ${displayDate}`;
+        }
+
+        // Reset timer
+        if (window.timerInterval) {
+            clearInterval(window.timerInterval);
+        }
+        window.startTime = null;
+
+    } catch (error) {
+        console.error('Error loading archive date:', error);
+        alert('Failed to load song for this date. Please try again.');
+    }
 }
 
 
