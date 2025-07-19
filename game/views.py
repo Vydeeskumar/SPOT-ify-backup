@@ -1130,7 +1130,8 @@ def load_archive_song(request, language='tamil'):
         'success': True,
         'snippet_url': song.snippet.url,
         'reveal_url': song.reveal_snippet.url if song.reveal_snippet else '',
-        'song_id': song.spotify_id,
+        'song_id': song.spotify_id,  # For JavaScript compatibility
+        'db_song_id': song.id,  # Database ID for backend submission
         'title': song.title,
         'movie': song.movie,
         'artist': song.artist,

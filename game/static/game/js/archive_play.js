@@ -538,7 +538,8 @@ async function loadArchiveDate(dateStr) {
         }
 
         // Update global variables
-        window.songId = data.song_id;
+        window.songId = data.db_song_id;  // Use database ID for submissions
+        window.spotifyId = data.song_id;  // Keep Spotify ID for other uses
         window.revealSnippet = data.reveal_audio_url;
         window.playDate = dateStr;
 
@@ -608,7 +609,8 @@ document.addEventListener('DOMContentLoaded', function () {
             snippet.load();
 
             // Global vars for guess and reveal
-            window.songId = data.song_id;
+            window.songId = data.db_song_id;  // Use database ID for submissions
+            window.spotifyId = data.song_id;  // Keep Spotify ID for other uses
             window.revealSnippet = data.reveal_audio_url;
             window.playDate = selectedDate;
         } catch (err) {
