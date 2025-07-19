@@ -110,25 +110,32 @@ async function handleGuess(e) {
     if (!guessInput.value.trim()) return alert('Enter a guess!');
 
     try {
+        const submissionData = {
+            guess: guessInput.value.trim(),
+            spotify_id: guessInput.dataset.spotifyId,
+            time_taken: timeTaken,
+            song_id: songId,
+            play_date: playDate
+        };
+
+        console.log('Submitting guess with data:', submissionData);
+
         const response = await fetch(`/${window.currentLanguage || 'tamil'}/archive/submit/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
             },
-            body: JSON.stringify({
-                guess: guessInput.value.trim(),
-                spotify_id: guessInput.dataset.spotifyId,
-                time_taken: timeTaken,
-                song_id: songId,
-                play_date: playDate
-            })
+            body: JSON.stringify(submissionData)
         });
 
         const data = await response.json();
+        console.log('Guess response:', data);
+
         if (data.correct) {
             showResults(data);
         } else {
+            console.log('Wrong guess. Expected song details:', data);
             alert(data.message || 'Wrong guess!');
         }
     } catch (err) {
@@ -543,7 +550,12 @@ async function loadArchiveDate(dateStr) {
         window.revealSnippet = data.reveal_audio_url;
         window.playDate = dateStr;
 
-        console.log('Updated playDate to:', window.playDate);
+        console.log('Updated song data:');
+        console.log('- Database ID (songId):', window.songId);
+        console.log('- Spotify ID:', window.spotifyId);
+        console.log('- Play Date:', window.playDate);
+        console.log('- Song Title:', data.title);
+        console.log('- Song Artist:', data.artist);
 
         // Update URL without page reload
         const newUrl = `/${window.currentLanguage || 'tamil'}/archive/?date=${dateStr}`;
