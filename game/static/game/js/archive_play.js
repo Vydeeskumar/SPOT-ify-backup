@@ -291,6 +291,7 @@ function showResults(result) {
     setupLeaderboardToggle(result);
 
     // Add navigation functionality
+    console.log('Setting up archive navigation...');
     setupArchiveNavigation();
 }
 
@@ -392,10 +393,15 @@ function displayLeaderboard(leaderboard, date) {
 }
 
 function setupArchiveNavigation() {
+    console.log('setupArchiveNavigation called');
     const prevBtn = document.getElementById('prev-date-btn');
     const nextBtn = document.getElementById('next-date-btn');
 
-    if (!prevBtn || !nextBtn) return;
+    console.log('Navigation buttons found:', { prevBtn, nextBtn });
+    if (!prevBtn || !nextBtn) {
+        console.log('Navigation buttons not found, exiting');
+        return;
+    }
 
     // Calculate previous and next dates
     const currentDate = new Date(playDate);
