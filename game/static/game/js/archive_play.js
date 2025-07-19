@@ -392,7 +392,7 @@ function displayLeaderboard(leaderboard, date) {
     leaderboardDiv.innerHTML = html;
 }
 
-function setupArchiveNavigation() {
+async function setupArchiveNavigation() {
     console.log('setupArchiveNavigation called');
     const prevBtn = document.getElementById('prev-date-btn');
     const nextBtn = document.getElementById('next-date-btn');
@@ -403,34 +403,52 @@ function setupArchiveNavigation() {
         return;
     }
 
-    // Calculate previous and next dates
-    const currentDate = new Date(playDate);
-    const prevDate = new Date(currentDate);
-    prevDate.setDate(currentDate.getDate() - 1);
+    try {
+        // Get proper previous and next dates from backend
+        const response = await fetch(`/${window.currentLanguage || 'tamil'}/archive-navigation/?date=${playDate}`);
+        const data = await response.json();
 
-    const nextDate = new Date(currentDate);
-    nextDate.setDate(currentDate.getDate() + 1);
+        console.log('Navigation data:', data);
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+        if (data.success) {
+            // Update button text and functionality
+            if (data.prev_date) {
+                prevBtn.innerHTML = `<i class="fas fa-chevron-left"></i><span>${data.prev_display}</span>`;
+                prevBtn.disabled = false;
+                prevBtn.classList.remove('disabled');
+                prevBtn.onclick = () => loadArchiveDate(data.prev_date);
+            } else {
+                prevBtn.innerHTML = `<i class="fas fa-chevron-left"></i><span>No Earlier</span>`;
+                prevBtn.disabled = true;
+                prevBtn.classList.add('disabled');
+            }
 
-    // Format dates for display and API
-    const prevDateStr = prevDate.toISOString().split('T')[0];
-    const nextDateStr = nextDate.toISOString().split('T')[0];
-
-    // Update button text with actual dates
-    prevBtn.innerHTML = `<i class="fas fa-chevron-left"></i><span>${prevDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>`;
-    nextBtn.innerHTML = `<i class="fas fa-chevron-right"></i><span>${nextDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>`;
-
-    // Disable next button if it would be today or future
-    if (nextDate >= today) {
+            if (data.next_date) {
+                nextBtn.innerHTML = `<i class="fas fa-chevron-right"></i><span>${data.next_display}</span>`;
+                nextBtn.disabled = false;
+                nextBtn.classList.remove('disabled');
+                nextBtn.onclick = () => loadArchiveDate(data.next_date);
+            } else {
+                nextBtn.innerHTML = `<i class="fas fa-chevron-right"></i><span>No Later</span>`;
+                nextBtn.disabled = true;
+                nextBtn.classList.add('disabled');
+            }
+        } else {
+            console.error('Failed to get navigation data:', data.error);
+            // Disable both buttons on error
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+            prevBtn.classList.add('disabled');
+            nextBtn.classList.add('disabled');
+        }
+    } catch (error) {
+        console.error('Error setting up navigation:', error);
+        // Disable both buttons on error
+        prevBtn.disabled = true;
         nextBtn.disabled = true;
+        prevBtn.classList.add('disabled');
         nextBtn.classList.add('disabled');
     }
-
-    // Add click handlers
-    prevBtn.addEventListener('click', () => loadArchiveDate(prevDateStr));
-    nextBtn.addEventListener('click', () => loadArchiveDate(nextDateStr));
 }
 
 async function loadArchiveDate(dateStr) {

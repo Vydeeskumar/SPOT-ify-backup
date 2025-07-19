@@ -1139,6 +1139,42 @@ def load_archive_song(request, language='tamil'):
 
     })
 
+@login_required
+@require_GET
+def get_archive_navigation(request, language='tamil'):
+    """Get previous and next available dates for archive navigation"""
+    current_language = language
+    date_str = request.GET.get('date')
+
+    try:
+        selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return JsonResponse({'success': False, 'error': 'Invalid date format'}, status=400)
+
+    # Use same logic as archive view to find prev/next dates
+    prev_song = Song.objects.filter(
+        display_date__lt=selected_date,
+        display_date__gte=LAUNCH_DATE,
+        language=current_language
+    ).order_by('-display_date').first()
+
+    next_song = Song.objects.filter(
+        display_date__gt=selected_date,
+        display_date__lt=date.today(),
+        language=current_language
+    ).order_by('display_date').first()
+
+    prev_date = prev_song.display_date.strftime('%Y-%m-%d') if prev_song else None
+    next_date = next_song.display_date.strftime('%Y-%m-%d') if next_song else None
+
+    return JsonResponse({
+        'success': True,
+        'prev_date': prev_date,
+        'next_date': next_date,
+        'prev_display': prev_song.display_date.strftime('%b %d') if prev_song else None,
+        'next_display': next_song.display_date.strftime('%b %d') if next_song else None
+    })
+
 @csrf_exempt
 @login_required
 def archive_submit(request, language='tamil'):
