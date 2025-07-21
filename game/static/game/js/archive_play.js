@@ -71,6 +71,7 @@ function setupGameControls() {
 }
 
 function startTimer() {
+    console.log('Starting timer...');
     startTime = Date.now();
     isTimerRunning = true;
     timerInterval = setInterval(updateTimer, 100);
@@ -482,14 +483,13 @@ async function loadArchiveDate(dateStr) {
             audio.currentTime = 0;
         });
 
-        // Clear any timers
-        if (window.timerInterval) {
-            clearInterval(window.timerInterval);
-            window.timerInterval = null;
+        // Clear any timers - use global variables
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
         }
-        if (window.startTime) {
-            window.startTime = null;
-        }
+        startTime = null;
+        isTimerRunning = false;
 
         // Show loading state
         const gameView = document.getElementById('game-view');
@@ -505,10 +505,14 @@ async function loadArchiveDate(dateStr) {
         if (guessInput) guessInput.value = '';
         if (timer) timer.textContent = '00:00';
 
+        // Reset timer state completely
+        startTime = null;
+        isTimerRunning = false;
+
         // Reset play button
         const playBtn = document.getElementById('playPauseBtn');
         if (playBtn) {
-            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            playBtn.innerHTML = '<i class="fas fa-play"></i> Play';
             playBtn.classList.remove('playing');
         }
 
