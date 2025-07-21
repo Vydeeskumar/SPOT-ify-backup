@@ -46,7 +46,7 @@ function setupGameControls() {
     clearInterval(timerInterval);
 
     try {
-        const response = await fetch(`/${window.currentLanguage || 'tamil'}/giveup-archive/?song_id=${songId}`);
+        const response = await fetch(`/${window.currentLanguage || 'tamil'}/giveup-archive/?song_id=${window.songId || songId}`);
         const data = await response.json();
 
         if (data.error) throw new Error(data.error);
@@ -114,8 +114,8 @@ async function handleGuess(e) {
             guess: guessInput.value.trim(),
             spotify_id: guessInput.dataset.spotifyId,
             time_taken: timeTaken,
-            song_id: songId,
-            play_date: playDate
+            song_id: window.songId || songId,
+            play_date: window.playDate || playDate
         };
 
         console.log('Submitting guess with data:', submissionData);
@@ -228,7 +228,7 @@ function showResults(result) {
     <div class="reveal-animation">
         <div class="reveal-header mb-4">
             <h4 class="archive-score-message">
-                If you had played on ${playDate}, you would've ranked #${result.rank}
+                If you had played on ${window.playDate || playDate}, you would've ranked #${result.rank}
             </h4>
         </div>
 
@@ -333,10 +333,11 @@ async function loadArchiveLeaderboard(result) {
 
     try {
         // Ensure date is in YYYY-MM-DD format
-        let formattedDate = playDate;
-        if (playDate && !playDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const currentPlayDate = window.playDate || playDate;
+        let formattedDate = currentPlayDate;
+        if (currentPlayDate && !currentPlayDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
             // If playDate is not in YYYY-MM-DD format, try to convert it
-            const date = new Date(playDate);
+            const date = new Date(currentPlayDate);
             if (!isNaN(date.getTime())) {
                 formattedDate = date.toISOString().split('T')[0];
             }
@@ -412,7 +413,7 @@ async function setupArchiveNavigation() {
 
     try {
         // Get proper previous and next dates from backend
-        const response = await fetch(`/${window.currentLanguage || 'tamil'}/archive-navigation/?date=${playDate}`);
+        const response = await fetch(`/${window.currentLanguage || 'tamil'}/archive-navigation/?date=${window.playDate || playDate}`);
         const data = await response.json();
 
         console.log('Navigation data:', data);
