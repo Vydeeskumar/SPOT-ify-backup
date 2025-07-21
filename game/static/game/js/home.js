@@ -42,7 +42,7 @@ function attachLeaderboardToggleListeners() {
 document.addEventListener('DOMContentLoaded', function () {
     console.log("✅ home.js loaded");
     const mainGame = document.getElementById('game-main');  // Add this container to home.html
-    if (!mainGame) return; 
+    if (!mainGame) return;
 
         // Initialize variables
     let startTime = null;
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
             startTime = Date.now();
             isTimerRunning = true;
             timerInterval = setInterval(updateTimer, 100);
-            
+
             localStorage.setItem('songTimer', JSON.stringify({
                 date: new Date().toDateString(),
                 initialStartTime: startTime
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const timerElement = document.getElementById('timer');
         if (timerElement) {
-            timerElement.textContent = 
+            timerElement.textContent =
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
@@ -203,32 +203,32 @@ document.addEventListener('DOMContentLoaded', function () {
     // ADD this new function
     function initializeCountdown() {
         console.log('Initializing countdown...'); // This helps us debug
-        
+
         // Clear any existing intervals
         if (window.countdownInterval) {
             clearInterval(window.countdownInterval);
         }
-        
+
         // Start new countdown
         updateCountdown();
         window.countdownInterval = setInterval(updateCountdown, 1000);
     }
 
-    
 
 
 
-    
-        
+
+
+
     // Check if we need to show countdown
-    const needsCountdown = document.querySelector('.countdown-section') || 
+    const needsCountdown = document.querySelector('.countdown-section') ||
                         document.querySelector('.result-container');
-    
+
     if (needsCountdown) {
         console.log('Countdown needed, initializing...'); // This helps us debug
         initializeCountdown();
     }
-    
+
 
     // ADD this new event listener
     window.addEventListener('beforeunload', function() {
@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    
+
 
 
     function showResultView() {
@@ -245,19 +245,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const gameContainer = document.getElementById('game-container');
             const resultContainer = document.getElementById('result-container');
-            
+
             if (gameContainer) gameContainer.style.display = 'none';
             if (resultContainer) {
                 resultContainer.style.display = 'block';
                 resultContainer.style.opacity = '1';
                 resultContainer.style.visibility = 'visible';
             }
-            
+
 
             // Get current points and update score message
             const points = document.querySelector('.points-value')?.textContent || '0';
             const scoreMessage = document.getElementById('score-message');
-            
+
             if (scoreMessage) {
                 let messageHTML;
 
@@ -278,8 +278,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 scoreMessage.innerHTML = messageHTML;
             }
-            
-            
+
+
             // Stop the main audio if it's playing
             const mainAudio = document.getElementById('song-snippet');
             if (mainAudio) {
@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     .catch(error => console.log('Audio playback failed:', error));
             }
 
-            
+
 
             // Remove any existing leaderboard
             const existingLeaderboard = document.querySelector('.daily-leaderboard');
@@ -390,18 +390,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-   
+
 
 
     // Reattach all dynamic listeners here
-    
+
     document.getElementById('upi-copy-btn')?.addEventListener('click', copyUpiId);  // Adjust ID if needed
     document.querySelector('.btn-share-whatsapp')?.addEventListener('click', shareToWhatsApp);
     document.querySelector('.btn-share-twitter')?.addEventListener('click', shareToTwitter);
     document.querySelector('.btn-share-copy')?.addEventListener('click', copyShareText);
 
 
-  
+
 
 
     // Initialize elements
@@ -445,13 +445,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (audioElement.duration) {
             const progress = (audioElement.currentTime / audioElement.duration) * 100;
             progressFill.style.width = `${progress}%`;
-            
+
             // Update time displays
             const currentMinutes = Math.floor(audioElement.currentTime / 60);
             const currentSeconds = Math.floor(audioElement.currentTime % 60);
             const totalMinutes = Math.floor(audioElement.duration / 60);
             const totalSeconds = Math.floor(audioElement.duration % 60);
-            
+
             if (currentTimeDisplay && totalTimeDisplay) {
                 currentTimeDisplay.textContent = `${currentMinutes}:${currentSeconds.toString().padStart(2, '0')}`;
                 totalTimeDisplay.textContent = `${totalMinutes}:${totalSeconds.toString().padStart(2, '0')}`;
@@ -467,14 +467,14 @@ document.addEventListener('DOMContentLoaded', function () {
     if (playPauseBtn) {
         playPauseBtn.addEventListener('click', () => {
             initAudioContext();
-            
+
             if (audioElement.paused) {
                 if (!source) {
                     source = audioContext.createMediaElementSource(audioElement);
                     source.connect(analyser);
                     analyser.connect(audioContext.destination);
                 }
-                
+
                 audioElement.play();
                 vinylPlayer.classList.add('playing');
                 vinylPlayer.classList.remove('paused');
@@ -498,7 +498,7 @@ document.addEventListener('DOMContentLoaded', function () {
         playPauseBtn.click();
     };
 
-   
+
 
 
     // Give Up functionality
@@ -516,10 +516,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (response.ok) {
                         const data = await response.json();
-                        
+
                         // Stop audio and animations
                         audioElement.pause();
-                        
+
                         // Set points to 0 for give up
                         const pointsValue = document.querySelector('.points-value');
                         if (pointsValue) {
@@ -528,10 +528,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         // Set a flag to indicate give-up
                         window.isGaveUp = true;
-                        
+
                         // Show result view (this should now show the give-up message)
                         showResultView();
-                        
+
                         // Clear timer
                         clearInterval(timerInterval);
                         localStorage.removeItem('songTimer');
@@ -576,20 +576,25 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             const data = await response.json();
-            
+
             if (data.correct) {
                 // Show success message
                 resultMessage.innerHTML = `<div class="alert alert-success">
                     ${data.message}
                 </div>`;
-                
+
                 // Show result view
                 showResultView();
-                
+
                 // Stop audio and clear timer
                 audioElement.pause();
                 clearInterval(timerInterval);
                 localStorage.removeItem('songTimer');
+
+                // 🔥 Trigger streak celebration modal after 3 seconds
+                if (data.streak && data.streak > 0) {
+                    window.showStreakCelebration(data.streak, 3000);
+                }
             } else {
                 resultMessage.innerHTML = `<div class="alert alert-danger">
                     ${data.message}
@@ -627,7 +632,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const upiId = document.getElementById('upiId');
         upiId.select();
         document.execCommand('copy');
-        
+
         // Show feedback
         const button = event.target.closest('button');
         const originalText = button.innerHTML;
@@ -647,7 +652,7 @@ document.addEventListener('DOMContentLoaded', function () {
     async function getSpotifyToken() {
         const clientId = 'f7d61e92fbfa47ba825b91d382c21bb8';
         const clientSecret = '3c18c9e7addf406a8b20ba92ea13d0e4';
-        
+
         try {
             const response = await fetch('https://accounts.spotify.com/api/token', {
                 method: 'POST',
@@ -657,7 +662,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: 'grant_type=client_credentials'
             });
-            
+
             const data = await response.json();
             accessToken = data.access_token;
         } catch (error) {
@@ -667,7 +672,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function searchSpotify(query) {
         if (!query) return;
-        
+
         try {
             // Add more search parameters and operators
             const searchQuery = `${query} OR lyrics:${query} OR track:${query}`;
@@ -676,7 +681,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     'Authorization': `Bearer ${accessToken}`
                 }
             });
-            
+
             const data = await response.json();
             return data.tracks.items;
         } catch (error) {
@@ -704,8 +709,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (tracks && tracks.length > 0) {
                     suggestionsContainer.innerHTML = tracks.map(track => `
-                        <div class="suggestion-item" 
-                            data-song-name="${encodeURIComponent(track.name)}" 
+                        <div class="suggestion-item"
+                            data-song-name="${encodeURIComponent(track.name)}"
                             data-spotify-id="${track.id}">
                             <img src="${track.album.images[track.album.images.length - 1].url}" alt="${track.name}">
                             <div class="suggestion-info">
@@ -755,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function getShareText() {
         const score = document.querySelector('.points-value')?.textContent || '';
         const rank = document.querySelector('.leaderboard-header span')?.textContent.replace('Your Rank: #', '') || '';
-        
+
         return `🎵 SPOT-ify the Paatu\n` +
             `🎯 Score: ${score} points\n` +
             `🏆 Rank: #${rank}\n\n` +
@@ -808,13 +813,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const button = event.currentTarget;
     const ripple = document.createElement('span');
     const rect = button.getBoundingClientRect();
-    
+
     ripple.className = 'ripple';
     ripple.style.left = `${event.clientX - rect.left}px`;
     ripple.style.top = `${event.clientY - rect.top}px`;
-    
+
     button.appendChild(ripple);
-    
+
     setTimeout(() => ripple.remove(), 600);
     }
 
@@ -891,7 +896,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Enhanced Share Functionality
     function shareContent(platform) {
         const shareText = getShareText();
-        
+
         switch(platform) {
             case 'whatsapp':
                 window.open(`whatsapp://send?text=${encodeURIComponent(shareText)}`);
@@ -914,12 +919,12 @@ document.addEventListener('DOMContentLoaded', function () {
         toast.className = 'toast-notification';
         toast.textContent = message;
         document.body.appendChild(toast);
-        
+
         setTimeout(() => {
             toast.classList.add('show');
             if (navigator.vibrate) navigator.vibrate(10);
         }, 100);
-        
+
         setTimeout(() => {
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 300);
@@ -938,9 +943,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    
 
-    
+
+
 
 });
 
@@ -973,3 +978,131 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+
+// 🔥 STREAK CELEBRATION MODAL FUNCTIONALITY
+
+const streakMessages = {
+    regular: [
+        "Keep it going!",
+        "You're on fire!",
+        "Streak master!",
+        "Unstoppable!",
+        "Amazing consistency!",
+        "Daily dedication!",
+        "Music genius!",
+        "Perfect rhythm!",
+        "Song detective!",
+        "Melody master!",
+        "Tune hunter!",
+        "Beat keeper!"
+    ],
+    milestone: [
+        "INCREDIBLE MILESTONE!",
+        "LEGENDARY STREAK!",
+        "ABSOLUTELY AMAZING!",
+        "STREAK CHAMPION!",
+        "MUSIC MASTER!",
+        "PHENOMENAL DEDICATION!",
+        "STREAK SUPERSTAR!",
+        "UNBELIEVABLE CONSISTENCY!"
+    ]
+};
+
+function shouldShowStreakModal(streak) {
+    if (!streak || streak === 0) return false;
+
+    // Show for days 1-10
+    if (streak <= 10) return true;
+
+    // Show for multiples of 5 after 10
+    if (streak > 10 && streak % 5 === 0) return true;
+
+    return false;
+}
+
+function isSpecialMilestone(streak) {
+    const milestones = [10, 25, 50, 75, 100, 150, 200, 250, 300, 365, 500, 750, 1000];
+    return milestones.includes(streak);
+}
+
+function getRandomMessage(isSpecial = false) {
+    const messages = isSpecial ? streakMessages.milestone : streakMessages.regular;
+    return messages[Math.floor(Math.random() * messages.length)];
+}
+
+function showStreakModal(streak) {
+    if (!shouldShowStreakModal(streak)) return;
+
+    const modal = document.getElementById('streak-modal');
+    const modalContent = modal.querySelector('.streak-modal-content');
+    const title = modal.querySelector('.streak-title');
+    const count = modal.querySelector('.streak-count');
+    const message = modal.querySelector('.streak-message');
+    const closeBtn = modal.querySelector('.streak-close-btn');
+
+    if (!modal || !modalContent) return;
+
+    const isSpecial = isSpecialMilestone(streak);
+
+    // Set content
+    title.textContent = isSpecial ? 'MILESTONE ACHIEVED!' : 'STREAK FIRE!';
+    count.textContent = `${streak} Day Streak!`;
+    message.textContent = getRandomMessage(isSpecial);
+
+    // Apply special styling for milestones
+    if (isSpecial) {
+        modalContent.classList.add('milestone');
+    } else {
+        modalContent.classList.remove('milestone');
+    }
+
+    // Show modal with animation
+    modal.style.display = 'block';
+
+    // Auto-close after 4 seconds
+    const autoCloseTimer = setTimeout(() => {
+        hideStreakModal();
+    }, 4000);
+
+    // Close button functionality
+    closeBtn.onclick = () => {
+        clearTimeout(autoCloseTimer);
+        hideStreakModal();
+    };
+
+    // Close on background click
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            clearTimeout(autoCloseTimer);
+            hideStreakModal();
+        }
+    };
+
+    console.log(`🔥 Showing streak modal for ${streak} days (${isSpecial ? 'MILESTONE' : 'regular'})`);
+}
+
+function hideStreakModal() {
+    const modal = document.getElementById('streak-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        console.log('🔥 Streak modal hidden');
+    }
+}
+
+// Global function to trigger streak modal (called from game logic)
+window.showStreakCelebration = function(streak, delay = 3000) {
+    console.log(`🔥 Streak celebration scheduled for ${streak} days in ${delay}ms`);
+    setTimeout(() => {
+        showStreakModal(streak);
+    }, delay);
+};
+
+// Export for use in other files
+window.streakModal = {
+    show: showStreakModal,
+    hide: hideStreakModal,
+    shouldShow: shouldShowStreakModal,
+    isSpecial: isSpecialMilestone
+};
+
+console.log('🔥 Streak modal system loaded');
