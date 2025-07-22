@@ -1394,13 +1394,20 @@ class OnboardingTour {
     }
 
     shouldShowTour() {
-        // Don't show tour if user has already played today's game
-        const hasPlayedToday = document.querySelector('.result-container') !== null;
+        // Check if user has already played today by looking for game view vs result view
+        const gameView = document.getElementById('game-view');
+        const gameContainer = document.getElementById('game-container');
+        const hasPlayedToday = gameView && gameView.style.display === 'none';
 
         // Don't show tour if already completed
         const tourCompleted = localStorage.getItem('spotifyTourCompleted');
 
-        console.log('🎯 Tour check:', { hasPlayedToday, tourCompleted });
+        console.log('🎯 Tour check:', {
+            hasPlayedToday,
+            tourCompleted,
+            gameViewDisplay: gameView?.style.display,
+            gameViewExists: !!gameView
+        });
 
         // Only show tour for new users who haven't played today and haven't completed tour
         return !hasPlayedToday && !tourCompleted;
@@ -1413,25 +1420,47 @@ let onboardingTour;
 document.addEventListener('DOMContentLoaded', () => {
     onboardingTour = new OnboardingTour();
 
+    console.log('🎯 Tour system initialized');
+
     // Auto-start tour for new users after a short delay
-    if (onboardingTour.shouldShowTour()) {
-        // Additional check: only start if game view is visible (not results view)
-        setTimeout(() => {
+    setTimeout(() => {
+        const shouldShow = onboardingTour.shouldShowTour();
+        console.log('🎯 Should show tour:', shouldShow);
+
+        if (shouldShow) {
             const gameView = document.getElementById('game-view');
             const isGameViewVisible = gameView && gameView.style.display !== 'none';
 
+            console.log('🎯 Game view check:', {
+                gameViewExists: !!gameView,
+                isVisible: isGameViewVisible,
+                display: gameView?.style.display
+            });
+
             if (isGameViewVisible) {
+                console.log('🎯 Starting tour...');
                 onboardingTour.start();
+            } else {
+                console.log('🎯 Tour not started - game view not visible');
             }
-        }, 2000); // 2 second delay to let page load
-    }
+        } else {
+            console.log('🎯 Tour not started - conditions not met');
+        }
+    }, 2000); // 2 second delay to let page load
 });
 
 // Global function to manually start tour (for testing or settings)
 window.startOnboardingTour = function() {
     if (onboardingTour) {
+        console.log('🎯 Manually starting tour...');
         onboardingTour.start();
     }
+};
+
+// Global function to reset tour (for testing)
+window.resetTour = function() {
+    localStorage.removeItem('spotifyTourCompleted');
+    console.log('🎯 Tour reset - will show on next page load');
 };
 
 console.log('🎯 Onboarding tour system loaded');
