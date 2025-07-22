@@ -1141,7 +1141,7 @@ const tourSteps = [
         position: 'top'
     },
     {
-        target: 'button[type="submit"]',
+        target: '.guess-form button[type="submit"], #guess-form button[type="submit"]',
         title: 'Submit Guess',
         description: 'Click here to submit your guess and see if you got it right!',
         position: 'top'
@@ -1159,25 +1159,26 @@ const tourSteps = [
         position: 'left'
     },
     {
-        target: '.navbar',
+        target: '.navbar, .navbar-nav',
         title: 'Navigation Menu',
         description: 'Use this menu to navigate between different pages and features.',
-        position: 'bottom'
+        position: 'bottom',
+        action: 'openMobileNav'
     },
     {
-        target: 'a[href*="archive"]',
+        target: '.navbar-nav a[href*="archive"], .nav-link[href*="archive"]',
         title: 'Archive Games',
         description: 'Play songs from previous days you missed! Note: Archive scores are just for fun - you\'ll see a \'hypothetical rank\' showing where you would have placed if you played that day, but it won\'t affect your real stats, streaks, or leaderboards. It\'s like time travel practice! 🕰️✨',
         position: 'bottom'
     },
     {
-        target: 'a[href*="friends"]',
+        target: '.navbar-nav a[href*="friends"], .nav-link[href*="friends"]',
         title: 'Friends System',
         description: 'Add friends and compare your scores! Challenge each other and see who\'s the ultimate music master.',
         position: 'bottom'
     },
     {
-        target: 'a[href*="profile"]',
+        target: '.navbar-nav a[href*="profile"], .nav-link[href*="profile"]',
         title: 'Your Profile',
         description: 'View your stats, streaks, achievements, and track your progress over time.',
         position: 'bottom'
@@ -1189,7 +1190,7 @@ const tourSteps = [
         position: 'left'
     },
     {
-        target: '.leaderboard-container',
+        target: '.leaderboard-container, .leaderboard-section, #leaderboard',
         title: 'Leaderboards',
         description: 'See how you rank against other players! Compete for the top spots in daily, weekly, and monthly rankings.',
         position: 'top'
@@ -1253,6 +1254,9 @@ class OnboardingTour {
         this.isActive = true;
         this.overlay.style.display = 'block';
 
+        // Prevent audio from playing during tour
+        this.disableAudio();
+
         // Small delay for smooth animation
         setTimeout(() => {
             this.overlay.classList.add('active');
@@ -1262,6 +1266,37 @@ class OnboardingTour {
         console.log('🎯 Onboarding tour started');
     }
 
+    disableAudio() {
+        // Disable all audio elements during tour
+        const audioElements = document.querySelectorAll('audio');
+        audioElements.forEach(audio => {
+            audio.muted = true;
+            audio.pause();
+        });
+
+        // Disable play buttons
+        const playButtons = document.querySelectorAll('#playPauseBtn, .play-btn');
+        playButtons.forEach(btn => {
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.5';
+        });
+    }
+
+    enableAudio() {
+        // Re-enable audio after tour
+        const audioElements = document.querySelectorAll('audio');
+        audioElements.forEach(audio => {
+            audio.muted = false;
+        });
+
+        // Re-enable play buttons
+        const playButtons = document.querySelectorAll('#playPauseBtn, .play-btn');
+        playButtons.forEach(btn => {
+            btn.style.pointerEvents = 'auto';
+            btn.style.opacity = '1';
+        });
+    }
+
     showStep(stepIndex) {
         if (stepIndex >= tourSteps.length) {
             this.endTour();
@@ -1269,7 +1304,25 @@ class OnboardingTour {
         }
 
         const step = tourSteps[stepIndex];
-        const target = document.querySelector(step.target);
+
+        // Handle special actions (like opening mobile nav)
+        if (step.action === 'openMobileNav') {
+            this.openMobileNavigation();
+        }
+
+        // Try multiple selectors for better element finding
+        let target = null;
+        const selectors = step.target.split(', ');
+        for (const selector of selectors) {
+            target = document.querySelector(selector.trim());
+            if (target) break;
+        }
+
+        // Fallback for missing elements
+        if (!target && step.target !== 'body') {
+            console.warn(`🎯 Target not found: ${step.target}, using fallback`);
+            target = document.body;
+        }
 
         // Update content
         this.title.textContent = step.title;
@@ -1290,7 +1343,21 @@ class OnboardingTour {
         // Highlight target element
         this.highlightElement(target);
 
-        console.log(`🎯 Tour step ${stepIndex + 1}: ${step.title}`);
+        console.log(`🎯 Tour step ${stepIndex + 1}: ${step.title}`, { target, found: !!target });
+    }
+
+    openMobileNavigation() {
+        // Open mobile navigation if it exists
+        const navToggle = document.querySelector('.navbar-toggler, .nav-toggle, .mobile-menu-toggle');
+        const navCollapse = document.querySelector('.navbar-collapse, .nav-collapse');
+
+        if (navToggle && navCollapse) {
+            // Check if nav is collapsed (mobile)
+            if (!navCollapse.classList.contains('show') && window.innerWidth <= 768) {
+                navToggle.click();
+                console.log('🎯 Opened mobile navigation');
+            }
+        }
     }
 
     positionElements(target, position) {
@@ -1379,10 +1446,20 @@ class OnboardingTour {
         this.isActive = false;
         this.overlay.classList.remove('active');
 
+        // Re-enable audio
+        this.enableAudio();
+
         // Remove highlights
         document.querySelectorAll('.tour-highlight').forEach(el => {
             el.classList.remove('tour-highlight');
         });
+
+        // Close mobile nav if it was opened
+        const navCollapse = document.querySelector('.navbar-collapse.show');
+        if (navCollapse && window.innerWidth <= 768) {
+            const navToggle = document.querySelector('.navbar-toggler');
+            if (navToggle) navToggle.click();
+        }
 
         setTimeout(() => {
             this.overlay.style.display = 'none';
