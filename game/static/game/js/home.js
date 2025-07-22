@@ -1394,8 +1394,16 @@ class OnboardingTour {
     }
 
     shouldShowTour() {
-        // Show tour for new users who haven't completed it
-        return !localStorage.getItem('spotifyTourCompleted');
+        // Don't show tour if user has already played today's game
+        const hasPlayedToday = document.querySelector('.result-container') !== null;
+
+        // Don't show tour if already completed
+        const tourCompleted = localStorage.getItem('spotifyTourCompleted');
+
+        console.log('🎯 Tour check:', { hasPlayedToday, tourCompleted });
+
+        // Only show tour for new users who haven't played today and haven't completed tour
+        return !hasPlayedToday && !tourCompleted;
     }
 }
 
@@ -1407,8 +1415,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Auto-start tour for new users after a short delay
     if (onboardingTour.shouldShowTour()) {
+        // Additional check: only start if game view is visible (not results view)
         setTimeout(() => {
-            onboardingTour.start();
+            const gameView = document.getElementById('game-view');
+            const isGameViewVisible = gameView && gameView.style.display !== 'none';
+
+            if (isGameViewVisible) {
+                onboardingTour.start();
+            }
         }, 2000); // 2 second delay to let page load
     }
 });
