@@ -1107,47 +1107,47 @@ window.streakModal = {
 
 console.log('🔥 Streak modal system loaded');
 
-// 🎯 ULTRA-COOL ONBOARDING TOUR SYSTEM
+// 🎯 PERFECT ONBOARDING TOUR SYSTEM - GOD PROGRAMMER VERSION
 
 const tourSteps = [
     {
-        target: '#vinyl-player',
+        target: 'tour-vinyl-player',
         title: 'Welcome to SPOT-ify!',
         description: 'Let\'s learn how to play this amazing music guessing game! Click this vinyl record to play the song snippet.',
         position: 'bottom'
     },
     {
-        target: '#playPauseBtn',
+        target: 'tour-play-btn',
         title: 'Play Controls',
         description: 'Or use this button to control playback. The song will start playing automatically when you click it.',
         position: 'top'
     },
     {
-        target: '#timer',
+        target: 'tour-timer',
         title: 'Timer',
         description: 'This timer shows how long you\'ve been guessing - faster guesses earn more points!',
         position: 'bottom'
     },
     {
-        target: '#points-indicator',
+        target: 'tour-points',
         title: 'Points System',
         description: 'Your points decrease over time, so guess quickly! Maximum 8 points for instant guesses.',
         position: 'bottom'
     },
     {
-        target: '#guess-input',
+        target: 'tour-guess-input',
         title: 'Guess Input',
         description: 'Type your song guess here - smart suggestions will appear as you type to help you!',
         position: 'top'
     },
     {
-        target: '.guess-form button[type="submit"], #guess-form button[type="submit"]',
+        target: 'tour-submit-btn',
         title: 'Submit Guess',
         description: 'Click here to submit your guess and see if you got it right!',
         position: 'top'
     },
     {
-        target: '#giveUpBtn',
+        target: 'tour-giveup-btn',
         title: 'Give Up Option',
         description: 'If you\'re stuck, click here to reveal the answer - but you\'ll lose your streak!',
         position: 'top'
@@ -1159,26 +1159,26 @@ const tourSteps = [
         position: 'left'
     },
     {
-        target: '.navbar, .navbar-nav',
+        target: '.navbar',
         title: 'Navigation Menu',
         description: 'Use this menu to navigate between different pages and features.',
         position: 'bottom',
         action: 'openMobileNav'
     },
     {
-        target: '.navbar-nav a[href*="archive"], .nav-link[href*="archive"]',
+        target: 'tour-archive-link',
         title: 'Archive Games',
         description: 'Play songs from previous days you missed! Note: Archive scores are just for fun - you\'ll see a \'hypothetical rank\' showing where you would have placed if you played that day, but it won\'t affect your real stats, streaks, or leaderboards. It\'s like time travel practice! 🕰️✨',
         position: 'bottom'
     },
     {
-        target: '.navbar-nav a[href*="friends"], .nav-link[href*="friends"]',
+        target: 'tour-friends-link',
         title: 'Friends System',
         description: 'Add friends and compare your scores! Challenge each other and see who\'s the ultimate music master.',
         position: 'bottom'
     },
     {
-        target: '.navbar-nav a[href*="profile"], .nav-link[href*="profile"]',
+        target: 'tour-profile-link',
         title: 'Your Profile',
         description: 'View your stats, streaks, achievements, and track your progress over time.',
         position: 'bottom'
@@ -1190,7 +1190,7 @@ const tourSteps = [
         position: 'left'
     },
     {
-        target: '.leaderboard-container, .leaderboard-section, #leaderboard',
+        target: 'tour-leaderboard',
         title: 'Leaderboards',
         description: 'See how you rank against other players! Compete for the top spots in daily, weekly, and monthly rankings.',
         position: 'top'
@@ -1203,30 +1203,93 @@ const tourSteps = [
     }
 ];
 
-class OnboardingTour {
+class PerfectOnboardingTour {
     constructor() {
         this.currentStep = 0;
         this.isActive = false;
-        this.overlay = document.getElementById('onboarding-tour');
-        this.spotlight = this.overlay?.querySelector('.tour-spotlight');
-        this.tooltip = this.overlay?.querySelector('.tour-tooltip');
-        this.title = this.overlay?.querySelector('.tour-title');
-        this.description = this.overlay?.querySelector('.tour-description');
-        this.stepCounter = this.overlay?.querySelector('.tour-step-counter');
-        this.progressFill = this.overlay?.querySelector('.tour-progress-fill');
-        this.nextBtn = this.overlay?.querySelector('#tour-next');
-        this.skipBtn = this.overlay?.querySelector('#tour-skip');
-        this.closeBtn = this.overlay?.querySelector('#tour-close');
+        this.dummyGameCreated = false;
+        this.originalGameState = null;
 
+        // DOM elements
+        this.overlay = null;
+        this.spotlight = null;
+        this.tooltip = null;
+        this.title = null;
+        this.description = null;
+        this.stepCounter = null;
+        this.progressFill = null;
+        this.nextBtn = null;
+        this.skipBtn = null;
+        this.closeBtn = null;
+
+        this.initializeElements();
         this.bindEvents();
+    }
+
+    initializeElements() {
+        this.overlay = document.getElementById('onboarding-tour');
+        if (!this.overlay) {
+            console.error('🎯 Tour overlay not found');
+            return;
+        }
+
+        this.spotlight = this.overlay.querySelector('.tour-spotlight');
+        this.tooltip = this.overlay.querySelector('.tour-tooltip');
+        this.title = this.overlay.querySelector('.tour-title');
+        this.description = this.overlay.querySelector('.tour-description');
+        this.stepCounter = this.overlay.querySelector('.tour-step-counter');
+        this.progressFill = this.overlay.querySelector('.tour-progress-fill');
+        this.nextBtn = this.overlay.querySelector('#tour-next');
+        this.skipBtn = this.overlay.querySelector('#tour-skip');
+        this.closeBtn = this.overlay.querySelector('#tour-close');
+
+        // Validate all elements exist
+        const requiredElements = {
+            spotlight: this.spotlight,
+            tooltip: this.tooltip,
+            title: this.title,
+            description: this.description,
+            stepCounter: this.stepCounter,
+            progressFill: this.progressFill,
+            nextBtn: this.nextBtn,
+            skipBtn: this.skipBtn,
+            closeBtn: this.closeBtn
+        };
+
+        for (const [name, element] of Object.entries(requiredElements)) {
+            if (!element) {
+                console.error(`🎯 Tour element missing: ${name}`);
+            }
+        }
     }
 
     bindEvents() {
         if (!this.overlay) return;
 
-        this.nextBtn?.addEventListener('click', () => this.nextStep());
-        this.skipBtn?.addEventListener('click', () => this.endTour());
-        this.closeBtn?.addEventListener('click', () => this.endTour());
+        // Button events with null checks
+        if (this.nextBtn) {
+            this.nextBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.nextStep();
+            });
+        }
+
+        if (this.skipBtn) {
+            this.skipBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.endTour();
+            });
+        }
+
+        if (this.closeBtn) {
+            this.closeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.endTour();
+            });
+        }
 
         // Close on overlay click (but not tooltip click)
         this.overlay.addEventListener('click', (e) => {
@@ -1236,65 +1299,243 @@ class OnboardingTour {
         });
 
         // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
+        this.keyboardHandler = (e) => {
             if (!this.isActive) return;
 
             if (e.key === 'Escape') {
+                e.preventDefault();
                 this.endTour();
             } else if (e.key === 'ArrowRight' || e.key === 'Enter') {
+                e.preventDefault();
                 this.nextStep();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                this.previousStep();
             }
-        });
+        };
+
+        document.addEventListener('keydown', this.keyboardHandler);
+    }
+
+    createDummyGame() {
+        if (this.dummyGameCreated) return;
+
+        // Save original game state
+        const gameContainer = document.getElementById('game-container');
+        const gameView = document.getElementById('game-view');
+
+        if (gameContainer) {
+            this.originalGameState = {
+                gameContainer: gameContainer.cloneNode(true),
+                display: gameContainer.style.display
+            };
+        }
+
+        // Create dummy game elements with tour IDs
+        const dummyHTML = `
+            <div id="tour-dummy-game" style="position: relative; z-index: 1;">
+                <div class="game-header">
+                    <h2>Today's Demo Song</h2>
+                    <div id="tour-timer" class="timer">00:00</div>
+                    <div id="tour-points" class="points-indicator">Points: <span class="points-value">8</span></div>
+                </div>
+
+                <div id="tour-vinyl-player" class="vinyl-player">
+                    <div class="vinyl-record">
+                        <div class="vinyl-grooves"></div>
+                        <div class="vinyl-center">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%;"></div>
+                    </div>
+                </div>
+
+                <div class="game-controls">
+                    <button id="tour-play-btn" class="btn btn-play">
+                        <i class="fas fa-play"></i> Play
+                    </button>
+                    <button id="tour-giveup-btn" class="btn btn-giveup">
+                        <i class="fas fa-flag"></i> Give Up
+                    </button>
+                </div>
+
+                <form class="guess-form">
+                    <div class="mb-3 position-relative">
+                        <input type="text" id="tour-guess-input" class="form-control"
+                               placeholder="Enter song name" value="Demo Song Name">
+                        <div class="suggestions-container">
+                            <div class="suggestion-item">Demo Song 1</div>
+                            <div class="suggestion-item">Demo Song 2</div>
+                        </div>
+                    </div>
+                    <button type="button" id="tour-submit-btn" class="btn btn-play">Submit Guess</button>
+                </form>
+            </div>
+
+            <!-- Dummy Navigation Links -->
+            <div id="tour-nav-links" style="position: absolute; top: -9999px;">
+                <a id="tour-archive-link" href="#" class="nav-link">Archive</a>
+                <a id="tour-friends-link" href="#" class="nav-link">Friends</a>
+                <a id="tour-profile-link" href="#" class="nav-link">Profile</a>
+            </div>
+
+            <!-- Dummy Leaderboard -->
+            <div id="tour-leaderboard" style="position: absolute; top: -9999px;">
+                <div class="leaderboard-container">
+                    <h3>Leaderboard</h3>
+                    <div class="leaderboard-item">Demo Player - 100 pts</div>
+                </div>
+            </div>
+        `;
+
+        // Insert dummy game
+        if (gameContainer) {
+            gameContainer.style.display = 'none';
+            gameContainer.insertAdjacentHTML('afterend', dummyHTML);
+        } else if (gameView) {
+            gameView.style.display = 'none';
+            gameView.insertAdjacentHTML('afterend', dummyHTML);
+        } else {
+            // Fallback: insert into game main
+            const gameMain = document.getElementById('game-main');
+            if (gameMain) {
+                gameMain.insertAdjacentHTML('beforeend', dummyHTML);
+            }
+        }
+
+        this.dummyGameCreated = true;
+        console.log('🎯 Dummy game created for tour');
+    }
+
+    removeDummyGame() {
+        if (!this.dummyGameCreated) return;
+
+        // Remove dummy elements
+        const dummyGame = document.getElementById('tour-dummy-game');
+        const dummyNav = document.getElementById('tour-nav-links');
+        const dummyLeaderboard = document.getElementById('tour-leaderboard');
+
+        if (dummyGame) dummyGame.remove();
+        if (dummyNav) dummyNav.remove();
+        if (dummyLeaderboard) dummyLeaderboard.remove();
+
+        // Restore original game
+        if (this.originalGameState) {
+            const gameContainer = document.getElementById('game-container');
+            if (gameContainer) {
+                gameContainer.style.display = this.originalGameState.display;
+            }
+        }
+
+        this.dummyGameCreated = false;
+        console.log('🎯 Dummy game removed');
     }
 
     start() {
-        if (!this.overlay || this.isActive) return;
+        if (!this.overlay || this.isActive) {
+            console.warn('🎯 Tour already active or overlay missing');
+            return;
+        }
 
+        console.log('🎯 Starting perfect onboarding tour...');
+
+        // Reset state
         this.currentStep = 0;
         this.isActive = true;
-        this.overlay.style.display = 'block';
 
-        // Prevent audio from playing during tour
-        this.disableAudio();
+        // Create dummy game environment
+        this.createDummyGame();
+
+        // Disable real game interactions
+        this.disableRealGame();
+
+        // Show overlay
+        this.overlay.style.display = 'block';
 
         // Small delay for smooth animation
         setTimeout(() => {
-            this.overlay.classList.add('active');
-            this.showStep(0);
-        }, 100);
+            if (this.overlay) {
+                this.overlay.classList.add('active');
+                this.showStep(0);
+            }
+        }, 150);
 
-        console.log('🎯 Onboarding tour started');
+        console.log('🎯 Perfect onboarding tour started');
     }
 
-    disableAudio() {
-        // Disable all audio elements during tour
+    disableRealGame() {
+        // Disable all real game interactions
+        const realGameElements = [
+            '#vinyl-player',
+            '#playPauseBtn',
+            '#giveUpBtn',
+            '#guess-input',
+            '#guess-form',
+            'button[type="submit"]'
+        ];
+
+        realGameElements.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+                el.style.pointerEvents = 'none';
+                el.style.opacity = '0.3';
+                el.setAttribute('data-tour-disabled', 'true');
+            });
+        });
+
+        // Mute and pause all audio
         const audioElements = document.querySelectorAll('audio');
         audioElements.forEach(audio => {
             audio.muted = true;
             audio.pause();
-        });
-
-        // Disable play buttons
-        const playButtons = document.querySelectorAll('#playPauseBtn, .play-btn');
-        playButtons.forEach(btn => {
-            btn.style.pointerEvents = 'none';
-            btn.style.opacity = '0.5';
+            audio.setAttribute('data-tour-muted', 'true');
         });
     }
 
-    enableAudio() {
-        // Re-enable audio after tour
-        const audioElements = document.querySelectorAll('audio');
-        audioElements.forEach(audio => {
-            audio.muted = false;
+    enableRealGame() {
+        // Re-enable all real game interactions
+        const disabledElements = document.querySelectorAll('[data-tour-disabled="true"]');
+        disabledElements.forEach(el => {
+            el.style.pointerEvents = 'auto';
+            el.style.opacity = '1';
+            el.removeAttribute('data-tour-disabled');
         });
 
-        // Re-enable play buttons
-        const playButtons = document.querySelectorAll('#playPauseBtn, .play-btn');
-        playButtons.forEach(btn => {
-            btn.style.pointerEvents = 'auto';
-            btn.style.opacity = '1';
+        // Unmute audio
+        const mutedAudio = document.querySelectorAll('[data-tour-muted="true"]');
+        mutedAudio.forEach(audio => {
+            audio.muted = false;
+            audio.removeAttribute('data-tour-muted');
         });
+    }
+
+    getTargetElement(targetId) {
+        // Smart element targeting with fallbacks
+        let element = null;
+
+        if (targetId === 'body') {
+            return document.body;
+        }
+
+        // Try direct ID first
+        element = document.getElementById(targetId);
+        if (element) return element;
+
+        // Try as class
+        element = document.querySelector(`.${targetId}`);
+        if (element) return element;
+
+        // Try as selector
+        element = document.querySelector(targetId);
+        if (element) return element;
+
+        console.warn(`🎯 Target element not found: ${targetId}`);
+        return null;
     }
 
     showStep(stepIndex) {
@@ -1303,47 +1544,70 @@ class OnboardingTour {
             return;
         }
 
+        this.currentStep = stepIndex;
         const step = tourSteps[stepIndex];
 
-        // Handle special actions (like opening mobile nav)
+        console.log(`🎯 Showing step ${stepIndex + 1}: ${step.title}`);
+
+        // Handle special actions
         if (step.action === 'openMobileNav') {
             this.openMobileNavigation();
         }
 
-        // Try multiple selectors for better element finding
-        let target = null;
-        const selectors = step.target.split(', ');
-        for (const selector of selectors) {
-            target = document.querySelector(selector.trim());
-            if (target) break;
+        // Get target element
+        const target = this.getTargetElement(step.target);
+
+        // Update content with null checks
+        if (this.title) this.title.textContent = step.title;
+        if (this.description) this.description.textContent = step.description;
+        if (this.stepCounter) this.stepCounter.textContent = `${stepIndex + 1} of ${tourSteps.length}`;
+        if (this.progressFill) {
+            this.progressFill.style.width = `${((stepIndex + 1) / tourSteps.length) * 100}%`;
         }
 
-        // Fallback for missing elements
-        if (!target && step.target !== 'body') {
-            console.warn(`🎯 Target not found: ${step.target}, using fallback`);
-            target = document.body;
+        // Update button text and visibility
+        if (this.nextBtn) {
+            if (stepIndex === tourSteps.length - 1) {
+                this.nextBtn.textContent = 'Finish Tour';
+                this.nextBtn.classList.add('tour-finish');
+            } else {
+                this.nextBtn.textContent = 'Next';
+                this.nextBtn.classList.remove('tour-finish');
+            }
+            this.nextBtn.style.display = 'block';
         }
 
-        // Update content
-        this.title.textContent = step.title;
-        this.description.textContent = step.description;
-        this.stepCounter.textContent = `${stepIndex + 1} of ${tourSteps.length}`;
-        this.progressFill.style.width = `${((stepIndex + 1) / tourSteps.length) * 100}%`;
-
-        // Update button text for last step
-        if (stepIndex === tourSteps.length - 1) {
-            this.nextBtn.textContent = 'Finish';
-        } else {
-            this.nextBtn.textContent = 'Next';
+        if (this.skipBtn) {
+            this.skipBtn.style.display = stepIndex === tourSteps.length - 1 ? 'none' : 'block';
         }
 
-        // Position spotlight and tooltip
+        // Position elements
         this.positionElements(target, step.position);
 
-        // Highlight target element
+        // Highlight target
         this.highlightElement(target);
 
-        console.log(`🎯 Tour step ${stepIndex + 1}: ${step.title}`, { target, found: !!target });
+        // Ensure tooltip is visible
+        if (this.tooltip) {
+            this.tooltip.style.opacity = '1';
+            this.tooltip.style.visibility = 'visible';
+        }
+
+        console.log(`🎯 Step ${stepIndex + 1} displayed successfully`);
+    }
+
+    nextStep() {
+        if (this.currentStep < tourSteps.length - 1) {
+            this.showStep(this.currentStep + 1);
+        } else {
+            this.endTour();
+        }
+    }
+
+    previousStep() {
+        if (this.currentStep > 0) {
+            this.showStep(this.currentStep - 1);
+        }
     }
 
     openMobileNavigation() {
@@ -1361,6 +1625,8 @@ class OnboardingTour {
     }
 
     positionElements(target, position) {
+        if (!this.spotlight || !this.tooltip) return;
+
         if (!target || target === document.body) {
             // Center position for final step
             this.spotlight.style.display = 'none';
@@ -1372,7 +1638,9 @@ class OnboardingTour {
         }
 
         const rect = target.getBoundingClientRect();
-        const tooltipRect = this.tooltip.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const isMobile = viewportWidth <= 768;
 
         // Position spotlight
         this.spotlight.style.display = 'block';
@@ -1381,7 +1649,19 @@ class OnboardingTour {
         this.spotlight.style.width = `${rect.width + 16}px`;
         this.spotlight.style.height = `${rect.height + 16}px`;
 
-        // Position tooltip based on position preference
+        if (isMobile) {
+            // Mobile: Always position tooltip at bottom
+            this.tooltip.style.position = 'fixed';
+            this.tooltip.style.bottom = '20px';
+            this.tooltip.style.left = '50%';
+            this.tooltip.style.transform = 'translateX(-50%)';
+            this.tooltip.style.top = 'auto';
+            this.tooltip.className = 'tour-tooltip mobile-position';
+            return;
+        }
+
+        // Desktop positioning
+        const tooltipRect = this.tooltip.getBoundingClientRect();
         let tooltipTop, tooltipLeft;
         let arrowClass = 'tour-tooltip';
 
@@ -1414,11 +1694,13 @@ class OnboardingTour {
 
         // Keep tooltip within viewport
         const margin = 20;
-        tooltipTop = Math.max(margin, Math.min(tooltipTop, window.innerHeight - tooltipRect.height - margin));
-        tooltipLeft = Math.max(margin, Math.min(tooltipLeft, window.innerWidth - tooltipRect.width - margin));
+        tooltipTop = Math.max(margin, Math.min(tooltipTop, viewportHeight - tooltipRect.height - margin));
+        tooltipLeft = Math.max(margin, Math.min(tooltipLeft, viewportWidth - tooltipRect.width - margin));
 
+        this.tooltip.style.position = 'absolute';
         this.tooltip.style.top = `${tooltipTop}px`;
         this.tooltip.style.left = `${tooltipLeft}px`;
+        this.tooltip.style.bottom = 'auto';
         this.tooltip.style.transform = 'none';
         this.tooltip.className = arrowClass;
     }
@@ -1443,31 +1725,70 @@ class OnboardingTour {
     endTour() {
         if (!this.isActive) return;
 
-        this.isActive = false;
-        this.overlay.classList.remove('active');
+        console.log('🎯 Ending perfect onboarding tour...');
 
-        // Re-enable audio
-        this.enableAudio();
+        this.isActive = false;
+
+        // Remove keyboard listener
+        if (this.keyboardHandler) {
+            document.removeEventListener('keydown', this.keyboardHandler);
+        }
+
+        // Re-enable real game
+        this.enableRealGame();
+
+        // Remove dummy game
+        this.removeDummyGame();
 
         // Remove highlights
         document.querySelectorAll('.tour-highlight').forEach(el => {
             el.classList.remove('tour-highlight');
         });
 
-        // Close mobile nav if it was opened
+        // Close mobile nav if opened
         const navCollapse = document.querySelector('.navbar-collapse.show');
         if (navCollapse && window.innerWidth <= 768) {
             const navToggle = document.querySelector('.navbar-toggler');
             if (navToggle) navToggle.click();
         }
 
-        setTimeout(() => {
-            this.overlay.style.display = 'none';
-        }, 400);
+        // Hide overlay with animation
+        if (this.overlay) {
+            this.overlay.classList.remove('active');
+            setTimeout(() => {
+                this.overlay.style.display = 'none';
+            }, 400);
+        }
 
         // Mark tour as completed
         localStorage.setItem('spotifyTourCompleted', 'true');
-        console.log('🎯 Onboarding tour completed');
+        console.log('🎯 Perfect onboarding tour completed successfully!');
+    }
+
+    openMobileNavigation() {
+        const navToggle = document.querySelector('.navbar-toggler, .nav-toggle, .mobile-menu-toggle');
+        const navCollapse = document.querySelector('.navbar-collapse, .nav-collapse');
+
+        if (navToggle && navCollapse && window.innerWidth <= 768) {
+            if (!navCollapse.classList.contains('show')) {
+                navToggle.click();
+                console.log('🎯 Opened mobile navigation for tour');
+
+                // Wait for animation and assign IDs
+                setTimeout(() => {
+                    const navLinks = navCollapse.querySelectorAll('.nav-link');
+                    navLinks.forEach(link => {
+                        if (link.href.includes('archive')) {
+                            link.id = 'tour-archive-link';
+                        } else if (link.href.includes('friends')) {
+                            link.id = 'tour-friends-link';
+                        } else if (link.href.includes('profile')) {
+                            link.id = 'tour-profile-link';
+                        }
+                    });
+                }, 300);
+            }
+        }
     }
 
     shouldShowTour() {
@@ -1495,7 +1816,7 @@ class OnboardingTour {
 let onboardingTour;
 
 document.addEventListener('DOMContentLoaded', () => {
-    onboardingTour = new OnboardingTour();
+    onboardingTour = new PerfectOnboardingTour();
 
     console.log('🎯 Tour system initialized');
 
