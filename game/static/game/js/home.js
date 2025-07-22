@@ -1106,3 +1106,318 @@ window.streakModal = {
 };
 
 console.log('🔥 Streak modal system loaded');
+
+// 🎯 ULTRA-COOL ONBOARDING TOUR SYSTEM
+
+const tourSteps = [
+    {
+        target: '#vinyl-player',
+        title: 'Welcome to SPOT-ify!',
+        description: 'Let\'s learn how to play this amazing music guessing game! Click this vinyl record to play the song snippet.',
+        position: 'bottom'
+    },
+    {
+        target: '#playPauseBtn',
+        title: 'Play Controls',
+        description: 'Or use this button to control playback. The song will start playing automatically when you click it.',
+        position: 'top'
+    },
+    {
+        target: '#timer',
+        title: 'Timer',
+        description: 'This timer shows how long you\'ve been guessing - faster guesses earn more points!',
+        position: 'bottom'
+    },
+    {
+        target: '#points-indicator',
+        title: 'Points System',
+        description: 'Your points decrease over time, so guess quickly! Maximum 8 points for instant guesses.',
+        position: 'bottom'
+    },
+    {
+        target: '#guess-input',
+        title: 'Guess Input',
+        description: 'Type your song guess here - smart suggestions will appear as you type to help you!',
+        position: 'top'
+    },
+    {
+        target: 'button[type="submit"]',
+        title: 'Submit Guess',
+        description: 'Click here to submit your guess and see if you got it right!',
+        position: 'top'
+    },
+    {
+        target: '#giveUpBtn',
+        title: 'Give Up Option',
+        description: 'If you\'re stuck, click here to reveal the answer - but you\'ll lose your streak!',
+        position: 'top'
+    },
+    {
+        target: '#languageOrb',
+        title: 'Language Switcher',
+        description: 'Click this floating orb to cycle between Tamil (Paatu), English (Song), and Hindi (Gaana) games - each language has different songs and separate leaderboards!',
+        position: 'left'
+    },
+    {
+        target: '.navbar',
+        title: 'Navigation Menu',
+        description: 'Use this menu to navigate between different pages and features.',
+        position: 'bottom'
+    },
+    {
+        target: 'a[href*="archive"]',
+        title: 'Archive Games',
+        description: 'Play songs from previous days you missed! Note: Archive scores are just for fun - you\'ll see a \'hypothetical rank\' showing where you would have placed if you played that day, but it won\'t affect your real stats, streaks, or leaderboards. It\'s like time travel practice! 🕰️✨',
+        position: 'bottom'
+    },
+    {
+        target: 'a[href*="friends"]',
+        title: 'Friends System',
+        description: 'Add friends and compare your scores! Challenge each other and see who\'s the ultimate music master.',
+        position: 'bottom'
+    },
+    {
+        target: 'a[href*="profile"]',
+        title: 'Your Profile',
+        description: 'View your stats, streaks, achievements, and track your progress over time.',
+        position: 'bottom'
+    },
+    {
+        target: '#zombiebot-bubble',
+        title: 'Zombiebot Assistant',
+        description: 'Ask me questions about the game rules, features, and how everything works!',
+        position: 'left'
+    },
+    {
+        target: '.leaderboard-container',
+        title: 'Leaderboards',
+        description: 'See how you rank against other players! Compete for the top spots in daily, weekly, and monthly rankings.',
+        position: 'top'
+    },
+    {
+        target: 'body',
+        title: 'You\'re All Set!',
+        description: 'That\'s everything! You\'re now ready to become a SPOT-ify master. Good luck and have fun guessing! 🎵🎯',
+        position: 'center'
+    }
+];
+
+class OnboardingTour {
+    constructor() {
+        this.currentStep = 0;
+        this.isActive = false;
+        this.overlay = document.getElementById('onboarding-tour');
+        this.spotlight = this.overlay?.querySelector('.tour-spotlight');
+        this.tooltip = this.overlay?.querySelector('.tour-tooltip');
+        this.title = this.overlay?.querySelector('.tour-title');
+        this.description = this.overlay?.querySelector('.tour-description');
+        this.stepCounter = this.overlay?.querySelector('.tour-step-counter');
+        this.progressFill = this.overlay?.querySelector('.tour-progress-fill');
+        this.nextBtn = this.overlay?.querySelector('#tour-next');
+        this.skipBtn = this.overlay?.querySelector('#tour-skip');
+        this.closeBtn = this.overlay?.querySelector('#tour-close');
+
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        if (!this.overlay) return;
+
+        this.nextBtn?.addEventListener('click', () => this.nextStep());
+        this.skipBtn?.addEventListener('click', () => this.endTour());
+        this.closeBtn?.addEventListener('click', () => this.endTour());
+
+        // Close on overlay click (but not tooltip click)
+        this.overlay.addEventListener('click', (e) => {
+            if (e.target === this.overlay) {
+                this.endTour();
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (!this.isActive) return;
+
+            if (e.key === 'Escape') {
+                this.endTour();
+            } else if (e.key === 'ArrowRight' || e.key === 'Enter') {
+                this.nextStep();
+            }
+        });
+    }
+
+    start() {
+        if (!this.overlay || this.isActive) return;
+
+        this.currentStep = 0;
+        this.isActive = true;
+        this.overlay.style.display = 'block';
+
+        // Small delay for smooth animation
+        setTimeout(() => {
+            this.overlay.classList.add('active');
+            this.showStep(0);
+        }, 100);
+
+        console.log('🎯 Onboarding tour started');
+    }
+
+    showStep(stepIndex) {
+        if (stepIndex >= tourSteps.length) {
+            this.endTour();
+            return;
+        }
+
+        const step = tourSteps[stepIndex];
+        const target = document.querySelector(step.target);
+
+        // Update content
+        this.title.textContent = step.title;
+        this.description.textContent = step.description;
+        this.stepCounter.textContent = `${stepIndex + 1} of ${tourSteps.length}`;
+        this.progressFill.style.width = `${((stepIndex + 1) / tourSteps.length) * 100}%`;
+
+        // Update button text for last step
+        if (stepIndex === tourSteps.length - 1) {
+            this.nextBtn.textContent = 'Finish';
+        } else {
+            this.nextBtn.textContent = 'Next';
+        }
+
+        // Position spotlight and tooltip
+        this.positionElements(target, step.position);
+
+        // Highlight target element
+        this.highlightElement(target);
+
+        console.log(`🎯 Tour step ${stepIndex + 1}: ${step.title}`);
+    }
+
+    positionElements(target, position) {
+        if (!target || target === document.body) {
+            // Center position for final step
+            this.spotlight.style.display = 'none';
+            this.tooltip.style.top = '50%';
+            this.tooltip.style.left = '50%';
+            this.tooltip.style.transform = 'translate(-50%, -50%)';
+            this.tooltip.className = 'tour-tooltip';
+            return;
+        }
+
+        const rect = target.getBoundingClientRect();
+        const tooltipRect = this.tooltip.getBoundingClientRect();
+
+        // Position spotlight
+        this.spotlight.style.display = 'block';
+        this.spotlight.style.top = `${rect.top - 8}px`;
+        this.spotlight.style.left = `${rect.left - 8}px`;
+        this.spotlight.style.width = `${rect.width + 16}px`;
+        this.spotlight.style.height = `${rect.height + 16}px`;
+
+        // Position tooltip based on position preference
+        let tooltipTop, tooltipLeft;
+        let arrowClass = 'tour-tooltip';
+
+        switch (position) {
+            case 'top':
+                tooltipTop = rect.top - tooltipRect.height - 30;
+                tooltipLeft = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+                arrowClass += ' arrow-bottom';
+                break;
+            case 'bottom':
+                tooltipTop = rect.bottom + 30;
+                tooltipLeft = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+                arrowClass += ' arrow-top';
+                break;
+            case 'left':
+                tooltipTop = rect.top + (rect.height / 2) - (tooltipRect.height / 2);
+                tooltipLeft = rect.left - tooltipRect.width - 30;
+                arrowClass += ' arrow-right';
+                break;
+            case 'right':
+                tooltipTop = rect.top + (rect.height / 2) - (tooltipRect.height / 2);
+                tooltipLeft = rect.right + 30;
+                arrowClass += ' arrow-left';
+                break;
+            default:
+                tooltipTop = rect.bottom + 30;
+                tooltipLeft = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+                arrowClass += ' arrow-top';
+        }
+
+        // Keep tooltip within viewport
+        const margin = 20;
+        tooltipTop = Math.max(margin, Math.min(tooltipTop, window.innerHeight - tooltipRect.height - margin));
+        tooltipLeft = Math.max(margin, Math.min(tooltipLeft, window.innerWidth - tooltipRect.width - margin));
+
+        this.tooltip.style.top = `${tooltipTop}px`;
+        this.tooltip.style.left = `${tooltipLeft}px`;
+        this.tooltip.style.transform = 'none';
+        this.tooltip.className = arrowClass;
+    }
+
+    highlightElement(target) {
+        // Remove previous highlights
+        document.querySelectorAll('.tour-highlight').forEach(el => {
+            el.classList.remove('tour-highlight');
+        });
+
+        // Add highlight to current target
+        if (target && target !== document.body) {
+            target.classList.add('tour-highlight');
+        }
+    }
+
+    nextStep() {
+        this.currentStep++;
+        this.showStep(this.currentStep);
+    }
+
+    endTour() {
+        if (!this.isActive) return;
+
+        this.isActive = false;
+        this.overlay.classList.remove('active');
+
+        // Remove highlights
+        document.querySelectorAll('.tour-highlight').forEach(el => {
+            el.classList.remove('tour-highlight');
+        });
+
+        setTimeout(() => {
+            this.overlay.style.display = 'none';
+        }, 400);
+
+        // Mark tour as completed
+        localStorage.setItem('spotifyTourCompleted', 'true');
+        console.log('🎯 Onboarding tour completed');
+    }
+
+    shouldShowTour() {
+        // Show tour for new users who haven't completed it
+        return !localStorage.getItem('spotifyTourCompleted');
+    }
+}
+
+// Initialize tour system
+let onboardingTour;
+
+document.addEventListener('DOMContentLoaded', () => {
+    onboardingTour = new OnboardingTour();
+
+    // Auto-start tour for new users after a short delay
+    if (onboardingTour.shouldShowTour()) {
+        setTimeout(() => {
+            onboardingTour.start();
+        }, 2000); // 2 second delay to let page load
+    }
+});
+
+// Global function to manually start tour (for testing or settings)
+window.startOnboardingTour = function() {
+    if (onboardingTour) {
+        onboardingTour.start();
+    }
+};
+
+console.log('🎯 Onboarding tour system loaded');

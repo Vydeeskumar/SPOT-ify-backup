@@ -1829,6 +1829,311 @@
     }
 }
 
+/* 🎯 ULTRA-COOL ONBOARDING TOUR STYLES */
+.tour-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 99999;
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.tour-overlay.active {
+    pointer-events: all;
+}
+
+.tour-spotlight {
+    position: absolute;
+    border-radius: 12px;
+    box-shadow:
+        0 0 0 9999px rgba(0, 0, 0, 0.85),
+        0 0 50px rgba(0, 212, 255, 0.6),
+        inset 0 0 30px rgba(0, 212, 255, 0.2);
+    transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    pointer-events: none;
+    z-index: 100000;
+}
+
+.tour-tooltip {
+    position: absolute;
+    background: linear-gradient(135deg, rgba(15, 15, 15, 0.95), rgba(30, 30, 30, 0.95));
+    border: 2px solid #00d4ff;
+    border-radius: 16px;
+    padding: 0;
+    min-width: 320px;
+    max-width: 400px;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(0, 212, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    z-index: 100001;
+    animation: tourTooltipIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    overflow: hidden;
+}
+
+.tour-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.tour-header {
+    background: linear-gradient(135deg, #00d4ff, #0099cc);
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tour-title {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.tour-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    opacity: 0.8;
+}
+
+.tour-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.tour-body {
+    padding: 24px 20px;
+    flex-grow: 1;
+}
+
+.tour-description {
+    color: #ffffff;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+    text-align: left;
+}
+
+.tour-footer {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.tour-progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.tour-step-counter {
+    color: #00d4ff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    min-width: 60px;
+}
+
+.tour-progress-bar {
+    flex-grow: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.tour-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00d4ff, #0099cc);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.tour-controls {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.tour-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tour-skip {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.tour-skip:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.tour-next {
+    background: linear-gradient(135deg, #00d4ff, #0099cc);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+.tour-next:hover {
+    background: linear-gradient(135deg, #00b8e6, #0088bb);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+}
+
+.tour-next:active {
+    transform: translateY(0);
+}
+
+/* Tooltip Arrow */
+.tour-tooltip::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 12px solid transparent;
+}
+
+.tour-tooltip.arrow-top::before {
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-bottom-color: #00d4ff;
+}
+
+.tour-tooltip.arrow-bottom::before {
+    bottom: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-top-color: #00d4ff;
+}
+
+.tour-tooltip.arrow-left::before {
+    left: -24px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-right-color: #00d4ff;
+}
+
+.tour-tooltip.arrow-right::before {
+    right: -24px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-left-color: #00d4ff;
+}
+
+/* Highlighted Element Pulse */
+.tour-highlight {
+    position: relative;
+    z-index: 100002 !important;
+}
+
+.tour-highlight::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border: 2px solid #00d4ff;
+    border-radius: 8px;
+    animation: tourPulse 2s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 100003;
+}
+
+/* Animations */
+@keyframes tourTooltipIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes tourPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(0, 212, 255, 0);
+    }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .tour-tooltip {
+        min-width: 280px;
+        max-width: 90vw;
+        margin: 0 20px;
+    }
+
+    .tour-header {
+        padding: 14px 16px;
+    }
+
+    .tour-title {
+        font-size: 1.1rem;
+    }
+
+    .tour-body {
+        padding: 20px 16px;
+    }
+
+    .tour-description {
+        font-size: 0.95rem;
+    }
+
+    .tour-footer {
+        padding: 14px 16px;
+    }
+
+    .tour-controls {
+        flex-direction: column;
+    }
+
+    .tour-btn {
+        width: 100%;
+        padding: 12px;
+    }
+}
+
 
 </style>
 {% endblock %}
@@ -2185,6 +2490,34 @@
             <div class="streak-message">Keep it going!</div>
         </div>
         <div class="streak-close-btn">×</div>
+    </div>
+</div>
+
+<!-- 🎯 ONBOARDING TOUR SYSTEM -->
+<div id="onboarding-tour" class="tour-overlay">
+    <div class="tour-spotlight"></div>
+    <div class="tour-tooltip">
+        <div class="tour-content">
+            <div class="tour-header">
+                <h3 class="tour-title">Welcome to SPOT-ify!</h3>
+                <button class="tour-close" id="tour-close">×</button>
+            </div>
+            <div class="tour-body">
+                <p class="tour-description">Let's learn how to play this amazing music guessing game!</p>
+            </div>
+            <div class="tour-footer">
+                <div class="tour-progress">
+                    <span class="tour-step-counter">1 of 15</span>
+                    <div class="tour-progress-bar">
+                        <div class="tour-progress-fill"></div>
+                    </div>
+                </div>
+                <div class="tour-controls">
+                    <button class="tour-btn tour-skip" id="tour-skip">Skip Tour</button>
+                    <button class="tour-btn tour-next" id="tour-next">Next</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
