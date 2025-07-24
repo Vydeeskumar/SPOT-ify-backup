@@ -1544,3 +1544,147 @@ def process_voice_audio(request):
             'error': f'Voice processing failed: {str(e)}',
             'success': False
         }, status=500)
+
+
+# 🏆 Celebration Modals Endpoint
+@login_required
+def check_celebrations(request, language):
+    """
+    Check if user should see celebration modals:
+    1. Weekly/Monthly winners (for all users on new week/month)
+    2. Daily top 10 achievement (for individual users who ranked top 10 yesterday)
+    """
+    try:
+        # Get current time in UTC
+        now = timezone.now()
+        today = now.date()
+
+        response_data = {
+            'success': True,
+            'weekly_winners': None,
+            'monthly_winners': None,
+            'daily_achievement': None
+        }
+
+        # Check if it's the start of a new week (Monday)
+        if today.weekday() == 0:  # Monday = 0
+            weekly_winners = get_weekly_winners(language)
+            if weekly_winners:
+                response_data['weekly_winners'] = weekly_winners
+
+        # Check if it's the start of a new month (1st day)
+        if today.day == 1:
+            monthly_winners = get_monthly_winners(language)
+            if monthly_winners:
+                response_data['monthly_winners'] = monthly_winners
+
+        # Check if user was in top 10 yesterday
+        yesterday = today - timedelta(days=1)
+        daily_rank = get_user_daily_rank(request.user, yesterday, language)
+        if daily_rank and daily_rank <= 10:
+            response_data['daily_achievement'] = {
+                'rank': daily_rank,
+                'date': yesterday.isoformat()
+            }
+
+        return JsonResponse(response_data)
+
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Failed to check celebrations: {str(e)}',
+            'success': False
+        }, status=500)
+
+
+def get_weekly_winners(language):
+    """Get top 3 weekly winners"""
+    try:
+        now = timezone.now()
+        today = now.date()
+
+        # Calculate last week's date range
+        last_monday = today - timedelta(days=today.weekday() + 7)
+        last_sunday = last_monday + timedelta(days=6)
+
+        # Get weekly leaderboard for last week
+        weekly_leaders = UserScore.objects.filter(
+            song__language=language,
+            attempt_date__date__gte=last_monday,
+            attempt_date__date__lte=last_sunday
+        ).values('user__username').annotate(
+            total_score=Sum('score'),
+            avg_time=Avg('guess_time'),
+            games_played=Count('id')
+        ).order_by('-total_score', 'avg_time')[:3]
+
+        return list(weekly_leaders) if weekly_leaders else None
+
+    except Exception as e:
+        print(f"Error getting weekly winners: {e}")
+        return None
+
+
+def get_monthly_winners(language):
+    """Get top 3 monthly winners"""
+    try:
+        now = timezone.now()
+        today = now.date()
+
+        # Calculate last month's date range
+        if today.month == 1:
+            last_month = 12
+            last_year = today.year - 1
+        else:
+            last_month = today.month - 1
+            last_year = today.year
+
+        last_month_start = today.replace(year=last_year, month=last_month, day=1)
+
+        # Calculate last day of last month
+        if last_month == 12:
+            next_month_start = today.replace(year=last_year + 1, month=1, day=1)
+        else:
+            next_month_start = today.replace(year=last_year, month=last_month + 1, day=1)
+
+        last_month_end = next_month_start - timedelta(days=1)
+
+        # Get monthly leaderboard for last month
+        monthly_leaders = UserScore.objects.filter(
+            song__language=language,
+            attempt_date__date__gte=last_month_start,
+            attempt_date__date__lte=last_month_end
+        ).values('user__username').annotate(
+            total_score=Sum('score'),
+            avg_time=Avg('guess_time'),
+            games_played=Count('id')
+        ).order_by('-total_score', 'avg_time')[:3]
+
+        return list(monthly_leaders) if monthly_leaders else None
+
+    except Exception as e:
+        print(f"Error getting monthly winners: {e}")
+        return None
+
+
+def get_user_daily_rank(user, date, language):
+    """Get user's rank for a specific date"""
+    try:
+        # Get daily leaderboard for the specified date
+        daily_leaders = UserScore.objects.filter(
+            song__language=language,
+            attempt_date__date=date
+        ).values('user').annotate(
+            total_score=Sum('score'),
+            avg_time=Avg('guess_time')
+        ).order_by('-total_score', 'avg_time')
+
+        # Find user's rank
+        for index, leader in enumerate(daily_leaders):
+            if leader['user'] == user.id:
+                return index + 1  # Rank is 1-based
+
+        return None  # User not found in rankings
+
+    except Exception as e:
+        print(f"Error getting user daily rank: {e}")
+        return None

@@ -1548,3 +1548,216 @@ window.updateVoiceLanguage = function(language) {
 };
 
 console.log('🎤 Voice recognition module loaded');
+
+// 🏆 CELEBRATION MODALS SYSTEM
+
+class CelebrationModals {
+    constructor() {
+        this.winnersModal = document.getElementById('winnersModal');
+        this.achievementModal = document.getElementById('achievementModal');
+        this.currentLanguage = window.currentLanguage || 'tamil';
+
+        this.bindEvents();
+        this.checkForCelebrations();
+    }
+
+    bindEvents() {
+        // Winners modal events
+        const winnersClose = document.getElementById('winnersClose');
+        const winnersContinue = document.getElementById('winnersContinue');
+
+        if (winnersClose) {
+            winnersClose.addEventListener('click', () => this.hideWinnersModal());
+        }
+
+        if (winnersContinue) {
+            winnersContinue.addEventListener('click', () => this.hideWinnersModal());
+        }
+
+        // Achievement modal events
+        const achievementClose = document.getElementById('achievementClose');
+        const achievementContinue = document.getElementById('achievementContinue');
+
+        if (achievementClose) {
+            achievementClose.addEventListener('click', () => this.hideAchievementModal());
+        }
+
+        if (achievementContinue) {
+            achievementContinue.addEventListener('click', () => this.hideAchievementModal());
+        }
+
+        // Close on background click
+        if (this.winnersModal) {
+            this.winnersModal.addEventListener('click', (e) => {
+                if (e.target === this.winnersModal) {
+                    this.hideWinnersModal();
+                }
+            });
+        }
+
+        if (this.achievementModal) {
+            this.achievementModal.addEventListener('click', (e) => {
+                if (e.target === this.achievementModal) {
+                    this.hideAchievementModal();
+                }
+            });
+        }
+    }
+
+    async checkForCelebrations() {
+        try {
+            const response = await fetch(`/${this.currentLanguage}/check-celebrations/`);
+            const data = await response.json();
+
+            if (data.success) {
+                // Show weekly winners first (if applicable)
+                if (data.weekly_winners) {
+                    setTimeout(() => {
+                        this.showWeeklyWinners(data.weekly_winners);
+                    }, 1000);
+                }
+
+                // Show monthly winners first (if applicable)
+                if (data.monthly_winners) {
+                    setTimeout(() => {
+                        this.showMonthlyWinners(data.monthly_winners);
+                    }, 1000);
+                }
+
+                // Show daily achievement after winners modal
+                if (data.daily_achievement) {
+                    const delay = (data.weekly_winners || data.monthly_winners) ? 6000 : 1500;
+                    setTimeout(() => {
+                        this.showDailyAchievement(data.daily_achievement);
+                    }, delay);
+                }
+            }
+        } catch (error) {
+            console.error('🏆 Failed to check celebrations:', error);
+        }
+    }
+
+    showWeeklyWinners(winners) {
+        this.showWinnersModal(winners, 'weekly');
+    }
+
+    showMonthlyWinners(winners) {
+        this.showWinnersModal(winners, 'monthly');
+    }
+
+    showWinnersModal(winners, type) {
+        if (!this.winnersModal || !winners || winners.length === 0) return;
+
+        const title = document.getElementById('winnersTitle');
+        const message = document.getElementById('winnersMessage');
+
+        // Update title and message
+        if (type === 'weekly') {
+            title.textContent = '🏆 WEEKLY CHAMPIONS 🏆';
+            message.textContent = 'Congratulations to this week\'s amazing champions!';
+        } else {
+            title.textContent = '🏆 MONTHLY CHAMPIONS 🏆';
+            message.textContent = 'Celebrating this month\'s incredible champions!';
+        }
+
+        // Update podium places
+        this.updatePodiumPlace('firstPlace', 'firstScore', winners[0]);
+        this.updatePodiumPlace('secondPlace', 'secondScore', winners[1]);
+        this.updatePodiumPlace('thirdPlace', 'thirdScore', winners[2]);
+
+        // Show modal
+        this.winnersModal.style.display = 'block';
+
+        console.log(`🏆 Showing ${type} winners modal`);
+    }
+
+    updatePodiumPlace(nameId, scoreId, winner) {
+        const nameElement = document.getElementById(nameId);
+        const scoreElement = document.getElementById(scoreId);
+
+        if (winner && nameElement && scoreElement) {
+            nameElement.textContent = winner.username;
+            scoreElement.textContent = `${winner.total_score} pts`;
+        } else if (nameElement && scoreElement) {
+            nameElement.textContent = 'No Player';
+            scoreElement.textContent = '0 pts';
+        }
+    }
+
+    showDailyAchievement(achievement) {
+        if (!this.achievementModal || !achievement) return;
+
+        const rank = document.getElementById('achievementRank');
+        const text = document.getElementById('achievementText');
+        const subtext = document.getElementById('achievementSubtext');
+
+        // Update content
+        if (rank) rank.textContent = `#${achievement.rank}`;
+        if (text) text.textContent = `You ranked #${achievement.rank} yesterday!`;
+
+        // Custom messages based on rank
+        let message = 'Great performance! Keep up the amazing work!';
+        if (achievement.rank === 1) {
+            message = '🎉 INCREDIBLE! You were #1 yesterday! You\'re a true champion!';
+        } else if (achievement.rank <= 3) {
+            message = '🥇 Amazing! You made it to the top 3! Fantastic job!';
+        } else if (achievement.rank <= 5) {
+            message = '⭐ Excellent! Top 5 performance! You\'re doing great!';
+        } else if (achievement.rank <= 10) {
+            message = '🌟 Well done! Top 10 achievement! Keep climbing!';
+        }
+
+        if (subtext) subtext.textContent = message;
+
+        // Show modal
+        this.achievementModal.style.display = 'block';
+
+        console.log(`⭐ Showing daily achievement modal for rank #${achievement.rank}`);
+    }
+
+    hideWinnersModal() {
+        if (this.winnersModal) {
+            this.winnersModal.style.display = 'none';
+        }
+    }
+
+    hideAchievementModal() {
+        if (this.achievementModal) {
+            this.achievementModal.style.display = 'none';
+        }
+    }
+}
+
+// 🧪 ADMIN TESTING FUNCTIONS
+window.testWeeklyWinners = function() {
+    const mockWinners = [
+        { username: 'TestUser1', total_score: 200 },
+        { username: 'TestUser2', total_score: 150 },
+        { username: 'TestUser3', total_score: 120 }
+    ];
+    celebrationModals.showWeeklyWinners(mockWinners);
+};
+
+window.testMonthlyWinners = function() {
+    const mockWinners = [
+        { username: 'MonthlyChamp', total_score: 500 },
+        { username: 'SecondPlace', total_score: 450 },
+        { username: 'ThirdPlace', total_score: 400 }
+    ];
+    celebrationModals.showMonthlyWinners(mockWinners);
+};
+
+window.testDailyAchievement = function(rank) {
+    const mockAchievement = { rank: rank };
+    celebrationModals.showDailyAchievement(mockAchievement);
+};
+
+// Initialize celebration modals system
+let celebrationModals;
+
+document.addEventListener('DOMContentLoaded', () => {
+    celebrationModals = new CelebrationModals();
+    console.log('🏆 Celebration modals system loaded');
+});
+
+console.log('🏆 Celebration modals module loaded');

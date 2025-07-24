@@ -22,6 +22,7 @@ urlpatterns = [
     path('zombiebot/', views.zombiebot, name='zombiebot'),
     path('send-friend-request/<str:username>/', views.send_friend_request, name='send_friend_request'),
     path('process-voice/', views.process_voice_audio, name='process_voice_audio'),
+    path('check-celebrations/', views.check_celebrations, name='check_celebrations'),
 
 
 ]
