@@ -1221,6 +1221,498 @@
 
 
         }
+
+        /* 🏆 CELEBRATION MODALS STYLES */
+        .winners-modal, .achievement-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(15px);
+            z-index: 10000;
+            animation: modalFadeIn 0.5s ease-out;
+        }
+
+        .winners-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 140, 0, 0.95));
+            border: 3px solid #ffd700;
+            border-radius: 25px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow:
+                0 30px 80px rgba(255, 215, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            max-width: 600px;
+            width: 90%;
+            animation: winnersModalIn 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .achievement-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.95), rgba(75, 0, 130, 0.95));
+            border: 3px solid #ffd700;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow:
+                0 25px 70px rgba(138, 43, 226, 0.4),
+                0 0 50px rgba(255, 215, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            max-width: 400px;
+            width: 90%;
+            animation: achievementModalIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .confetti-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 25px;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ffd700;
+            animation: confettiFall 3s linear infinite;
+        }
+
+        .confetti:nth-child(1) { left: 10%; animation-delay: 0s; background: #ff6b6b; }
+        .confetti:nth-child(2) { left: 20%; animation-delay: 0.5s; background: #4ecdc4; }
+        .confetti:nth-child(3) { left: 30%; animation-delay: 1s; background: #45b7d1; }
+        .confetti:nth-child(4) { left: 40%; animation-delay: 1.5s; background: #96ceb4; }
+        .confetti:nth-child(5) { left: 50%; animation-delay: 2s; background: #ffeaa7; }
+        .confetti:nth-child(6) { left: 60%; animation-delay: 0.3s; background: #dda0dd; }
+        .confetti:nth-child(7) { left: 70%; animation-delay: 0.8s; background: #98d8c8; }
+        .confetti:nth-child(8) { left: 80%; animation-delay: 1.3s; background: #f7dc6f; }
+
+        .winners-header, .achievement-header {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .winners-header h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow:
+                2px 2px 0 #ff8c00,
+                4px 4px 10px rgba(0, 0, 0, 0.5);
+            margin: 0;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        .achievement-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow:
+                2px 2px 0 #8a2be2,
+                4px 4px 10px rgba(0, 0, 0, 0.5);
+            margin: 0;
+            animation: achievementGlow 2s ease-in-out infinite alternate;
+        }
+
+        .winners-close, .achievement-close {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .winners-close:hover, .achievement-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .podium-container {
+            display: flex;
+            justify-content: center;
+            align-items: end;
+            gap: 20px;
+            margin: 30px 0;
+            perspective: 1000px;
+        }
+
+        .podium-place {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: podiumRise 1.5s ease-out;
+        }
+
+        .first-place { animation-delay: 0.5s; }
+        .second-place { animation-delay: 0.3s; }
+        .third-place { animation-delay: 0.7s; }
+
+        .podium-player {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            min-width: 120px;
+            position: relative;
+        }
+
+        .podium-crown {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            animation: crownFloat 2s ease-in-out infinite;
+        }
+
+        .podium-rank {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .podium-name {
+            font-weight: bold;
+            color: #333;
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .podium-score {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .podium-base {
+            width: 80px;
+            border-radius: 8px 8px 0 0;
+            position: relative;
+        }
+
+        .podium-base.gold {
+            height: 80px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        .podium-base.silver {
+            height: 60px;
+            background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+            box-shadow: 0 0 15px rgba(192, 192, 192, 0.6);
+        }
+
+        .podium-base.bronze {
+            height: 40px;
+            background: linear-gradient(135deg, #cd7f32, #daa520);
+            box-shadow: 0 0 15px rgba(205, 127, 50, 0.6);
+        }
+
+        .winners-footer, .achievement-footer {
+            margin-top: 30px;
+        }
+
+        .winners-footer p {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .winners-continue, .achievement-continue {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .achievement-continue {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #8a2be2;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .winners-continue:hover, .achievement-continue:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .achievement-stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ffd700;
+            border-radius: 50%;
+            animation: starFloat 3s ease-in-out infinite;
+        }
+
+        .star-particle:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .star-particle:nth-child(2) { top: 30%; right: 15%; animation-delay: 0.5s; }
+        .star-particle:nth-child(3) { top: 60%; left: 20%; animation-delay: 1s; }
+        .star-particle:nth-child(4) { top: 70%; right: 25%; animation-delay: 1.5s; }
+        .star-particle:nth-child(5) { top: 40%; left: 50%; animation-delay: 2s; }
+        .star-particle:nth-child(6) { top: 80%; right: 40%; animation-delay: 2.5s; }
+
+        .achievement-badge {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                0 10px 30px rgba(255, 215, 0, 0.4),
+                inset 0 2px 0 rgba(255, 255, 255, 0.3);
+            animation: badgePulse 2s ease-in-out infinite;
+            position: relative;
+        }
+
+        .achievement-badge::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 2px solid #ffd700;
+            border-radius: 50%;
+            animation: badgeRing 2s ease-in-out infinite;
+        }
+
+        .badge-rank {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #8a2be2;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .badge-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #8a2be2;
+            margin-top: -5px;
+        }
+
+        .achievement-message h3 {
+            color: white;
+            font-size: 1.4rem;
+            margin: 0 0 10px 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .achievement-message p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            margin: 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        /* CELEBRATION ANIMATIONS */
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes winnersModalIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0.3) rotateY(180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1) rotateY(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1) rotateY(0deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes achievementModalIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0;
+                filter: brightness(2);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                filter: brightness(1.5);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+                filter: brightness(1);
+            }
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes starFloat {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateY(-20px) scale(1.5);
+                opacity: 1;
+            }
+        }
+
+        @keyframes titleGlow {
+            0% {
+                text-shadow:
+                    2px 2px 0 #ff8c00,
+                    4px 4px 10px rgba(0, 0, 0, 0.5);
+            }
+            100% {
+                text-shadow:
+                    2px 2px 0 #ff8c00,
+                    4px 4px 20px rgba(255, 215, 0, 0.8),
+                    0 0 30px rgba(255, 215, 0, 0.6);
+            }
+        }
+
+        @keyframes achievementGlow {
+            0% {
+                text-shadow:
+                    2px 2px 0 #8a2be2,
+                    4px 4px 10px rgba(0, 0, 0, 0.5);
+            }
+            100% {
+                text-shadow:
+                    2px 2px 0 #8a2be2,
+                    4px 4px 20px rgba(255, 215, 0, 0.8),
+                    0 0 30px rgba(255, 215, 0, 0.6);
+            }
+        }
+
+        @keyframes podiumRise {
+            0% {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes crownFloat {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+
+        @keyframes badgePulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes badgeRing {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.1);
+            }
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .winners-modal-content {
+                padding: 30px 20px;
+                max-width: 350px;
+            }
+
+            .winners-header h2 {
+                font-size: 2rem;
+            }
+
+            .podium-container {
+                gap: 10px;
+            }
+
+            .podium-player {
+                min-width: 100px;
+                padding: 10px;
+            }
+
+            .achievement-modal-content {
+                padding: 30px 20px;
+                max-width: 320px;
+            }
+
+            .achievement-title {
+                font-size: 1.5rem;
+            }
+
+            .achievement-badge {
+                width: 100px;
+                height: 100px;
+            }
+
+            .badge-rank {
+                font-size: 2rem;
+            }
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
@@ -1603,7 +2095,7 @@
     </script>
 
     <!-- Game logic script -->
-    <script src="{% static 'game/js/home.js' %}?v=136" defer></script>
+    <script src="{% static 'game/js/home.js' %}?v=137" defer></script>
 {% endblock %}
 
 
