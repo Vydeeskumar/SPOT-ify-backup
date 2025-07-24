@@ -1498,11 +1498,12 @@ def process_voice_audio(request):
         if not audio_file:
             return JsonResponse({'error': 'No audio file provided'}, status=400)
 
-        # Language mapping for Whisper
+        # CORRECTED: Language mapping for Whisper
+        # Both Tamil AND Hindi songs are in English letters (Romanized)!
         whisper_lang_map = {
-            'tamil': 'ta',
-            'english': 'en',
-            'hindi': 'hi'
+            'tamil': 'en',    # Tamil songs written in English letters!
+            'english': 'en',  # English songs
+            'hindi': 'en'     # Hindi songs ALSO written in English letters!
         }
 
         whisper_lang = whisper_lang_map.get(language, 'en')

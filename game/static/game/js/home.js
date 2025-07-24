@@ -1136,16 +1136,17 @@ class VoiceRecognitionSystem {
         this.voiceInstructions = document.getElementById('voiceInstructions');
         this.guessInput = document.getElementById('guess-input');
 
+        // CORRECTED: Both Tamil AND Hindi songs are in English letters (Romanized)!
         this.languageMap = {
-            'tamil': 'ta-IN',
-            'english': 'en-US',
-            'hindi': 'hi-IN'
+            'tamil': 'en-US',    // Tamil songs written in English letters!
+            'english': 'en-US',  // English songs
+            'hindi': 'en-US'     // Hindi songs ALSO written in English letters!
         };
 
         this.fallbackLanguages = {
-            'tamil': ['ta-IN', 'en-US', 'hi-IN'],
-            'english': ['en-US', 'ta-IN', 'hi-IN'],
-            'hindi': ['hi-IN', 'en-US', 'ta-IN']
+            'tamil': ['en-US', 'en-IN'],     // English recognition for Romanized Tamil
+            'english': ['en-US', 'en-IN'],   // English variants
+            'hindi': ['en-US', 'en-IN']      // English recognition for Romanized Hindi
         };
 
         this.initializeVoiceRecognition();
@@ -1307,13 +1308,110 @@ class VoiceRecognitionSystem {
     }
 
     cleanTranscript(transcript) {
-        // Remove common speech recognition artifacts
-        return transcript
+        let cleaned = transcript
             .replace(/\b(the|a|an)\b/gi, '') // Remove articles
             .replace(/[.,!?;]/g, '') // Remove punctuation
             .replace(/\s+/g, ' ') // Normalize spaces
-            .trim()
-            .toLowerCase();
+            .trim();
+
+        // Apply phonetic corrections for common misrecognitions
+        if (this.currentLanguage === 'tamil') {
+            cleaned = this.applyTamilPhoneticCorrections(cleaned);
+        } else if (this.currentLanguage === 'hindi') {
+            cleaned = this.applyHindiPhoneticCorrections(cleaned);
+        }
+
+        return cleaned;
+    }
+
+    applyTamilPhoneticCorrections(text) {
+        // Common Tamil phonetic corrections for English speech recognition
+        const corrections = {
+            // Common Tamil sounds that get misrecognized
+            'andra': 'ondra',
+            'endra': 'ondra',
+            'renda': 'renda',
+            'vaathi': 'vaathi',
+            'rowdy': 'rowdy',
+            'baby': 'baby',
+            'coming': 'coming',
+            'kadhal': 'kadhal',
+            'anbe': 'anbe',
+            'sivam': 'sivam',
+            'theri': 'theri',
+            'mersal': 'mersal',
+            'bigil': 'bigil',
+            'master': 'master',
+            'beast': 'beast',
+            'vikram': 'vikram',
+            'leo': 'leo',
+            // Add more common Tamil song name corrections
+            'naan': 'naan',
+            'unna': 'unna',
+            'enna': 'enna',
+            'illa': 'illa',
+            'dhan': 'than',
+            'than': 'than'
+        };
+
+        let corrected = text.toLowerCase();
+
+        // Apply corrections
+        for (const [wrong, right] of Object.entries(corrections)) {
+            const regex = new RegExp(`\\b${wrong}\\b`, 'gi');
+            corrected = corrected.replace(regex, right);
+        }
+
+        return corrected;
+    }
+
+    applyHindiPhoneticCorrections(text) {
+        // Common Hindi phonetic corrections for English speech recognition
+        const corrections = {
+            // Common Hindi sounds that get misrecognized
+            'tum': 'tum',
+            'hai': 'hai',
+            'hum': 'hum',
+            'main': 'main',
+            'kya': 'kya',
+            'kal': 'kal',
+            'ho': 'ho',
+            'naa': 'naa',
+            'kabhi': 'kabhi',
+            'khushi': 'khushi',
+            'gham': 'gham',
+            'dilwale': 'dilwale',
+            'dulhania': 'dulhania',
+            'jayenge': 'jayenge',
+            'shah': 'shah',
+            'rukh': 'rukh',
+            'khan': 'khan',
+            'bollywood': 'bollywood',
+            'hindi': 'hindi',
+            'gaana': 'gaana',
+            'film': 'film',
+            'movie': 'movie',
+            'song': 'song',
+            // Add more common Hindi song name corrections
+            'pyaar': 'pyaar',
+            'ishq': 'ishq',
+            'dil': 'dil',
+            'mohabbat': 'mohabbat',
+            'zindagi': 'zindagi',
+            'sapna': 'sapna',
+            'rang': 'rang',
+            'baarish': 'baarish'
+        };
+
+        let corrected = text.toLowerCase();
+
+        // Apply corrections
+        for (const [wrong, right] of Object.entries(corrections)) {
+            const regex = new RegExp(`\\b${wrong}\\b`, 'gi');
+            corrected = corrected.replace(regex, right);
+        }
+
+        return corrected;
     }
 
     async tryWhisperFallback(transcript) {
@@ -1383,7 +1481,16 @@ class VoiceRecognitionSystem {
             case 'listening':
                 this.voiceBtn.classList.add('listening');
                 this.voiceStatusText.textContent = '🎤 Listening...';
-                this.voiceInstructions.textContent = `Speak the song name in ${this.currentLanguage}`;
+
+                // Updated instructions for Romanized Tamil & Hindi
+                if (this.currentLanguage === 'tamil') {
+                    this.voiceInstructions.textContent = 'Speak Tamil song name (will be recognized in English letters)';
+                } else if (this.currentLanguage === 'hindi') {
+                    this.voiceInstructions.textContent = 'Speak Hindi song name (will be recognized in English letters)';
+                } else {
+                    this.voiceInstructions.textContent = 'Speak the English song name clearly';
+                }
+
                 this.voiceTranscript.textContent = '';
                 break;
 
