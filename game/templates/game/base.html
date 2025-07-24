@@ -1345,7 +1345,8 @@
         </div>
     </main>
 
-    <!-- 🌍 Floating Language Orb -->
+    <!-- 🌍 Floating Language Orb (Hidden on login/signup pages) -->
+    {% if request.resolver_match.url_name != 'account_login' and request.resolver_match.url_name != 'account_signup' %}
     <div class="floating-language-orb" id="languageOrb">
         <div class="orb-content">
             <i class="orb-icon fas fa-globe"></i>
@@ -1373,6 +1374,7 @@
             {% endif %}
         </div>
     </div>
+    {% endif %}
 
     <footer class="footer">
         <div class="container">
@@ -1527,6 +1529,9 @@
             const languageOrb = document.getElementById('languageOrb');
             const orbText = document.getElementById('orbText');
             const orbTooltip = document.getElementById('orbTooltip');
+
+            // Exit early if language orb doesn't exist (e.g., on login page)
+            if (!languageOrb) return;
 
             // Language cycle: Tamil → English → Hindi → Tamil
             const languages = {
