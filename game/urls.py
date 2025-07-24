@@ -21,6 +21,7 @@ urlpatterns = [
     path('profile/<str:username>/', views.public_profile, name='public_profile'),
     path('zombiebot/', views.zombiebot, name='zombiebot'),
     path('send-friend-request/<str:username>/', views.send_friend_request, name='send_friend_request'),
+    path('process-voice/', views.process_voice_audio, name='process_voice_audio'),
 
 
 ]

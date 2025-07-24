@@ -1121,3 +1121,323 @@ console.log('🔥 Streak modal system loaded');
 
 
 console.log('🔥 Streak modal system loaded');
+
+// 🎤 ADVANCED VOICE RECOGNITION SYSTEM - ALL LANGUAGES SUPPORT
+
+class VoiceRecognitionSystem {
+    constructor() {
+        this.recognition = null;
+        this.isListening = false;
+        this.currentLanguage = window.currentLanguage || 'tamil';
+        this.voiceBtn = document.getElementById('voiceBtn');
+        this.voiceFeedback = document.getElementById('voiceFeedback');
+        this.voiceStatusText = document.getElementById('voiceStatusText');
+        this.voiceTranscript = document.getElementById('voiceTranscript');
+        this.voiceInstructions = document.getElementById('voiceInstructions');
+        this.guessInput = document.getElementById('guess-input');
+
+        this.languageMap = {
+            'tamil': 'ta-IN',
+            'english': 'en-US',
+            'hindi': 'hi-IN'
+        };
+
+        this.fallbackLanguages = {
+            'tamil': ['ta-IN', 'en-US', 'hi-IN'],
+            'english': ['en-US', 'ta-IN', 'hi-IN'],
+            'hindi': ['hi-IN', 'en-US', 'ta-IN']
+        };
+
+        this.initializeVoiceRecognition();
+        this.bindEvents();
+    }
+
+    initializeVoiceRecognition() {
+        // Check for Web Speech API support
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            console.warn('🎤 Web Speech API not supported');
+            this.voiceBtn.style.display = 'none';
+            return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        this.recognition = new SpeechRecognition();
+
+        // Configure recognition
+        this.recognition.continuous = false;
+        this.recognition.interimResults = true;
+        this.recognition.maxAlternatives = 3;
+
+        this.setupRecognitionEvents();
+        console.log('🎤 Voice recognition system initialized');
+    }
+
+    setupRecognitionEvents() {
+        if (!this.recognition) return;
+
+        this.recognition.onstart = () => {
+            console.log('🎤 Voice recognition started');
+            this.isListening = true;
+            this.updateUI('listening');
+        };
+
+        this.recognition.onresult = (event) => {
+            let transcript = '';
+            let confidence = 0;
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const result = event.results[i];
+                if (result.isFinal) {
+                    transcript = result[0].transcript.trim();
+                    confidence = result[0].confidence;
+                    console.log(`🎤 Final result: "${transcript}" (confidence: ${confidence})`);
+                } else {
+                    // Show interim results
+                    const interimTranscript = result[0].transcript;
+                    this.voiceTranscript.textContent = `"${interimTranscript}"`;
+                }
+            }
+
+            if (transcript) {
+                this.processVoiceResult(transcript, confidence);
+            }
+        };
+
+        this.recognition.onerror = (event) => {
+            console.error('🎤 Voice recognition error:', event.error);
+            this.handleVoiceError(event.error);
+        };
+
+        this.recognition.onend = () => {
+            console.log('🎤 Voice recognition ended');
+            this.isListening = false;
+            if (!this.voiceFeedback.classList.contains('processing')) {
+                this.hideVoiceFeedback();
+            }
+        };
+    }
+
+    bindEvents() {
+        if (!this.voiceBtn) return;
+
+        this.voiceBtn.addEventListener('click', () => {
+            if (this.isListening) {
+                this.stopListening();
+            } else {
+                this.startListening();
+            }
+        });
+
+        // Close feedback on click outside
+        this.voiceFeedback.addEventListener('click', (e) => {
+            if (e.target === this.voiceFeedback) {
+                this.stopListening();
+            }
+        });
+
+        // Keyboard shortcut (Ctrl/Cmd + M)
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'm') {
+                e.preventDefault();
+                if (!this.isListening) {
+                    this.startListening();
+                }
+            }
+        });
+    }
+
+    startListening() {
+        if (!this.recognition || this.isListening) return;
+
+        // Set language based on current game language
+        const langCode = this.languageMap[this.currentLanguage] || 'en-US';
+        this.recognition.lang = langCode;
+
+        console.log(`🎤 Starting voice recognition for ${this.currentLanguage} (${langCode})`);
+
+        try {
+            this.recognition.start();
+            this.showVoiceFeedback();
+        } catch (error) {
+            console.error('🎤 Failed to start recognition:', error);
+            this.handleVoiceError('start-failed');
+        }
+    }
+
+    stopListening() {
+        if (this.recognition && this.isListening) {
+            this.recognition.stop();
+        }
+        this.hideVoiceFeedback();
+    }
+
+    processVoiceResult(transcript, confidence) {
+        console.log(`🎤 Processing: "${transcript}" (confidence: ${confidence})`);
+
+        this.updateUI('processing');
+        this.voiceTranscript.textContent = `"${transcript}"`;
+
+        // If confidence is high, use result directly
+        if (confidence > 0.7) {
+            this.submitVoiceGuess(transcript);
+        } else {
+            // Try Whisper fallback for better accuracy
+            console.log('🎤 Low confidence, trying Whisper fallback...');
+            this.tryWhisperFallback(transcript);
+        }
+    }
+
+    submitVoiceGuess(transcript) {
+        // Clean up the transcript
+        const cleanTranscript = this.cleanTranscript(transcript);
+
+        // Fill the input field
+        if (this.guessInput) {
+            this.guessInput.value = cleanTranscript;
+            this.guessInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        // Auto-submit or let user confirm
+        setTimeout(() => {
+            this.hideVoiceFeedback();
+            // Optionally auto-submit: document.querySelector('form').submit();
+        }, 1000);
+
+        console.log(`🎤 Voice guess submitted: "${cleanTranscript}"`);
+    }
+
+    cleanTranscript(transcript) {
+        // Remove common speech recognition artifacts
+        return transcript
+            .replace(/\b(the|a|an)\b/gi, '') // Remove articles
+            .replace(/[.,!?;]/g, '') // Remove punctuation
+            .replace(/\s+/g, ' ') // Normalize spaces
+            .trim()
+            .toLowerCase();
+    }
+
+    async tryWhisperFallback(transcript) {
+        console.log('🎤 Attempting Whisper fallback for better accuracy...');
+
+        try {
+            // For now, we'll use the Web Speech result since we need audio recording
+            // In a full implementation, you would:
+            // 1. Record audio during speech recognition
+            // 2. Send audio blob to backend
+            // 3. Process with Whisper
+
+            // Simulate Whisper processing delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Use the Web Speech result for now
+            this.submitVoiceGuess(transcript);
+
+            console.log('🎤 Whisper fallback completed (simulated)');
+
+        } catch (error) {
+            console.error('🎤 Whisper fallback failed:', error);
+            // Fall back to original transcript
+            this.submitVoiceGuess(transcript);
+        }
+    }
+
+    handleVoiceError(error) {
+        console.error('🎤 Voice error:', error);
+
+        let errorMessage = 'Voice recognition failed';
+
+        switch (error) {
+            case 'no-speech':
+                errorMessage = 'No speech detected. Please try again.';
+                break;
+            case 'audio-capture':
+                errorMessage = 'Microphone not accessible. Please check permissions.';
+                break;
+            case 'not-allowed':
+                errorMessage = 'Microphone permission denied. Please allow microphone access.';
+                break;
+            case 'network':
+                errorMessage = 'Network error. Please check your connection.';
+                break;
+            case 'start-failed':
+                errorMessage = 'Failed to start voice recognition.';
+                break;
+        }
+
+        this.updateUI('error');
+        this.voiceStatusText.textContent = `❌ ${errorMessage}`;
+        this.voiceInstructions.textContent = 'Click to try again';
+
+        setTimeout(() => {
+            this.hideVoiceFeedback();
+        }, 3000);
+    }
+
+    updateUI(state) {
+        if (!this.voiceBtn) return;
+
+        // Reset button classes
+        this.voiceBtn.classList.remove('listening', 'processing');
+
+        switch (state) {
+            case 'listening':
+                this.voiceBtn.classList.add('listening');
+                this.voiceStatusText.textContent = '🎤 Listening...';
+                this.voiceInstructions.textContent = `Speak the song name in ${this.currentLanguage}`;
+                this.voiceTranscript.textContent = '';
+                break;
+
+            case 'processing':
+                this.voiceBtn.classList.add('processing');
+                this.voiceStatusText.textContent = '🔄 Processing...';
+                this.voiceInstructions.textContent = 'Analyzing your voice input';
+                break;
+
+            case 'error':
+                // Error styling handled in handleVoiceError
+                break;
+
+            default:
+                this.voiceStatusText.textContent = '🎤 Ready';
+                this.voiceInstructions.textContent = 'Click microphone to start';
+        }
+    }
+
+    showVoiceFeedback() {
+        if (this.voiceFeedback) {
+            this.voiceFeedback.classList.add('show');
+        }
+    }
+
+    hideVoiceFeedback() {
+        if (this.voiceFeedback) {
+            this.voiceFeedback.classList.remove('show');
+        }
+        if (this.voiceBtn) {
+            this.voiceBtn.classList.remove('listening', 'processing');
+        }
+    }
+
+    // Update current language when user switches
+    updateLanguage(newLanguage) {
+        this.currentLanguage = newLanguage;
+        console.log(`🎤 Voice recognition language updated to: ${newLanguage}`);
+    }
+}
+
+// Initialize voice recognition system
+let voiceRecognition;
+
+document.addEventListener('DOMContentLoaded', () => {
+    voiceRecognition = new VoiceRecognitionSystem();
+    console.log('🎤 Voice recognition system loaded');
+});
+
+// Global function to update voice language when user switches
+window.updateVoiceLanguage = function(language) {
+    if (voiceRecognition) {
+        voiceRecognition.updateLanguage(language);
+    }
+};
+
+console.log('🎤 Voice recognition module loaded');

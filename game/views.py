@@ -30,6 +30,8 @@ from django.shortcuts import redirect
 from allauth.socialaccount.signals import pre_social_login
 from django.dispatch import receiver
 from django.contrib.auth.signals import user_logged_in
+import tempfile
+import os
 
 
 
@@ -1476,3 +1478,68 @@ def send_friend_request(request, username, language='tamil'):
         messages.success(request, "Friend request sent!")
 
     return redirect('public_profile', username=username, language=language)
+
+
+# 🎤 Voice Recognition Processing Endpoint
+@login_required
+def process_voice_audio(request):
+    """
+    Process audio file with Whisper for better accuracy
+    Fallback when Web Speech API confidence is low
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST method required'}, status=405)
+
+    try:
+        # Get audio file from request
+        audio_file = request.FILES.get('audio')
+        language = request.POST.get('language', 'tamil')
+
+        if not audio_file:
+            return JsonResponse({'error': 'No audio file provided'}, status=400)
+
+        # Language mapping for Whisper
+        whisper_lang_map = {
+            'tamil': 'ta',
+            'english': 'en',
+            'hindi': 'hi'
+        }
+
+        whisper_lang = whisper_lang_map.get(language, 'en')
+
+        # Save temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_file:
+            for chunk in audio_file.chunks():
+                temp_file.write(chunk)
+            temp_path = temp_file.name
+
+        try:
+            # TODO: Implement Whisper processing
+            # For now, return a placeholder response
+            # In production, you would:
+            # 1. Install whisper: pip install openai-whisper
+            # 2. Load model: model = whisper.load_model("base")
+            # 3. Transcribe: result = model.transcribe(temp_path, language=whisper_lang)
+
+            # Placeholder response
+            transcript = "Whisper processing not implemented yet"
+            confidence = 0.8
+
+            return JsonResponse({
+                'success': True,
+                'transcript': transcript,
+                'confidence': confidence,
+                'language': language,
+                'method': 'whisper'
+            })
+
+        finally:
+            # Clean up temporary file
+            if os.path.exists(temp_path):
+                os.unlink(temp_path)
+
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Voice processing failed: {str(e)}',
+            'success': False
+        }, status=500)

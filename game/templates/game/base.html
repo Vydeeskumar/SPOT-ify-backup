@@ -1580,6 +1580,10 @@
                     orbTooltip.style.opacity = '0';
 
                     setTimeout(() => {
+                        // Update voice recognition language before switching
+                        if (window.updateVoiceLanguage) {
+                            window.updateVoiceLanguage(nextLangInfo.key);
+                        }
                         // Navigate to next language
                         window.location.href = nextLangInfo.url;
                     }, 200);
@@ -1599,7 +1603,7 @@
     </script>
 
     <!-- Game logic script -->
-    <script src="{% static 'game/js/home.js' %}?v=132" defer></script>
+    <script src="{% static 'game/js/home.js' %}?v=133" defer></script>
 {% endblock %}
 
 
