@@ -980,6 +980,23 @@
             animation: orbFloat 3s ease-in-out infinite;
         }
 
+        /* First-time user discovery animation */
+        .floating-language-orb.first-time {
+            animation: orbDiscovery 4s ease-in-out infinite;
+        }
+
+        .floating-language-orb.first-time::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: orbPulse 2s ease-in-out infinite;
+        }
+
         .floating-language-orb:hover {
             transform: scale(1.1) translateY(-5px);
             box-shadow:
@@ -1053,6 +1070,36 @@
             }
         }
 
+        @keyframes orbDiscovery {
+            0%, 100% {
+                transform: translateY(0px) scale(1);
+                box-shadow: 0 4px 20px rgba(176, 38, 255, 0.4), 0 0 40px rgba(176, 38, 255, 0.2);
+            }
+            25% {
+                transform: translateY(-15px) scale(1.1);
+                box-shadow: 0 8px 30px rgba(176, 38, 255, 0.6), 0 0 60px rgba(176, 38, 255, 0.4);
+            }
+            50% {
+                transform: translateY(-10px) scale(1.05);
+                box-shadow: 0 6px 25px rgba(176, 38, 255, 0.5), 0 0 50px rgba(176, 38, 255, 0.3);
+            }
+            75% {
+                transform: translateY(-5px) scale(1.02);
+                box-shadow: 0 5px 22px rgba(176, 38, 255, 0.45), 0 0 45px rgba(176, 38, 255, 0.25);
+            }
+        }
+
+        @keyframes orbPulse {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.2);
+            }
+        }
+
         /* Language-specific orb colors */
         .floating-language-orb.tamil {
             background: linear-gradient(135deg, #8B45FF, #FF6B9D);
@@ -1073,6 +1120,81 @@
             box-shadow:
                 0 4px 20px rgba(255, 140, 0, 0.4),
                 0 0 40px rgba(255, 140, 0, 0.2);
+        }
+
+        /* Mobile Language Discovery Hint */
+        .language-discovery-hint {
+            position: fixed;
+            bottom: 100px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            max-width: 250px;
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .language-discovery-hint.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .language-discovery-hint::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 30px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid rgba(0, 0, 0, 0.9);
+        }
+
+        .hint-close {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .hint-close:hover {
+            opacity: 1;
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 768px) {
+            .floating-language-orb {
+                bottom: 20px;
+                left: 20px;
+                width: 55px;
+                height: 55px;
+            }
+
+            .language-discovery-hint {
+                bottom: 85px;
+                left: 15px;
+                max-width: calc(100vw - 30px);
+                font-size: 0.85rem;
+            }
+
+            .orb-tooltip {
+                display: none; /* Hide hover tooltips on mobile */
+            }
         }
 
         /* Mobile Responsiveness */
@@ -2002,6 +2124,17 @@
                 {% else %}
                     <i class="fas fa-music"></i> SPOT-ify the Paatu
                 {% endif %}
+                <span class="language-indicator d-md-none" style="font-size: 0.7em; opacity: 0.8; margin-left: 8px;">
+                    {% if current_language == 'tamil' %}
+                        (Tamil)
+                    {% elif current_language == 'english' %}
+                        (English)
+                    {% elif current_language == 'hindi' %}
+                        (Hindi)
+                    {% else %}
+                        (Tamil)
+                    {% endif %}
+                </span>
             </a>
 
             <button class="navbar-toggler neon-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -2125,6 +2258,15 @@
             {% else %}
                 Switch to English
             {% endif %}
+        </div>
+    </div>
+
+    <!-- Mobile Language Discovery Hint -->
+    <div class="language-discovery-hint" id="languageHint">
+        <button class="hint-close" onclick="dismissLanguageHint()">&times;</button>
+        <div style="margin-right: 20px;">
+            <strong>🌍 Did you know?</strong><br>
+            Tap this orb to switch between Tamil, English & Hindi songs! Each language has different songs and leaderboards.
         </div>
     </div>
     {% endif %}
@@ -2291,13 +2433,52 @@
 
     <!-- 🌍 Floating Language Orb functionality -->
     <script>
+        // Global function to dismiss language hint
+        function dismissLanguageHint() {
+            const hint = document.getElementById('languageHint');
+            const orb = document.getElementById('languageOrb');
+
+            if (hint) {
+                hint.classList.remove('show');
+                localStorage.setItem('languageHintDismissed', 'true');
+            }
+
+            if (orb) {
+                orb.classList.remove('first-time');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const languageOrb = document.getElementById('languageOrb');
             const orbText = document.getElementById('orbText');
             const orbTooltip = document.getElementById('orbTooltip');
+            const languageHint = document.getElementById('languageHint');
 
             // Exit early if language orb doesn't exist (e.g., on login page)
             if (!languageOrb) return;
+
+            // Check if user is new to language discovery
+            const hintDismissed = localStorage.getItem('languageHintDismissed');
+            const orbClicked = localStorage.getItem('languageOrbClicked');
+
+            if (!hintDismissed && !orbClicked) {
+                // Show discovery animation and hint for new users
+                languageOrb.classList.add('first-time');
+
+                // Show hint after a delay
+                setTimeout(() => {
+                    if (languageHint) {
+                        languageHint.classList.add('show');
+                    }
+                }, 3000);
+
+                // Auto-hide hint after 10 seconds
+                setTimeout(() => {
+                    if (languageHint && languageHint.classList.contains('show')) {
+                        dismissLanguageHint();
+                    }
+                }, 13000);
+            }
 
             // Language cycle: Tamil → English → Hindi → Tamil
             const languages = {
@@ -2332,6 +2513,10 @@
             languageOrb.addEventListener('click', function(e) {
                 e.preventDefault();
 
+                // Mark that user has discovered the orb
+                localStorage.setItem('languageOrbClicked', 'true');
+                dismissLanguageHint();
+
                 // Add click animation
                 this.style.transform = 'scale(0.9)';
                 setTimeout(() => {
@@ -2365,6 +2550,28 @@
             languageOrb.addEventListener('mouseleave', function() {
                 this.style.animationDuration = '3s';
             });
+
+            // Mobile-specific: Add touch feedback
+            languageOrb.addEventListener('touchstart', function(e) {
+                this.style.transform = 'scale(0.95)';
+            });
+
+            languageOrb.addEventListener('touchend', function(e) {
+                this.style.transform = '';
+            });
+
+            // Show hint again if user visits multiple times without clicking
+            const visitCount = parseInt(localStorage.getItem('siteVisitCount') || '0') + 1;
+            localStorage.setItem('siteVisitCount', visitCount.toString());
+
+            if (visitCount === 3 && !orbClicked && !hintDismissed) {
+                // Show hint again on 3rd visit if they haven't discovered it
+                setTimeout(() => {
+                    if (languageHint) {
+                        languageHint.classList.add('show');
+                    }
+                }, 5000);
+            }
         });
     </script>
 
