@@ -2537,6 +2537,18 @@
                                 You've already played today! Come back tomorrow for a New Song.
                             {% endif %}
                         </p>
+                        <p style="margin: 5px 0; font-size: 0.9em; opacity: 0.8;">
+                            <i class="fas fa-globe" style="margin-right: 5px;"></i>
+                            {% if current_language == 'tamil' %}
+                                Try English or Hindi versions too! 🎧🎤
+                            {% elif current_language == 'english' %}
+                                Try Tamil or Hindi versions too! 🎵🎤
+                            {% elif current_language == 'hindi' %}
+                                Try Tamil or English versions too! 🎵🎧
+                            {% else %}
+                                Try other language versions too! 🎵🎧🎤
+                            {% endif %}
+                        </p>
                     </div>
 
                     <div class="countdown-section" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px; margin-top: 20px;">
