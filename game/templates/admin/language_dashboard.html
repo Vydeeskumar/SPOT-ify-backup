@@ -160,7 +160,9 @@
         {% with today_song=today_songs|lookup:lang_code %}
         {% if today_song %}
             <p><strong>{{ today_song.title }}</strong> by {{ today_song.artist }}</p>
-            <p>From: {{ today_song.movie }}</p>
+            {% if today_song.movie %}
+                <p>From: {{ today_song.movie }}</p>
+            {% endif %}
             <div class="song-actions">
                 <button class="btn-custom" onclick="changeDailySong('{{ lang_code }}')">Change Song</button>
                 <a href="{% url 'admin:game_song_change' today_song.id %}" class="btn-custom">Edit Song</a>

@@ -165,11 +165,17 @@ class SongAdmin(admin.ModelAdmin):
 
 
     def song_title_with_movie(self, obj):
-        return format_html(
-            '<strong>{}</strong> <span style="color: #666;">from {}</span>',
-            obj.title,
-            obj.movie
-        )
+        if obj.movie:
+            return format_html(
+                '<strong>{}</strong> <span style="color: #666;">from {}</span>',
+                obj.title,
+                obj.movie
+            )
+        else:
+            return format_html(
+                '<strong>{}</strong>',
+                obj.title
+            )
     song_title_with_movie.short_description = 'Song'
 
     def language_tag(self, obj):

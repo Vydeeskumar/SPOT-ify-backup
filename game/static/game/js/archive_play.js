@@ -237,7 +237,7 @@ function showResults(result) {
             ${result.image ? `<img src="${result.image}" alt="${result.song_title}" class="song-image">` : ''}
             <div class="song-details">
                 <div class="song-title">${result.song_title}</div>
-                <div class="song-info">${result.movie}</div>
+                ${result.movie ? `<div class="song-info">${result.movie}</div>` : ''}
                 <div class="song-info">${result.artist}</div>
             </div>
         </div>

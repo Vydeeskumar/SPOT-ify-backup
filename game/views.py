@@ -752,8 +752,14 @@ def give_up(request, language='tamil'):
 
         profile.save()
 
+        # Create message with or without movie info
+        if today_song.movie:
+            message = f'The song was "{today_song.title}" from "{today_song.movie}"'
+        else:
+            message = f'The song was "{today_song.title}" by {today_song.artist}'
+
         return JsonResponse({
-            'message': f'The song was "{today_song.title}" from "{today_song.movie}"',
+            'message': message,
             'title': today_song.title,
             'movie': today_song.movie,
             'artist': today_song.artist,

@@ -2518,7 +2518,9 @@
 
                     <div class="song-details" style="margin: 20px 0;">
                         <div class="song-title">{{ today_song.title }}</div>
-                        <div class="song-info">from {{ today_song.movie }}</div>
+                        {% if today_song.movie %}
+                            <div class="song-info">from {{ today_song.movie }}</div>
+                        {% endif %}
                         <div class="song-info">{{ today_song.artist }}</div>
                     </div>
                     
@@ -2695,7 +2697,9 @@
                     
                         <div class="song-details">
                             <div class="song-title">{{ today_song.title }}</div>
-                            <div class="song-info">{{ today_song.movie }}</div>
+                            {% if today_song.movie %}
+                                <div class="song-info">{{ today_song.movie }}</div>
+                            {% endif %}
                             <div class="song-info">{{ today_song.artist }}</div>
                         </div>
 
