@@ -1737,7 +1737,7 @@
         }
 
         .tour-modal {
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -1747,12 +1747,15 @@
             padding: 30px;
             max-width: 500px;
             width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
             box-shadow:
                 0 25px 80px rgba(0, 123, 255, 0.3),
                 0 0 50px rgba(0, 123, 255, 0.2),
                 inset 0 1px 0 rgba(255, 255, 255, 0.8);
             animation: tourModalIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             transition: all 0.3s ease;
+            z-index: 15001;
         }
 
         .tour-header {
@@ -1913,6 +1916,9 @@
                 padding: 25px 20px;
                 max-width: 350px;
                 margin: 20px;
+                max-height: 85vh;
+                top: 50%;
+                transform: translate(-50%, -50%);
             }
 
             .tour-content h3 {
@@ -1921,6 +1927,7 @@
 
             .tour-content p {
                 font-size: 1rem;
+                line-height: 1.5;
             }
 
             .tour-navigation {
@@ -2335,7 +2342,7 @@
     </script>
 
     <!-- Game logic script -->
-    <script src="{% static 'game/js/home.js' %}?v=139" defer></script>
+    <script src="{% static 'game/js/home.js' %}?v=140" defer></script>
 {% endblock %}
 
 
