@@ -2956,11 +2956,11 @@
     </div>
 </div>
 
-<!-- 🎮 HELP BUTTON FOR ONBOARDING TOUR -->
-<div id="helpPanel" style="position: fixed; top: 10px; left: 10px; z-index: 9999;">
-    <button onclick="restartOnboardingTour()" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; border: none; padding: 10px 15px; border-radius: 25px; cursor: pointer; font-size: 14px; font-weight: 600; box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3); transition: all 0.3s ease;"
-            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 123, 255, 0.4)'"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0, 123, 255, 0.3)'">
+<!-- 🎮 HELP BUTTON FOR ONBOARDING TOUR - Moved to bottom right -->
+<div id="helpPanel" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+    <button onclick="restartOnboardingTour()" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; border: none; padding: 12px 18px; border-radius: 30px; cursor: pointer; font-size: 14px; font-weight: 600; box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4); transition: all 0.3s ease; border: 2px solid rgba(255, 255, 255, 0.2);"
+            onmouseover="this.style.transform='translateY(-3px) scale(1.05)'; this.style.boxShadow='0 8px 25px rgba(0, 123, 255, 0.5)'"
+            onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 6px 20px rgba(0, 123, 255, 0.4)'">
         🎮 How to Play
     </button>
 </div>

@@ -1767,7 +1767,7 @@ console.log('🏆 Celebration modals module loaded');
 class OnboardingTour {
     constructor() {
         this.currentStep = 0;
-        this.totalSteps = 6;
+        this.totalSteps = 8;
         this.tourModal = null;
         this.isActive = false;
         this.currentLanguage = window.currentLanguage || 'tamil';
@@ -1792,10 +1792,22 @@ class OnboardingTour {
                 buttonText: "Cool!"
             },
             {
+                title: "🌍 Language Orb - Switch Languages!",
+                content: "Click the floating orb to switch between Tamil (Paatu), English (Song), and Hindi (Gaana) versions. Each language has different songs and separate leaderboards!",
+                highlight: ".language-orb",
+                buttonText: "Amazing!"
+            },
+            {
                 title: "⏱️ Scoring System",
                 content: "Speed matters! Guess within 10 seconds for 8 points, 20 seconds for 5 points, and so on.",
                 highlight: ".timer-section",
                 buttonText: "Understood!"
+            },
+            {
+                title: "📊 Language-Specific Stats",
+                content: "Important: Each language (Tamil/English/Hindi) has its own leaderboards, streaks, and statistics. Your progress is tracked separately for each language!",
+                highlight: ".leaderboard-link",
+                buttonText: "Got it!"
             },
             {
                 title: "📚 Archive Feature",
