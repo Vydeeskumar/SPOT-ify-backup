@@ -2465,9 +2465,9 @@
                 // Show discovery animation and hint for new users
                 languageOrb.classList.add('first-time');
 
-                // Show hint after a delay
+                // Show hint after a delay, but only if user is not actively playing
                 setTimeout(() => {
-                    if (languageHint) {
+                    if (languageHint && !isUserActivelyPlaying()) {
                         languageHint.classList.add('show');
                     }
                 }, 3000);
@@ -2479,6 +2479,36 @@
                     }
                 }, 13000);
             }
+
+            // Function to check if user is actively playing/typing
+            function isUserActivelyPlaying() {
+                const guessInput = document.getElementById('guess-input');
+                const gameContainer = document.querySelector('.game-container');
+                const resultContainer = document.querySelector('.result-container');
+
+                // Don't show hint if:
+                // 1. User is typing in guess input
+                // 2. Game is active (game container visible)
+                // 3. Results are showing
+                return (guessInput && document.activeElement === guessInput) ||
+                       (gameContainer && gameContainer.style.display !== 'none') ||
+                       (resultContainer && resultContainer.style.display !== 'none') ||
+                       window.gameStarted === true;
+            }
+
+            // Hide hint when user starts typing
+            document.addEventListener('focusin', function(e) {
+                if (e.target.id === 'guess-input' && languageHint) {
+                    languageHint.classList.remove('show');
+                }
+            });
+
+            // Also check periodically and hide hint if game becomes active
+            setInterval(() => {
+                if (languageHint && languageHint.classList.contains('show') && isUserActivelyPlaying()) {
+                    languageHint.classList.remove('show');
+                }
+            }, 1000);
 
             // Language cycle: Tamil → English → Hindi → Tamil
             const languages = {

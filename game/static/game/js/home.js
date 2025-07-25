@@ -44,6 +44,118 @@ document.addEventListener('DOMContentLoaded', function () {
     const mainGame = document.getElementById('game-main');  // Add this container to home.html
     if (!mainGame) return;
 
+    // Game state persistence for deployment safety
+    let gameState = {
+        isActive: false,
+        startTime: null,
+        pausedTime: 0,
+        serverError: false
+    };
+
+    // Save game state to localStorage
+    function saveGameState() {
+        if (isTimerRunning && startTime) {
+            const state = {
+                startTime: startTime,
+                elapsedTime: Date.now() - startTime,
+                isTimerRunning: isTimerRunning,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('spotifyGameState', JSON.stringify(state));
+        }
+    }
+
+    // Load and restore game state
+    function loadGameState() {
+        const saved = localStorage.getItem('spotifyGameState');
+        if (saved) {
+            try {
+                const state = JSON.parse(saved);
+                // Only restore if saved within last 5 minutes (reasonable for deployment)
+                if (Date.now() - state.timestamp < 300000) {
+                    return state;
+                }
+            } catch (e) {
+                console.error('Failed to parse saved game state:', e);
+            }
+        }
+        localStorage.removeItem('spotifyGameState');
+        return null;
+    }
+
+    // Clear saved game state
+    function clearGameState() {
+        localStorage.removeItem('spotifyGameState');
+    }
+
+    // Pause timer function
+    function pauseTimer() {
+        if (isTimerRunning) {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            gameState.pausedTime = Date.now() - startTime;
+        }
+    }
+
+    // Resume timer function
+    function resumeTimer() {
+        if (!isTimerRunning && gameState.pausedTime > 0) {
+            startTime = Date.now() - gameState.pausedTime;
+            isTimerRunning = true;
+            timerInterval = setInterval(updateTimer, 100);
+            hideServerErrorMessage();
+        }
+    }
+
+    // Error handling for server issues
+    function handleServerError() {
+        if (isTimerRunning) {
+            pauseTimer();
+            showServerErrorMessage();
+            saveGameState();
+
+            // Try to reconnect every 5 seconds
+            const reconnectInterval = setInterval(async () => {
+                try {
+                    const response = await fetch('/tamil/', { method: 'HEAD' });
+                    if (response.ok) {
+                        clearInterval(reconnectInterval);
+                        resumeTimer();
+                    }
+                } catch (e) {
+                    // Server still down, keep trying
+                }
+            }, 5000);
+        }
+    }
+
+    function showServerErrorMessage() {
+        const errorDiv = document.createElement('div');
+        errorDiv.id = 'server-error-message';
+        errorDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 69, 0, 0.95);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            z-index: 10000;
+            font-weight: bold;
+            box-shadow: 0 4px 20px rgba(255, 69, 0, 0.4);
+        `;
+        errorDiv.innerHTML = '⚠️ Server temporarily unavailable. Your game is paused and will resume automatically.';
+        document.body.appendChild(errorDiv);
+    }
+
+    function hideServerErrorMessage() {
+        const errorDiv = document.getElementById('server-error-message');
+        if (errorDiv) {
+            errorDiv.remove();
+        }
+    }
+
         // Initialize variables
     let startTime = null;
     let timerInterval;
@@ -93,6 +205,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 date: new Date().toDateString(),
                 initialStartTime: startTime
             }));
+
+            // Save game state for deployment safety
+            saveGameState();
         }
     }
 
@@ -103,6 +218,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (elapsedTime < 0) {
             startTime = Date.now();
             return;
+        }
+
+        // Periodically save game state during active gameplay
+        if (Math.floor(elapsedTime) % 5 === 0) { // Save every 5 seconds
+            saveGameState();
         }
 
         const minutes = Math.floor(elapsedTime / 60);
@@ -160,6 +280,10 @@ document.addEventListener('DOMContentLoaded', function () {
         clearInterval(timerInterval);
         isTimerRunning = false;
         const timeTaken = (Date.now() - startTime) / 1000;
+
+        // Clear game state when game ends
+        clearGameState();
+
         return Math.max(0, Math.min(timeTaken, 3600));
     }
 
@@ -572,6 +696,11 @@ document.addEventListener('DOMContentLoaded', function () {
             // ... rest of your code
 
             if (!response.ok) {
+                if (response.status === 502 || response.status === 503 || response.status === 504) {
+                    // Server deployment/reload issue
+                    handleServerError();
+                    return;
+                }
                 throw new Error('Network response was not ok');
             }
 
@@ -604,16 +733,50 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } catch (error) {
             console.error('Error:', error);
-            resultMessage.innerHTML = '<div class="alert alert-danger">An error occurred. Please try again.</div>';
+
+            // Check if it's a network error (server down)
+            if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                handleServerError();
+            } else {
+                resultMessage.innerHTML = '<div class="alert alert-danger">An error occurred. Please try again.</div>';
+            }
         }
     });
 
-    // Initialize timer on page load
-    const timerWasRunning = initializeTimer();
+    // Check for saved game state on page load
+    const savedState = loadGameState();
+    if (savedState && savedState.timeElapsed < 300) { // Only restore if less than 5 minutes
+        // Restore game state
+        startTime = Date.now() - (savedState.timeElapsed * 1000);
+        isTimerRunning = true;
+        timerInterval = setInterval(updateTimer, 100);
 
-    // Start timer on first play only if it wasn't already running
-    if (audioElement && !timerWasRunning) {
-        audioElement.addEventListener('play', startTimer, { once: true });
+        // Show restoration message
+        const restoreDiv = document.createElement('div');
+        restoreDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 255, 157, 0.95);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            z-index: 10000;
+            font-weight: bold;
+        `;
+        restoreDiv.innerHTML = '✅ Game restored! Your timer continues from where you left off.';
+        document.body.appendChild(restoreDiv);
+
+        setTimeout(() => restoreDiv.remove(), 4000);
+    } else {
+        // Initialize timer normally
+        const timerWasRunning = initializeTimer();
+
+        // Start timer on first play only if it wasn't already running
+        if (audioElement && !timerWasRunning) {
+            audioElement.addEventListener('play', startTimer, { once: true });
+        }
     }
 
     // Handle page visibility changes
