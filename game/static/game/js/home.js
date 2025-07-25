@@ -1526,16 +1526,16 @@ class VoiceRecognitionSystem {
         }
     }
 
-    // Method to completely hide voice system when game is over or no song available
+    // Method to hide only voice feedback overlay (keep button visible)
     hideVoiceSystem() {
         this.hideVoiceFeedback();
-        if (this.voiceBtn) {
-            this.voiceBtn.style.display = 'none';
-        }
+        // Don't hide the voice button - users should always be able to use voice input
+        // Just hide the feedback overlay
     }
 
     // Method to show voice system when game is active
     showVoiceSystem() {
+        // Voice button should always be visible if recognition is supported
         if (this.voiceBtn && this.recognition) {
             this.voiceBtn.style.display = 'block';
         }
@@ -1560,24 +1560,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function checkVoiceSystemVisibility() {
-    // Hide voice system if no song is available or game is over
-    const noSongMessage = document.querySelector('.alert-warning');
-    const gameOverState = document.querySelector('.result-section');
-    const answerRevealed = document.querySelector('.answer-revealed');
+    // Only hide voice feedback overlay in certain situations, but keep voice button functional
     const tourModal = document.querySelector('.tour-modal');
     const rulesModal = document.querySelector('#rulesModal.show');
     const answerSection = document.querySelector('.answer-section');
     const resultContainer = document.querySelector('.result-container');
 
-    if (noSongMessage || gameOverState || answerRevealed || tourModal || rulesModal || answerSection || resultContainer) {
+    if (tourModal || rulesModal || answerSection || resultContainer) {
         if (voiceRecognition) {
-            voiceRecognition.hideVoiceSystem();
-        }
-    } else {
-        if (voiceRecognition) {
-            voiceRecognition.showVoiceSystem();
+            // Only hide the feedback overlay, not the voice functionality
+            voiceRecognition.hideVoiceFeedback();
         }
     }
+    // Voice button should always remain visible and functional
 }
 
 // Run visibility check more frequently
