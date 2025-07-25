@@ -2956,6 +2956,15 @@
     </div>
 </div>
 
+<!-- 🎮 HELP BUTTON FOR ONBOARDING TOUR -->
+<div id="helpPanel" style="position: fixed; top: 10px; left: 10px; z-index: 9999;">
+    <button onclick="restartOnboardingTour()" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; border: none; padding: 10px 15px; border-radius: 25px; cursor: pointer; font-size: 14px; font-weight: 600; box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3); transition: all 0.3s ease;"
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 123, 255, 0.4)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0, 123, 255, 0.3)'">
+        🎮 How to Play
+    </button>
+</div>
+
 <!-- 🧪 ADMIN TESTING PANEL (Only visible to superusers) -->
 {% if user.is_superuser %}
 <div id="adminTestPanel" style="position: fixed; top: 10px; right: 10px; z-index: 99999; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 8px; color: white; font-size: 12px;">
@@ -2965,6 +2974,7 @@
     <button onclick="testDailyAchievement(1)" style="display: block; margin: 5px 0; padding: 5px 10px; background: #ffc107; color: black; border: none; border-radius: 4px; cursor: pointer;">Test Daily #1</button>
     <button onclick="testDailyAchievement(5)" style="display: block; margin: 5px 0; padding: 5px 10px; background: #fd7e14; color: white; border: none; border-radius: 4px; cursor: pointer;">Test Daily #5</button>
     <button onclick="testDailyAchievement(10)" style="display: block; margin: 5px 0; padding: 5px 10px; background: #6f42c1; color: white; border: none; border-radius: 4px; cursor: pointer;">Test Daily #10</button>
+    <button onclick="restartOnboardingTour()" style="display: block; margin: 5px 0; padding: 5px 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Test Onboarding</button>
 </div>
 {% endif %}
 

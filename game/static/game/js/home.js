@@ -1761,3 +1761,279 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 console.log('🏆 Celebration modals module loaded');
+
+// 🎮 INTERACTIVE ONBOARDING TOUR SYSTEM
+
+class OnboardingTour {
+    constructor() {
+        this.currentStep = 0;
+        this.totalSteps = 6;
+        this.tourModal = null;
+        this.isActive = false;
+        this.currentLanguage = window.currentLanguage || 'tamil';
+
+        this.steps = [
+            {
+                title: "🎵 Welcome to SPOT-ify!",
+                content: "The ultimate daily music guessing game! Listen to song snippets and test your music knowledge.",
+                highlight: null,
+                buttonText: "Let's Start!"
+            },
+            {
+                title: "🎧 Listen to Song Snippets",
+                content: "Each day features a new song. Click the play button to hear a snippet and guess the song name!",
+                highlight: ".audio-controls",
+                buttonText: "Got it!"
+            },
+            {
+                title: "🎤 Make Your Guess",
+                content: "Type the song name in the input box. You can also use the microphone button for voice recognition!",
+                highlight: ".guess-section",
+                buttonText: "Cool!"
+            },
+            {
+                title: "⏱️ Scoring System",
+                content: "Speed matters! Guess within 10 seconds for 8 points, 20 seconds for 5 points, and so on.",
+                highlight: ".timer-section",
+                buttonText: "Understood!"
+            },
+            {
+                title: "📚 Archive Feature",
+                content: "Missed a day? No problem! Use the Archive to play previous songs and catch up on your favorites.",
+                highlight: ".archive-link",
+                buttonText: "Awesome!"
+            },
+            {
+                title: "🎮 Ready to Play!",
+                content: "You're all set! Compete with friends, build streaks, and become the ultimate music champion!",
+                highlight: null,
+                buttonText: "Start Playing! 🚀"
+            }
+        ];
+
+        this.createTourModal();
+        this.bindEvents();
+        this.checkShouldShowTour();
+    }
+
+    createTourModal() {
+        // Create tour modal HTML
+        const modalHTML = `
+            <div id="onboardingTour" class="onboarding-tour">
+                <div class="tour-overlay"></div>
+                <div class="tour-modal">
+                    <div class="tour-header">
+                        <div class="tour-progress">
+                            <span id="tourStepIndicator">Step 1 of ${this.totalSteps}</span>
+                        </div>
+                        <button class="tour-skip" id="tourSkip">Skip Tour</button>
+                    </div>
+                    <div class="tour-content">
+                        <h3 id="tourTitle">Welcome!</h3>
+                        <p id="tourDescription">Let's get you started...</p>
+                    </div>
+                    <div class="tour-navigation">
+                        <button class="tour-btn tour-back" id="tourBack" style="display: none;">
+                            ← Back
+                        </button>
+                        <button class="tour-btn tour-next" id="tourNext">
+                            Next →
+                        </button>
+                    </div>
+                </div>
+                <div class="tour-spotlight" id="tourSpotlight"></div>
+            </div>
+        `;
+
+        // Add to page
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        this.tourModal = document.getElementById('onboardingTour');
+    }
+
+    bindEvents() {
+        const nextBtn = document.getElementById('tourNext');
+        const backBtn = document.getElementById('tourBack');
+        const skipBtn = document.getElementById('tourSkip');
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => this.nextStep());
+        }
+
+        if (backBtn) {
+            backBtn.addEventListener('click', () => this.previousStep());
+        }
+
+        if (skipBtn) {
+            skipBtn.addEventListener('click', () => this.skipTour());
+        }
+
+        // Prevent closing on overlay click during tour
+        if (this.tourModal) {
+            this.tourModal.addEventListener('click', (e) => {
+                if (e.target.classList.contains('tour-overlay')) {
+                    // Don't close - force users to complete or skip
+                }
+            });
+        }
+    }
+
+    checkShouldShowTour() {
+        // Check if user has seen the new onboarding tour
+        const hasSeenNewTour = localStorage.getItem('spotifyOnboardingV2Seen');
+
+        if (!hasSeenNewTour) {
+            // Show tour after a short delay to let page load
+            setTimeout(() => {
+                this.startTour();
+            }, 1500);
+        }
+    }
+
+    startTour() {
+        if (this.isActive) return;
+
+        this.isActive = true;
+        this.currentStep = 0;
+
+        // Show modal
+        if (this.tourModal) {
+            this.tourModal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+
+        this.showStep(0);
+        console.log('🎮 Onboarding tour started');
+    }
+
+    showStep(stepIndex) {
+        if (stepIndex < 0 || stepIndex >= this.totalSteps) return;
+
+        this.currentStep = stepIndex;
+        const step = this.steps[stepIndex];
+
+        // Update content
+        const titleEl = document.getElementById('tourTitle');
+        const descEl = document.getElementById('tourDescription');
+        const indicatorEl = document.getElementById('tourStepIndicator');
+        const nextBtn = document.getElementById('tourNext');
+        const backBtn = document.getElementById('tourBack');
+
+        if (titleEl) titleEl.textContent = step.title;
+        if (descEl) descEl.textContent = step.content;
+        if (indicatorEl) indicatorEl.textContent = `Step ${stepIndex + 1} of ${this.totalSteps}`;
+        if (nextBtn) nextBtn.textContent = step.buttonText;
+
+        // Show/hide back button
+        if (backBtn) {
+            backBtn.style.display = stepIndex > 0 ? 'block' : 'none';
+        }
+
+        // Highlight element if specified
+        this.highlightElement(step.highlight);
+
+        // Add step-specific animations
+        this.animateStep(stepIndex);
+    }
+
+    highlightElement(selector) {
+        // Remove previous highlights
+        document.querySelectorAll('.tour-highlighted').forEach(el => {
+            el.classList.remove('tour-highlighted');
+        });
+
+        const spotlight = document.getElementById('tourSpotlight');
+
+        if (selector && spotlight) {
+            const element = document.querySelector(selector);
+            if (element) {
+                element.classList.add('tour-highlighted');
+
+                // Position spotlight
+                const rect = element.getBoundingClientRect();
+                spotlight.style.display = 'block';
+                spotlight.style.top = (rect.top - 10) + 'px';
+                spotlight.style.left = (rect.left - 10) + 'px';
+                spotlight.style.width = (rect.width + 20) + 'px';
+                spotlight.style.height = (rect.height + 20) + 'px';
+            }
+        } else if (spotlight) {
+            spotlight.style.display = 'none';
+        }
+    }
+
+    animateStep(stepIndex) {
+        const modal = document.querySelector('.tour-modal');
+        if (!modal) return;
+
+        // Add entrance animation
+        modal.style.transform = 'scale(0.8) translateY(20px)';
+        modal.style.opacity = '0';
+
+        setTimeout(() => {
+            modal.style.transform = 'scale(1) translateY(0)';
+            modal.style.opacity = '1';
+        }, 100);
+    }
+
+    nextStep() {
+        if (this.currentStep < this.totalSteps - 1) {
+            this.showStep(this.currentStep + 1);
+        } else {
+            this.completeTour();
+        }
+    }
+
+    previousStep() {
+        if (this.currentStep > 0) {
+            this.showStep(this.currentStep - 1);
+        }
+    }
+
+    skipTour() {
+        this.completeTour();
+    }
+
+    completeTour() {
+        // Mark tour as seen
+        localStorage.setItem('spotifyOnboardingV2Seen', 'true');
+
+        // Hide modal
+        if (this.tourModal) {
+            this.tourModal.style.display = 'none';
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        // Remove highlights
+        document.querySelectorAll('.tour-highlighted').forEach(el => {
+            el.classList.remove('tour-highlighted');
+        });
+
+        this.isActive = false;
+        console.log('🎮 Onboarding tour completed');
+    }
+
+    // Public method to restart tour (for help/settings)
+    restartTour() {
+        this.startTour();
+    }
+}
+
+// Initialize onboarding tour
+let onboardingTour;
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Wait for other systems to load first
+    setTimeout(() => {
+        onboardingTour = new OnboardingTour();
+        console.log('🎮 Onboarding tour system loaded');
+    }, 1000);
+});
+
+// Global function to restart tour
+window.restartOnboardingTour = function() {
+    if (onboardingTour) {
+        onboardingTour.restartTour();
+    }
+};
+
+console.log('🎮 Onboarding tour module loaded');

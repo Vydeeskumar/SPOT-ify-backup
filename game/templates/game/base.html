@@ -1713,6 +1713,246 @@
                 font-size: 2rem;
             }
         }
+
+        /* 🎮 INTERACTIVE ONBOARDING TOUR STYLES */
+        .onboarding-tour {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 15000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .tour-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+        }
+
+        .tour-modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
+            border: 2px solid #007bff;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow:
+                0 25px 80px rgba(0, 123, 255, 0.3),
+                0 0 50px rgba(0, 123, 255, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            animation: tourModalIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transition: all 0.3s ease;
+        }
+
+        .tour-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(0, 123, 255, 0.2);
+        }
+
+        .tour-progress {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .tour-skip {
+            background: rgba(108, 117, 125, 0.1);
+            border: 1px solid rgba(108, 117, 125, 0.3);
+            color: #6c757d;
+            padding: 8px 16px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tour-skip:hover {
+            background: rgba(108, 117, 125, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .tour-content {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .tour-content h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #007bff;
+            margin: 0 0 15px 0;
+            text-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+        }
+
+        .tour-content p {
+            font-size: 1.1rem;
+            color: #495057;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .tour-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .tour-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tour-back {
+            background: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+            border: 2px solid rgba(108, 117, 125, 0.3);
+        }
+
+        .tour-back:hover {
+            background: rgba(108, 117, 125, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .tour-next {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: 2px solid transparent;
+            flex: 1;
+            max-width: 200px;
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .tour-next:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
+        }
+
+        .tour-spotlight {
+            position: absolute;
+            display: none;
+            border: 3px solid #007bff;
+            border-radius: 10px;
+            box-shadow:
+                0 0 0 5px rgba(0, 123, 255, 0.3),
+                0 0 30px rgba(0, 123, 255, 0.6),
+                inset 0 0 0 3px rgba(255, 255, 255, 0.8);
+            animation: spotlightPulse 2s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 14999;
+        }
+
+        .tour-highlighted {
+            position: relative;
+            z-index: 14998;
+            border-radius: 8px;
+        }
+
+        /* Tour Animations */
+        @keyframes tourModalIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5) rotateY(180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1) rotateY(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1) rotateY(0deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes spotlightPulse {
+            0%, 100% {
+                box-shadow:
+                    0 0 0 5px rgba(0, 123, 255, 0.3),
+                    0 0 30px rgba(0, 123, 255, 0.6),
+                    inset 0 0 0 3px rgba(255, 255, 255, 0.8);
+            }
+            50% {
+                box-shadow:
+                    0 0 0 8px rgba(0, 123, 255, 0.5),
+                    0 0 50px rgba(0, 123, 255, 0.8),
+                    inset 0 0 0 3px rgba(255, 255, 255, 1);
+            }
+        }
+
+        /* Mobile Responsiveness for Tour */
+        @media (max-width: 768px) {
+            .tour-modal {
+                padding: 25px 20px;
+                max-width: 350px;
+                margin: 20px;
+            }
+
+            .tour-content h3 {
+                font-size: 1.5rem;
+            }
+
+            .tour-content p {
+                font-size: 1rem;
+            }
+
+            .tour-navigation {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .tour-btn {
+                width: 100%;
+                padding: 14px 20px;
+            }
+
+            .tour-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+
+        /* Special highlighting effects */
+        .tour-highlighted {
+            animation: tourHighlight 2s ease-in-out infinite;
+        }
+
+        @keyframes tourHighlight {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(0, 123, 255, 0.1);
+            }
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
@@ -2095,7 +2335,7 @@
     </script>
 
     <!-- Game logic script -->
-    <script src="{% static 'game/js/home.js' %}?v=137" defer></script>
+    <script src="{% static 'game/js/home.js' %}?v=138" defer></script>
 {% endblock %}
 
 
