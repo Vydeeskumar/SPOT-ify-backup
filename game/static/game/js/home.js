@@ -673,12 +673,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Play/Pause functionality
 
-    if (playPauseBtn) {
+    // Play/Pause functionality
+
+    if (playPauseBtn && audioElement) {
         playPauseBtn.addEventListener('click', () => {
             initAudioContext();
 
             if (audioElement.paused) {
-                // Show loading indicator immediately
                 showLoadingIndicator();
 
                 if (!source) {
@@ -687,16 +688,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     analyser.connect(audioContext.destination);
                 }
 
-                // Start playing audio
-                audioElement.play().then(() => {
-                    vinylPlayer.classList.add('playing');
-                    vinylPlayer.classList.remove('paused');
-                    // Update vinyl center icon
-                    document.getElementById('vinyl-play-icon').className = 'fas fa-pause';
-
-                    // Start timer only when audio actually starts playing
-                    startTimerOnAudioPlay();
-                }).catch((error) => {
+                audioElement.play().catch((error) => {
                     console.error('Audio play failed:', error);
                     hideLoadingIndicator();
                     playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
@@ -705,10 +697,37 @@ document.addEventListener('DOMContentLoaded', function () {
                 audioElement.pause();
                 vinylPlayer.classList.remove('playing');
                 vinylPlayer.classList.add('paused');
+                hideLoadingIndicator();
                 playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
-                // Update vinyl center icon
                 document.getElementById('vinyl-play-icon').className = 'fas fa-play';
             }
+        });
+
+        audioElement.addEventListener('playing', () => {
+            hideLoadingIndicator();
+            vinylPlayer.classList.add('playing');
+            vinylPlayer.classList.remove('paused');
+            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            document.getElementById('vinyl-play-icon').className = 'fas fa-pause';
+
+            startTimerOnAudioPlay();
+        });
+
+        audioElement.addEventListener('pause', () => {
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+            vinylPlayer.classList.remove('playing');
+            vinylPlayer.classList.add('paused');
+            document.getElementById('vinyl-play-icon').className = 'fas fa-play';
+        });
+
+        audioElement.addEventListener('ended', () => {
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+            vinylPlayer.classList.remove('playing');
+            vinylPlayer.classList.add('paused');
+            document.getElementById('vinyl-play-icon').className = 'fas fa-play';
+
+            clearInterval(timerInterval);
+            localStorage.removeItem('songTimer');
         });
     }
 
