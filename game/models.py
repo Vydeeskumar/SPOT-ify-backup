@@ -195,3 +195,70 @@ class DailySong(models.Model):
 
     def __str__(self):
         return f"{self.song.title} - {self.date} ({self.get_language_display()})"
+
+
+# Community Models
+class Poll(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.title
+
+    def total_votes(self):
+        return sum(option.votes.count() for option in self.options.all())
+
+class PollOption(models.Model):
+    poll = models.ForeignKey(Poll, related_name='options', on_delete=models.CASCADE)
+    text = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.poll.title} - {self.text}"
+
+class PollVote(models.Model):
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
+    option = models.ForeignKey(PollOption, related_name='votes', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    voted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['poll', 'user']  # One vote per user per poll
+
+class Feedback(models.Model):
+    FEEDBACK_TYPES = [
+        ('feedback', 'General Feedback'),
+        ('bug', 'Bug Report'),
+        ('suggestion', 'Feature Suggestion'),
+        ('question', 'Question'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    type = models.CharField(max_length=20, choices=FEEDBACK_TYPES, default='feedback')
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    is_resolved = models.BooleanField(default=False)
+    admin_response = models.TextField(blank=True)
+    responded_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.get_type_display()} - {self.title}"
+
+    class Meta:
+        ordering = ['-submitted_at']
+
+class Announcement(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        ordering = ['-created_at']

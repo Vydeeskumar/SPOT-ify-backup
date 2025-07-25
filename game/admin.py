@@ -3,8 +3,8 @@ from django.contrib.admin import AdminSite
 from django.utils.html import format_html
 from django.urls import path
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from .models import Song, UserScore, UserProfile, DailySong, LANGUAGE_CHOICES
+from django.http import JsonResponse, HttpResponseRedirect
+from .models import Song, UserScore, UserProfile, DailySong, LANGUAGE_CHOICES, Poll, PollOption, PollVote, Feedback, Announcement
 from django import forms
 from django.utils import timezone
 from datetime import date
@@ -312,3 +312,62 @@ def admin_language_redirect(request):
 
 # Register as a simple admin action instead of custom URL
 # This avoids URL conflicts
+
+
+# Community Admin Classes
+class PollOptionInline(admin.TabularInline):
+    model = PollOption
+    extra = 2
+    min_num = 2
+
+@admin.register(Poll)
+class PollAdmin(admin.ModelAdmin):
+    list_display = ['title', 'created_by', 'created_at', 'is_active', 'total_votes']
+    list_filter = ['is_active', 'created_at']
+    search_fields = ['title', 'description']
+    inlines = [PollOptionInline]
+
+    def save_model(self, request, obj, form, change):
+        if not change:  # If creating new poll
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
+
+@admin.register(PollVote)
+class PollVoteAdmin(admin.ModelAdmin):
+    list_display = ['poll', 'option', 'user', 'voted_at']
+    list_filter = ['poll', 'voted_at']
+    search_fields = ['user__username', 'poll__title']
+    readonly_fields = ['voted_at']
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ['title', 'user', 'type', 'submitted_at', 'is_resolved']
+    list_filter = ['type', 'is_resolved', 'submitted_at']
+    search_fields = ['title', 'message', 'user__username']
+    readonly_fields = ['submitted_at', 'user']
+
+    fieldsets = (
+        ('Feedback Details', {
+            'fields': ('user', 'type', 'title', 'message', 'submitted_at')
+        }),
+        ('Admin Response', {
+            'fields': ('is_resolved', 'admin_response', 'responded_at')
+        }),
+    )
+
+    def save_model(self, request, obj, form, change):
+        if obj.admin_response and not obj.responded_at:
+            obj.responded_at = timezone.now()
+        super().save_model(request, obj, form, change)
+
+@admin.register(Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
+    list_display = ['title', 'created_by', 'created_at', 'is_active']
+    list_filter = ['is_active', 'created_at']
+    search_fields = ['title', 'content']
+    readonly_fields = ['created_at']
+
+    def save_model(self, request, obj, form, change):
+        if not change:  # If creating new announcement
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)

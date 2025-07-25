@@ -211,6 +211,91 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // New function to start timer only when audio actually starts playing
+    function startTimerOnAudioPlay() {
+        if (!isTimerRunning && startTime === null) {
+            const audioElement = document.getElementById('song-snippet');
+            if (audioElement) {
+                // Wait for audio to actually start playing
+                const onPlaying = () => {
+                    startTimer();
+                    audioElement.removeEventListener('playing', onPlaying);
+                    hideLoadingIndicator();
+                };
+                audioElement.addEventListener('playing', onPlaying);
+            }
+        }
+    }
+
+    // Show loading indicator
+    function showLoadingIndicator() {
+        const playBtn = document.getElementById('playPauseBtn');
+        if (playBtn) {
+            playBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            playBtn.disabled = true;
+        }
+    }
+
+    // Hide loading indicator
+    function hideLoadingIndicator() {
+        const playBtn = document.getElementById('playPauseBtn');
+        if (playBtn) {
+            playBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            playBtn.disabled = false;
+        }
+    }
+
+    // Network quality detection
+    function detectNetworkQuality() {
+        if ('connection' in navigator) {
+            const connection = navigator.connection;
+            const effectiveType = connection.effectiveType;
+
+            // Adjust behavior based on network quality
+            if (effectiveType === 'slow-2g' || effectiveType === '2g') {
+                return 'slow';
+            } else if (effectiveType === '3g') {
+                return 'medium';
+            } else {
+                return 'fast';
+            }
+        }
+        return 'unknown';
+    }
+
+    // Adaptive audio loading based on network
+    function adaptiveAudioLoad() {
+        const audioElement = document.getElementById('song-snippet');
+        const networkQuality = detectNetworkQuality();
+
+        if (audioElement) {
+            if (networkQuality === 'slow') {
+                // For slow networks, show a warning
+                const warningDiv = document.createElement('div');
+                warningDiv.style.cssText = `
+                    background: rgba(255, 165, 0, 0.1);
+                    border: 1px solid orange;
+                    color: orange;
+                    padding: 10px;
+                    border-radius: 8px;
+                    margin: 10px 0;
+                    font-size: 0.9em;
+                    text-align: center;
+                `;
+                warningDiv.innerHTML = '⚠️ Slow network detected. Audio may take a moment to load.';
+
+                const gameControls = document.querySelector('.game-controls');
+                if (gameControls && !document.querySelector('.network-warning')) {
+                    warningDiv.className = 'network-warning';
+                    gameControls.parentNode.insertBefore(warningDiv, gameControls);
+                }
+            }
+
+            // Force preload for better experience
+            audioElement.load();
+        }
+    }
+
     function updateTimer() {
         if (startTime === null) return;
 
@@ -593,19 +678,29 @@ document.addEventListener('DOMContentLoaded', function () {
             initAudioContext();
 
             if (audioElement.paused) {
+                // Show loading indicator immediately
+                showLoadingIndicator();
+
                 if (!source) {
                     source = audioContext.createMediaElementSource(audioElement);
                     source.connect(analyser);
                     analyser.connect(audioContext.destination);
                 }
 
-                audioElement.play();
-                vinylPlayer.classList.add('playing');
-                vinylPlayer.classList.remove('paused');
-                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
-                // Update vinyl center icon
-                document.getElementById('vinyl-play-icon').className = 'fas fa-pause';
-                startTimer();
+                // Start playing audio
+                audioElement.play().then(() => {
+                    vinylPlayer.classList.add('playing');
+                    vinylPlayer.classList.remove('paused');
+                    // Update vinyl center icon
+                    document.getElementById('vinyl-play-icon').className = 'fas fa-pause';
+
+                    // Start timer only when audio actually starts playing
+                    startTimerOnAudioPlay();
+                }).catch((error) => {
+                    console.error('Audio play failed:', error);
+                    hideLoadingIndicator();
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+                });
             } else {
                 audioElement.pause();
                 vinylPlayer.classList.remove('playing');
@@ -674,10 +769,17 @@ document.addEventListener('DOMContentLoaded', function () {
         const timeTaken = stopTimer();
         const guessInput = document.getElementById('guess-input');
         const resultMessage = document.getElementById('result-message');
+        const submitBtn = this.querySelector('button[type="submit"]');
 
         if (!guessInput.value.trim()) {
             resultMessage.innerHTML = '<div class="alert alert-danger">Please enter a guess!</div>';
             return;
+        }
+
+        // Show loading state for submission
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+            submitBtn.disabled = true;
         }
 
         try {
@@ -740,6 +842,12 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 resultMessage.innerHTML = '<div class="alert alert-danger">An error occurred. Please try again.</div>';
             }
+        } finally {
+            // Reset submit button state
+            if (submitBtn) {
+                submitBtn.innerHTML = 'Submit';
+                submitBtn.disabled = false;
+            }
         }
     });
 
@@ -778,6 +886,9 @@ document.addEventListener('DOMContentLoaded', function () {
             audioElement.addEventListener('play', startTimer, { once: true });
         }
     }
+
+    // Initialize adaptive audio loading
+    adaptiveAudioLoad();
 
     // Handle page visibility changes
     document.addEventListener('visibilitychange', () => {

@@ -23,6 +23,9 @@ urlpatterns = [
     path('send-friend-request/<str:username>/', views.send_friend_request, name='send_friend_request'),
     path('process-voice/', views.process_voice_audio, name='process_voice_audio'),
     path('check-celebrations/', views.check_celebrations, name='check_celebrations'),
+    path('community/', views.community, name='community'),
+    path('community/submit-feedback/', views.submit_feedback, name='submit_feedback'),
+    path('community/vote-poll/', views.vote_poll, name='vote_poll'),
 
 
 ]

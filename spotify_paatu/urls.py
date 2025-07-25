@@ -16,6 +16,9 @@ urlpatterns = [
     # Default redirect to Tamil (backward compatibility)
     path('', language_redirect, name='language_redirect'),
 
+    # Global Community (not language-specific)
+    path('community/', include('game.community_urls')),
+
     # Custom login redirect for language selection
     path('login-redirect/', custom_login_redirect, name='custom_login_redirect'),
     path('store-language/', store_language, name='store_language'),

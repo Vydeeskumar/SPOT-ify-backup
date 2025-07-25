@@ -1694,3 +1694,103 @@ def get_user_daily_rank(user, date, language):
     except Exception as e:
         print(f"Error getting user daily rank: {e}")
         return None
+
+
+# Community Views
+@login_required
+def community(request):
+    from .models import Poll, Announcement, Feedback
+
+    # Get active polls
+    active_polls = Poll.objects.filter(is_active=True).order_by('-created_at')[:5]
+
+    # Get recent announcements
+    announcements = Announcement.objects.filter(is_active=True).order_by('-created_at')[:3]
+
+    # Get user's recent feedback
+    user_feedback = Feedback.objects.filter(user=request.user).order_by('-submitted_at')[:5]
+
+    context = {
+        'active_polls': active_polls,
+        'announcements': announcements,
+        'user_feedback': user_feedback,
+    }
+
+    return render(request, 'game/community.html', context)
+
+@login_required
+def submit_feedback(request):
+    if request.method == 'POST':
+        from .models import Feedback
+
+        feedback_type = request.POST.get('type', 'feedback')
+        title = request.POST.get('title', '').strip()
+        message = request.POST.get('message', '').strip()
+
+        if title and message:
+            Feedback.objects.create(
+                user=request.user,
+                type=feedback_type,
+                title=title,
+                message=message
+            )
+            messages.success(request, 'Your feedback has been submitted successfully!')
+        else:
+            messages.error(request, 'Please fill in all fields.')
+
+    return redirect('community')
+
+@login_required
+def vote_poll(request):
+    if request.method == 'POST':
+        from .models import Poll, PollOption, PollVote
+
+        poll_id = request.POST.get('poll_id')
+        option_id = request.POST.get('option_id')
+
+        try:
+            poll = Poll.objects.get(id=poll_id, is_active=True)
+            option = PollOption.objects.get(id=option_id, poll=poll)
+
+            # Check if user already voted
+            existing_vote = PollVote.objects.filter(poll=poll, user=request.user).first()
+
+            if existing_vote:
+                # Update existing vote
+                existing_vote.option = option
+                existing_vote.save()
+                messages.success(request, 'Your vote has been updated!')
+            else:
+                # Create new vote
+                PollVote.objects.create(
+                    poll=poll,
+                    option=option,
+                    user=request.user
+                )
+                messages.success(request, 'Thank you for voting!')
+
+        except (Poll.DoesNotExist, PollOption.DoesNotExist):
+            messages.error(request, 'Invalid poll or option.')
+
+    return redirect('community')
+
+@login_required
+def submit_question(request):
+    if request.method == 'POST':
+        from .models import Feedback
+
+        title = request.POST.get('title', '').strip()
+        message = request.POST.get('message', '').strip()
+
+        if title and message:
+            Feedback.objects.create(
+                user=request.user,
+                type='question',
+                title=title,
+                message=message
+            )
+            messages.success(request, 'Your question has been submitted!')
+        else:
+            messages.error(request, 'Please fill in all fields.')
+
+    return redirect('community')
