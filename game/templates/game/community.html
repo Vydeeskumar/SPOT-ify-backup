@@ -7,51 +7,64 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
-            <h2 class="text-center mb-4" style="color: var(--neon-purple);">
+            <h2 class="text-center mb-4" style="color: #00ff9d; font-weight: bold;">
                 <i class="fas fa-comments"></i> Community Hub
             </h2>
-            <p class="text-center text-muted mb-5">
+            <p class="text-center mb-5" style="color: #ffffff; font-size: 1.1em;">
                 Connect with fellow music lovers, share feedback, and participate in polls!
             </p>
         </div>
     </div>
 
-    <!-- Active Polls Section -->
+    <!-- Active Polls/Questions Section -->
     {% if active_polls %}
     <div class="row mb-5">
         <div class="col-12">
-            <div class="glass-card">
+            <div class="community-card">
                 <div class="card-header">
-                    <h4><i class="fas fa-poll"></i> Active Polls</h4>
+                    <h4><i class="fas fa-poll"></i> Active Polls & Questions</h4>
                 </div>
                 <div class="card-body">
                     {% for poll in active_polls %}
-                    <div class="poll-item mb-4 p-3" style="background: rgba(176, 38, 255, 0.05); border-radius: 10px;">
-                        <h5>{{ poll.title }}</h5>
+                    <div class="poll-item mb-4 p-4" style="background: rgba(0, 255, 157, 0.1); border: 1px solid rgba(0, 255, 157, 0.3); border-radius: 12px;">
+                        <div class="d-flex align-items-center mb-2">
+                            {% if poll.is_question %}
+                                <span class="badge bg-warning me-2"><i class="fas fa-question-circle"></i> Question</span>
+                            {% else %}
+                                <span class="badge bg-info me-2"><i class="fas fa-poll"></i> Poll</span>
+                            {% endif %}
+                            <h5 class="mb-0" style="color: #ffffff;">{{ poll.title }}</h5>
+                        </div>
                         {% if poll.description %}
-                            <p class="text-muted">{{ poll.description }}</p>
+                            <p style="color: #e0e0e0; margin-bottom: 15px;">{{ poll.description }}</p>
                         {% endif %}
                         
                         <form method="post" action="{% url 'vote_poll' %}">
                             {% csrf_token %}
                             <input type="hidden" name="poll_id" value="{{ poll.id }}">
-                            
+
                             {% for option in poll.options.all %}
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="radio" name="option_id" value="{{ option.id }}" id="option_{{ option.id }}">
-                                <label class="form-check-label" for="option_{{ option.id }}">
-                                    {{ option.text }} 
-                                    <span class="badge bg-secondary ms-2">{{ option.votes.count }} votes</span>
+                            <div class="form-check mb-3" style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px;">
+                                <input class="form-check-input" type="radio" name="option_id" value="{{ option.id }}" id="option_{{ option.id }}" style="margin-top: 8px;">
+                                <label class="form-check-label" for="option_{{ option.id }}" style="color: #ffffff; font-size: 1.05em; margin-left: 8px;">
+                                    {{ option.text }}
+                                    <span class="badge bg-success ms-2">{{ option.votes.count }} votes</span>
                                 </label>
                             </div>
                             {% endfor %}
-                            
-                            <button type="submit" class="btn btn-primary mt-2">
-                                <i class="fas fa-vote-yea"></i> Vote
-                            </button>
+
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-vote-yea"></i>
+                                    {% if poll.is_question %}
+                                        Submit Answer
+                                    {% else %}
+                                        Vote
+                                    {% endif %}
+                                </button>
+                                <small style="color: #b0b0b0;">Total votes: {{ poll.total_votes }}</small>
+                            </div>
                         </form>
-                        
-                        <small class="text-muted">Total votes: {{ poll.total_votes }}</small>
                     </div>
                     {% endfor %}
                 </div>
@@ -64,16 +77,16 @@
     {% if announcements %}
     <div class="row mb-5">
         <div class="col-12">
-            <div class="glass-card">
+            <div class="community-card">
                 <div class="card-header">
                     <h4><i class="fas fa-bullhorn"></i> Latest from Admin</h4>
                 </div>
                 <div class="card-body">
                     {% for announcement in announcements %}
-                    <div class="announcement-item mb-3 p-3" style="background: rgba(0, 150, 255, 0.05); border-left: 4px solid var(--neon-blue); border-radius: 5px;">
-                        <h6>{{ announcement.title }}</h6>
-                        <p>{{ announcement.content|linebreaks }}</p>
-                        <small class="text-muted">{{ announcement.created_at|date:"M d, Y" }}</small>
+                    <div class="announcement-item mb-4 p-4" style="background: rgba(0, 150, 255, 0.1); border-left: 4px solid #0096ff; border-radius: 8px;">
+                        <h5 style="color: #ffffff; margin-bottom: 10px;">{{ announcement.title }}</h5>
+                        <p style="color: #e0e0e0; line-height: 1.6;">{{ announcement.content|linebreaks }}</p>
+                        <small style="color: #b0b0b0;">📅 {{ announcement.created_at|date:"M d, Y" }}</small>
                     </div>
                     {% endfor %}
                 </div>
@@ -85,7 +98,7 @@
     <!-- Feedback & Questions Section -->
     <div class="row mb-5">
         <div class="col-md-6">
-            <div class="glass-card">
+            <div class="community-card">
                 <div class="card-header">
                     <h4><i class="fas fa-comment-dots"></i> Submit Feedback</h4>
                 </div>
@@ -117,7 +130,7 @@
         </div>
 
         <div class="col-md-6">
-            <div class="glass-card">
+            <div class="community-card">
                 <div class="card-header">
                     <h4><i class="fas fa-question-circle"></i> Ask a Question</h4>
                 </div>
@@ -145,30 +158,30 @@
     {% if user_feedback %}
     <div class="row">
         <div class="col-12">
-            <div class="glass-card">
+            <div class="community-card">
                 <div class="card-header">
                     <h4><i class="fas fa-history"></i> Your Recent Submissions</h4>
                 </div>
                 <div class="card-body">
                     {% for feedback in user_feedback %}
-                    <div class="feedback-item mb-3 p-3" style="background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
-                        <div class="d-flex justify-content-between align-items-start">
+                    <div class="feedback-item mb-4 p-4" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px;">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
-                                <h6>{{ feedback.title }}</h6>
-                                <span class="badge bg-info">{{ feedback.get_type_display }}</span>
+                                <h6 style="color: #ffffff; margin-bottom: 8px;">{{ feedback.title }}</h6>
+                                <span class="badge bg-info me-2">{{ feedback.get_type_display }}</span>
                                 {% if feedback.is_resolved %}
-                                    <span class="badge bg-success">Resolved</span>
+                                    <span class="badge bg-success">✅ Resolved</span>
                                 {% else %}
-                                    <span class="badge bg-warning">Pending</span>
+                                    <span class="badge bg-warning">⏳ Pending</span>
                                 {% endif %}
                             </div>
-                            <small class="text-muted">{{ feedback.submitted_at|date:"M d, Y" }}</small>
+                            <small style="color: #b0b0b0;">📅 {{ feedback.submitted_at|date:"M d, Y" }}</small>
                         </div>
-                        <p class="mt-2 mb-1">{{ feedback.message|truncatewords:20 }}</p>
+                        <p style="color: #e0e0e0; margin-bottom: 10px;">{{ feedback.message|truncatewords:20 }}</p>
                         {% if feedback.admin_response %}
-                        <div class="admin-response mt-2 p-2" style="background: rgba(0, 255, 157, 0.1); border-left: 3px solid var(--neon-green); border-radius: 3px;">
-                            <strong>Admin Response:</strong>
-                            <p class="mb-0">{{ feedback.admin_response }}</p>
+                        <div class="admin-response mt-3 p-3" style="background: rgba(0, 255, 157, 0.15); border-left: 4px solid #00ff9d; border-radius: 6px;">
+                            <strong style="color: #00ff9d;">💬 Admin Response:</strong>
+                            <p style="color: #ffffff; margin-bottom: 0; margin-top: 5px;">{{ feedback.admin_response }}</p>
                         </div>
                         {% endif %}
                     </div>
@@ -201,57 +214,97 @@
 </div>
 
 <style>
-.glass-card {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+.community-card {
+    background: rgba(30, 30, 30, 0.95);
+    border: 2px solid rgba(0, 255, 157, 0.3);
     border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    margin-bottom: 2rem;
 }
 
 .card-header {
-    background: rgba(176, 38, 255, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 15px 15px 0 0 !important;
-    padding: 1rem 1.5rem;
+    background: rgba(0, 255, 157, 0.15);
+    border-bottom: 2px solid rgba(0, 255, 157, 0.3);
+    border-radius: 13px 13px 0 0 !important;
+    padding: 1.2rem 1.5rem;
 }
 
 .card-header h4 {
     margin: 0;
-    color: var(--neon-purple);
+    color: #00ff9d;
+    font-weight: bold;
+}
+
+.card-body {
+    padding: 1.5rem;
 }
 
 .form-control, .form-select {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: white;
+    background: rgba(50, 50, 50, 0.9);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 12px 15px;
 }
 
 .form-control:focus, .form-select:focus {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: var(--neon-purple);
-    box-shadow: 0 0 0 0.2rem rgba(176, 38, 255, 0.25);
-    color: white;
+    background: rgba(60, 60, 60, 0.9);
+    border-color: #00ff9d;
+    box-shadow: 0 0 0 0.2rem rgba(0, 255, 157, 0.25);
+    color: #ffffff;
+}
+
+.form-label {
+    color: #ffffff;
+    font-weight: 500;
+    margin-bottom: 8px;
 }
 
 .btn-primary {
-    background: linear-gradient(45deg, var(--neon-purple), var(--neon-blue));
+    background: linear-gradient(45deg, #b026ff, #0096ff);
     border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 500;
 }
 
 .btn-success {
-    background: linear-gradient(45deg, var(--neon-green), #00ff8c);
+    background: linear-gradient(45deg, #00ff9d, #00d4aa);
     border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    color: #000000;
 }
 
 .btn-outline-primary {
-    border-color: var(--neon-purple);
-    color: var(--neon-purple);
+    border: 2px solid #b026ff;
+    color: #b026ff;
+    background: transparent;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
 }
 
 .btn-outline-primary:hover {
-    background: var(--neon-purple);
-    border-color: var(--neon-purple);
+    background: #b026ff;
+    border-color: #b026ff;
+    color: #ffffff;
+}
+
+.badge {
+    font-size: 0.85em;
+    padding: 6px 10px;
+    border-radius: 6px;
+}
+
+.form-check-input:checked {
+    background-color: #00ff9d;
+    border-color: #00ff9d;
+}
+
+.form-check-label {
+    cursor: pointer;
 }
 </style>
 {% endblock %}

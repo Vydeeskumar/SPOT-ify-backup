@@ -199,8 +199,14 @@ class DailySong(models.Model):
 
 # Community Models
 class Poll(models.Model):
+    POLL_TYPES = [
+        ('poll', 'Poll'),
+        ('question', 'Question/Quiz'),
+    ]
+
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
+    poll_type = models.CharField(max_length=20, choices=POLL_TYPES, default='poll')
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
@@ -210,6 +216,9 @@ class Poll(models.Model):
 
     def total_votes(self):
         return sum(option.votes.count() for option in self.options.all())
+
+    def is_question(self):
+        return self.poll_type == 'question' or any(keyword in self.title.lower() for keyword in ['question', 'quiz', 'mcq', 'trivia'])
 
 class PollOption(models.Model):
     poll = models.ForeignKey(Poll, related_name='options', on_delete=models.CASCADE)
