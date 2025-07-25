@@ -646,19 +646,114 @@ function shareStreak() {
     const streakEmojis = '🔥'.repeat(Math.min(currentStreak, 10));
     const shareText = `🎵 SPOT-ify the {{ current_language|title }} Streak Alert! 🎵\n\n${streakEmojis} {{ user.username }} is on FIRE! ${streakEmojis}\n\n🏆 Current Streak: ${currentStreak} days\n⚡ Daily music guessing champion!\n🎯 Can you beat this streak?\n\n🎮 Join the challenge:`;
 
-    if (navigator.share) {
-        navigator.share({
-            title: `🔥 {{ user.username }}'s ${currentStreak}-Day SPOT-ify Streak!`,
-            text: shareText,
-            url: shareUrl
-        }).catch(err => {
+    // Generate streak image
+    generateStreakImage(currentStreak).then(imageBlob => {
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([imageBlob], 'streak.png', { type: 'image/png' })] })) {
+            // Share with image if supported
+            const file = new File([imageBlob], `${currentStreak}-day-streak.png`, { type: 'image/png' });
+            navigator.share({
+                title: `🔥 {{ user.username }}'s ${currentStreak}-Day SPOT-ify Streak!`,
+                text: shareText,
+                url: shareUrl,
+                files: [file]
+            }).catch(err => {
+                // Fallback to text sharing
+                shareTextOnly();
+            });
+        } else {
+            // Fallback to text sharing
+            shareTextOnly();
+        }
+    }).catch(err => {
+        // Fallback to text sharing
+        shareTextOnly();
+    });
+
+    function shareTextOnly() {
+        if (navigator.share) {
+            navigator.share({
+                title: `🔥 {{ user.username }}'s ${currentStreak}-Day SPOT-ify Streak!`,
+                text: shareText,
+                url: shareUrl
+            }).catch(err => {
+                copyToClipboard(`${shareText}\n${shareUrl}`);
+                showStreakAnimation();
+            });
+        } else {
             copyToClipboard(`${shareText}\n${shareUrl}`);
             showStreakAnimation();
-        });
-    } else {
-        copyToClipboard(`${shareText}\n${shareUrl}`);
-        showStreakAnimation();
+        }
     }
+}
+
+function generateStreakImage(streakCount) {
+    return new Promise((resolve, reject) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size
+        canvas.width = 800;
+        canvas.height = 600;
+
+        // Create gradient background
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        gradient.addColorStop(0, '#1a1a1a');
+        gradient.addColorStop(0.5, '#2d1810');
+        gradient.addColorStop(1, '#1a1a1a');
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Add fire gradient overlay
+        const fireGradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, 300);
+        fireGradient.addColorStop(0, 'rgba(255, 140, 0, 0.3)');
+        fireGradient.addColorStop(0.5, 'rgba(255, 69, 0, 0.2)');
+        fireGradient.addColorStop(1, 'rgba(255, 140, 0, 0.1)');
+
+        ctx.fillStyle = fireGradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Add title
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 48px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('🎵 SPOT-ify Streak Alert! 🎵', canvas.width/2, 80);
+
+        // Add username
+        ctx.fillStyle = '#ff8c00';
+        ctx.font = 'bold 36px Arial';
+        ctx.fillText('{{ user.username }} is on FIRE!', canvas.width/2, 140);
+
+        // Add fire emojis
+        ctx.font = '60px Arial';
+        const fireEmojis = '🔥'.repeat(Math.min(streakCount, 8));
+        ctx.fillText(fireEmojis, canvas.width/2, 220);
+
+        // Add streak count
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 72px Arial';
+        ctx.fillText(`${streakCount}`, canvas.width/2, 320);
+
+        ctx.font = 'bold 32px Arial';
+        ctx.fillText('DAY STREAK!', canvas.width/2, 360);
+
+        // Add challenge text
+        ctx.fillStyle = '#ff8c00';
+        ctx.font = 'bold 28px Arial';
+        ctx.fillText('🏆 Daily Music Guessing Champion! 🏆', canvas.width/2, 420);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '24px Arial';
+        ctx.fillText('🎯 Can you beat this streak?', canvas.width/2, 460);
+
+        // Add URL
+        ctx.fillStyle = '#87ceeb';
+        ctx.font = '20px Arial';
+        ctx.fillText('🎮 webzombies.pythonanywhere.com', canvas.width/2, 520);
+
+        // Convert to blob
+        canvas.toBlob(resolve, 'image/png');
+    });
 }
 
 function showStreakAnimation() {
