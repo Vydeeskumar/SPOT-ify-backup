@@ -1941,13 +1941,17 @@
             }
 
             .tour-navigation {
-                flex-direction: column;
+                flex-direction: row;
+                justify-content: space-between;
                 gap: 10px;
+                flex-wrap: nowrap;
             }
 
             .tour-btn {
-                width: 100%;
-                padding: 14px 20px;
+                flex: 1;
+                padding: 12px 16px;
+                font-size: 0.9rem;
+                min-width: 0;
             }
 
             .tour-header {
@@ -2365,7 +2369,7 @@
     </script>
 
     <!-- Game logic script -->
-    <script src="{% static 'game/js/home.js' %}?v=142" defer></script>
+    <script src="{% static 'game/js/home.js' %}?v=143" defer></script>
 {% endblock %}
 
 

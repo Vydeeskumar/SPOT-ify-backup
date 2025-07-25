@@ -1564,14 +1564,37 @@ function checkVoiceSystemVisibility() {
     const noSongMessage = document.querySelector('.alert-warning');
     const gameOverState = document.querySelector('.result-section');
     const answerRevealed = document.querySelector('.answer-revealed');
+    const tourModal = document.querySelector('.tour-modal');
+    const rulesModal = document.querySelector('#rulesModal.show');
+    const answerSection = document.querySelector('.answer-section');
+    const resultContainer = document.querySelector('.result-container');
 
-    if (noSongMessage || gameOverState || answerRevealed) {
+    if (noSongMessage || gameOverState || answerRevealed || tourModal || rulesModal || answerSection || resultContainer) {
         if (voiceRecognition) {
             voiceRecognition.hideVoiceSystem();
         }
     } else {
         if (voiceRecognition) {
             voiceRecognition.showVoiceSystem();
+        }
+    }
+}
+
+// Run visibility check more frequently
+setInterval(checkVoiceSystemVisibility, 500);
+
+// Enhanced visibility check that runs more frequently
+function enhancedVoiceVisibilityCheck() {
+    checkVoiceSystemVisibility();
+
+    // Also check for specific game states
+    const gameContainer = document.querySelector('.game-container');
+    const answerSection = document.querySelector('.answer-section');
+    const resultContainer = document.querySelector('.result-container');
+
+    if (gameContainer && (answerSection || resultContainer)) {
+        if (voiceRecognition) {
+            voiceRecognition.hideVoiceSystem();
         }
     }
 }
