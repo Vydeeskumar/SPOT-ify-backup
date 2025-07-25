@@ -1907,6 +1907,17 @@
             }
         }
 
+        /* Tutorial Button Styling */
+        .tutorial-btn:hover {
+            transform: translateY(-2px) scale(1.02) !important;
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.5) !important;
+            background: linear-gradient(135deg, #0056b3, #004085) !important;
+        }
+
+        .tutorial-btn:active {
+            transform: translateY(0) scale(1) !important;
+        }
+
         /* Mobile Responsiveness for Tour */
         @media (max-width: 768px) {
             .tour-modal {
@@ -2175,6 +2186,19 @@
                             <li>🏆 Build the longest streak possible!</li>
                         </ul>
                     </div>
+
+                    <!-- Interactive Tutorial Section -->
+                    <div class="rules-section mt-4 pt-3" style="border-top: 1px solid rgba(176, 38, 255, 0.3);">
+                        <h6 style="color: var(--neon-blue);"><i class="fas fa-graduation-cap"></i> Interactive Tutorial</h6>
+                        <p class="mb-3" style="color: rgba(255, 255, 255, 0.8);">
+                            Want a guided walkthrough? Take our interactive tutorial to learn all the features!
+                        </p>
+                        <button onclick="restartOnboardingTour(); bootstrap.Modal.getInstance(document.getElementById('rulesModal')).hide();"
+                                class="btn btn-outline-primary w-100 tutorial-btn"
+                                style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; border: none; border-radius: 25px; padding: 12px 20px; font-weight: 600; box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3); transition: all 0.3s ease;">
+                            🎮 Start Interactive Tutorial
+                        </button>
+                    </div>
                 </div>
                 <div class="modal-footer border-top" style="border-color: var(--neon-purple) !important;">
                     <button type="button" class="btn btn-primary" style="background: var(--neon-purple); border: none;" data-bs-dismiss="modal">Got it!</button>
@@ -2341,7 +2365,7 @@
     </script>
 
     <!-- Game logic script -->
-    <script src="{% static 'game/js/home.js' %}?v=141" defer></script>
+    <script src="{% static 'game/js/home.js' %}?v=142" defer></script>
 {% endblock %}
 
 
