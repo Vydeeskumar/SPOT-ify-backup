@@ -1519,9 +1519,25 @@ class VoiceRecognitionSystem {
     hideVoiceFeedback() {
         if (this.voiceFeedback) {
             this.voiceFeedback.classList.remove('show');
+            this.voiceFeedback.style.display = 'none'; // Ensure it's completely hidden
         }
         if (this.voiceBtn) {
             this.voiceBtn.classList.remove('listening', 'processing');
+        }
+    }
+
+    // Method to completely hide voice system when game is over or no song available
+    hideVoiceSystem() {
+        this.hideVoiceFeedback();
+        if (this.voiceBtn) {
+            this.voiceBtn.style.display = 'none';
+        }
+    }
+
+    // Method to show voice system when game is active
+    showVoiceSystem() {
+        if (this.voiceBtn && this.recognition) {
+            this.voiceBtn.style.display = 'block';
         }
     }
 
@@ -1538,7 +1554,27 @@ let voiceRecognition;
 document.addEventListener('DOMContentLoaded', () => {
     voiceRecognition = new VoiceRecognitionSystem();
     console.log('🎤 Voice recognition system loaded');
+
+    // Check if voice system should be hidden based on game state
+    checkVoiceSystemVisibility();
 });
+
+function checkVoiceSystemVisibility() {
+    // Hide voice system if no song is available or game is over
+    const noSongMessage = document.querySelector('.alert-warning');
+    const gameOverState = document.querySelector('.result-section');
+    const answerRevealed = document.querySelector('.answer-revealed');
+
+    if (noSongMessage || gameOverState || answerRevealed) {
+        if (voiceRecognition) {
+            voiceRecognition.hideVoiceSystem();
+        }
+    } else {
+        if (voiceRecognition) {
+            voiceRecognition.showVoiceSystem();
+        }
+    }
+}
 
 // Global function to update voice language when user switches
 window.updateVoiceLanguage = function(language) {

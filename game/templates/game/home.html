@@ -2990,10 +2990,10 @@
     box-shadow: 0 8px 25px rgba(0, 123, 255, 0.5);
 }
 
-/* Mobile positioning to avoid language orb overlap */
+/* Mobile positioning to avoid language orb and chatbot overlap */
 @media (max-width: 768px) {
     .help-panel {
-        bottom: 120px; /* Move up to avoid language orb */
+        bottom: 180px; /* Move up to avoid both language orb and chatbot */
         right: 15px;
     }
 
@@ -3006,13 +3006,26 @@
 /* Extra small screens */
 @media (max-width: 480px) {
     .help-panel {
-        bottom: 130px;
+        bottom: 190px; /* Even higher on small screens */
         right: 10px;
     }
 
     .help-button {
         padding: 8px 12px;
         font-size: 12px;
+    }
+}
+
+/* Alternative positioning for very crowded mobile screens */
+@media (max-width: 360px) {
+    .help-panel {
+        bottom: 200px;
+        right: 5px;
+    }
+
+    .help-button {
+        padding: 6px 10px;
+        font-size: 11px;
     }
 }
 </style>

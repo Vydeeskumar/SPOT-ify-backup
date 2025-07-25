@@ -1737,10 +1737,10 @@
         }
 
         .tour-modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
             border: 2px solid #007bff;
             border-radius: 20px;
@@ -1754,7 +1754,7 @@
                 0 0 50px rgba(0, 123, 255, 0.2),
                 inset 0 1px 0 rgba(255, 255, 255, 0.8);
             animation: tourModalIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            transition: all 0.3s ease;
+            transition: none !important;
             z-index: 15001;
         }
 
@@ -1883,14 +1883,11 @@
         /* Tour Animations */
         @keyframes tourModalIn {
             0% {
-                transform: translate(-50%, -50%) scale(0.5) rotateY(180deg);
+                transform: translate(-50%, -50%) scale(0.8);
                 opacity: 0;
             }
-            50% {
-                transform: translate(-50%, -50%) scale(1.1) rotateY(0deg);
-            }
             100% {
-                transform: translate(-50%, -50%) scale(1) rotateY(0deg);
+                transform: translate(-50%, -50%) scale(1);
                 opacity: 1;
             }
         }
@@ -1913,12 +1910,14 @@
         /* Mobile Responsiveness for Tour */
         @media (max-width: 768px) {
             .tour-modal {
-                padding: 25px 20px;
-                max-width: 350px;
-                margin: 20px;
-                max-height: 85vh;
-                top: 50%;
-                transform: translate(-50%, -50%);
+                padding: 25px 20px !important;
+                max-width: 350px !important;
+                margin: 0 !important;
+                max-height: 85vh !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                width: 90% !important;
             }
 
             .tour-content h3 {
@@ -2342,7 +2341,7 @@
     </script>
 
     <!-- Game logic script -->
-    <script src="{% static 'game/js/home.js' %}?v=140" defer></script>
+    <script src="{% static 'game/js/home.js' %}?v=141" defer></script>
 {% endblock %}
 
 
