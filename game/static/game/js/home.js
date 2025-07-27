@@ -1072,33 +1072,122 @@ document.addEventListener('DOMContentLoaded', function () {
     window.shareToWhatsApp = function () {
         const text = encodeURIComponent(getShareText());
         window.open(`https://wa.me/?text=${text}`, '_blank');
+        showScoreShareAnimation('WhatsApp');
     };
 
     window.shareToTwitter = function () {
         const text = encodeURIComponent(getShareText());
         window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+        showScoreShareAnimation('X (Twitter)');
     };
 
     window.shareToInstagram = function () {
         copyShareText();
-        alert('Text copied! Open Instagram and paste in your story or post.');
+        showScoreShareAnimation('Instagram');
     };
 
     window.copyShareText = function () {
         const text = getShareText();
         navigator.clipboard.writeText(text).then(() => {
-            const copySuccess = document.getElementById('copySuccess');
-            if (!copySuccess) return;
-            copySuccess.style.display = 'block';
-            copySuccess.classList.add('show');
-            setTimeout(() => {
-                copySuccess.classList.remove('show');
-                setTimeout(() => {
-                    copySuccess.style.display = 'none';
-                }, 300);
-            }, 2000);
+            showScoreShareAnimation('Clipboard');
+        }).catch(() => {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showScoreShareAnimation('Clipboard');
         });
     };
+
+    // Score Share Animation Function
+    function showScoreShareAnimation(platform) {
+        const score = document.querySelector('.points-value')?.textContent || '0';
+        const rank = document.querySelector('.leaderboard-header span')?.textContent?.replace('Your Rank: #', '') || '?';
+
+        // Create animated score share overlay
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeIn 0.4s ease;
+        `;
+
+        const scoreCard = document.createElement('div');
+        scoreCard.style.cssText = `
+            background: linear-gradient(135deg, #b026ff, #0096ff);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(176, 38, 255, 0.8);
+            animation: scoreCardPulse 2s ease-in-out infinite;
+            max-width: 90%;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        `;
+
+        // Get platform-specific emoji and color
+        let platformEmoji = '📱';
+        let platformColor = '#b026ff';
+
+        switch(platform) {
+            case 'WhatsApp':
+                platformEmoji = '💬';
+                platformColor = '#25D366';
+                break;
+            case 'X (Twitter)':
+                platformEmoji = '🐦';
+                platformColor = '#1DA1F2';
+                break;
+            case 'Instagram':
+                platformEmoji = '📸';
+                platformColor = '#E4405F';
+                break;
+            case 'Clipboard':
+                platformEmoji = '📋';
+                platformColor = '#00ff9d';
+                break;
+        }
+
+        scoreCard.innerHTML = `
+            <div style="font-size: 3rem; margin-bottom: 15px;">🎵✨🏆</div>
+            <h2 style="margin: 0; font-size: 2.2rem; margin-bottom: 10px;">Score Shared!</h2>
+            <div style="background: rgba(255, 255, 255, 0.2); padding: 20px; border-radius: 15px; margin: 20px 0;">
+                <div style="font-size: 2.5rem; color: #00ff9d; font-weight: bold; margin-bottom: 5px;">${score} Points</div>
+                <div style="font-size: 1.3rem; opacity: 0.9;">Rank: #${rank}</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px;">
+                <span style="font-size: 2rem;">${platformEmoji}</span>
+                <span style="font-size: 1.2rem; color: ${platformColor};">Shared to ${platform}</span>
+            </div>
+            <div style="font-size: 1.5rem; margin-top: 15px;">🎮🎯🎪</div>
+        `;
+
+        overlay.appendChild(scoreCard);
+        document.body.appendChild(overlay);
+
+        // Auto remove after 3.5 seconds
+        setTimeout(() => {
+            overlay.style.animation = 'fadeOut 0.4s ease';
+            setTimeout(() => overlay.remove(), 400);
+        }, 3500);
+
+        // Click to close
+        overlay.addEventListener('click', () => {
+            overlay.style.animation = 'fadeOut 0.4s ease';
+            setTimeout(() => overlay.remove(), 400);
+        });
+    }
 
     // Add these new interaction functions
 
