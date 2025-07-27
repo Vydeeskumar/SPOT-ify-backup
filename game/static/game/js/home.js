@@ -1051,13 +1051,44 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Share functions
     function getShareText() {
-        const score = document.querySelector('.points-value')?.textContent || '';
-        const rank = document.querySelector('.leaderboard-header span')?.textContent.replace('Your Rank: #', '') || '';
+        const score = document.querySelector('.points-value')?.textContent || '0';
+        // Fix rank detection - look for the actual rank display
+        let rank = 'N/A';
 
-        return `🎵 SPOT-ify the Paatu\n` +
+        // Try multiple selectors to find the rank
+        const rankSelectors = [
+            'span:contains("Your Rank: #")',
+            '.leaderboard-header span',
+            '[data-rank]',
+            'span[style*="neon-purple"]'
+        ];
+
+        // Look for rank in the leaderboard section
+        const leaderboardSection = document.querySelector('.daily-leaderboard');
+        if (leaderboardSection) {
+            const rankText = leaderboardSection.textContent;
+            const rankMatch = rankText.match(/Your Rank:\s*#(\d+)/i);
+            if (rankMatch) {
+                rank = rankMatch[1];
+            }
+        }
+
+        // Fallback: look in the entire document
+        if (rank === 'N/A') {
+            const bodyText = document.body.textContent;
+            const rankMatch = bodyText.match(/Your Rank:\s*#(\d+)/i);
+            if (rankMatch) {
+                rank = rankMatch[1];
+            }
+        }
+
+        const language = window.currentLanguage || 'tamil';
+        const gameTitle = language === 'tamil' ? 'Paatu' : language === 'english' ? 'Song' : 'Gaana';
+
+        return `🎵 SPOT-ify the ${gameTitle}\n` +
             `🎯 Score: ${score} points\n` +
             `🏆 Rank: #${rank}\n\n` +
-            `Play now: https://webzombies.pythonanywhere.com/${window.currentLanguage || 'tamil'}/`;  // Your actual URL
+            `Play now: https://webzombies.pythonanywhere.com/${language}/`;
     }
 
     function getCurrentDay() {
@@ -1070,21 +1101,81 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     window.shareToWhatsApp = function () {
-        const text = encodeURIComponent(getShareText());
-        window.open(`https://wa.me/?text=${text}`, '_blank');
-        showScoreShareAnimation('WhatsApp');
+        shareScoreWithImage('WhatsApp');
     };
 
     window.shareToTwitter = function () {
-        const text = encodeURIComponent(getShareText());
-        window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
-        showScoreShareAnimation('X (Twitter)');
+        shareScoreWithImage('X (Twitter)');
     };
 
     window.shareToInstagram = function () {
-        copyShareText();
-        showScoreShareAnimation('Instagram');
+        shareScoreWithImage('Instagram');
     };
+
+    // Score sharing with image generation
+    function shareScoreWithImage(platform) {
+        const shareText = getShareText();
+        const score = document.querySelector('.points-value')?.textContent || '0';
+
+        // Get rank using the same logic as getShareText
+        let rank = 'N/A';
+        const leaderboardSection = document.querySelector('.daily-leaderboard');
+        if (leaderboardSection) {
+            const rankText = leaderboardSection.textContent;
+            const rankMatch = rankText.match(/Your Rank:\s*#(\d+)/i);
+            if (rankMatch) {
+                rank = rankMatch[1];
+            }
+        }
+
+        if (rank === 'N/A') {
+            const bodyText = document.body.textContent;
+            const rankMatch = bodyText.match(/Your Rank:\s*#(\d+)/i);
+            if (rankMatch) {
+                rank = rankMatch[1];
+            }
+        }
+
+        // Generate score image
+        generateScoreImage(score, rank).then(imageBlob => {
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([imageBlob], 'score.png', { type: 'image/png' })] })) {
+                // Share with image if supported
+                const file = new File([imageBlob], `spot-ify-score-${score}pts.png`, { type: 'image/png' });
+                navigator.share({
+                    title: `🎵 My SPOT-ify Score: ${score} Points!`,
+                    text: shareText,
+                    files: [file]
+                }).catch(err => {
+                    // Fallback to text sharing
+                    shareTextOnly();
+                });
+            } else {
+                // Fallback to text sharing
+                shareTextOnly();
+            }
+        }).catch(err => {
+            // Fallback to text sharing
+            shareTextOnly();
+        });
+
+        function shareTextOnly() {
+            const text = encodeURIComponent(shareText);
+            switch(platform) {
+                case 'WhatsApp':
+                    window.open(`https://wa.me/?text=${text}`, '_blank');
+                    break;
+                case 'X (Twitter)':
+                    window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+                    break;
+                case 'Instagram':
+                    navigator.clipboard.writeText(shareText).then(() => {
+                        alert('Text copied! Open Instagram and paste in your story or post.');
+                    });
+                    break;
+            }
+            showScoreShareAnimation(platform);
+        }
+    }
 
     window.copyShareText = function () {
         const text = getShareText();
@@ -1102,10 +1193,105 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     };
 
+    // Generate Score Image
+    function generateScoreImage(score, rank) {
+        return new Promise((resolve) => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Set canvas size
+            canvas.width = 800;
+            canvas.height = 600;
+
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#b026ff');
+            gradient.addColorStop(0.5, '#0096ff');
+            gradient.addColorStop(1, '#00ff9d');
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Add overlay pattern
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            for (let i = 0; i < canvas.width; i += 40) {
+                for (let j = 0; j < canvas.height; j += 40) {
+                    ctx.fillRect(i, j, 20, 20);
+                }
+            }
+
+            // Add border
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 8;
+            ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+
+            // Title
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 48px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('🎵 SPOT-ify Score 🎵', canvas.width / 2, 120);
+
+            // Score
+            ctx.font = 'bold 120px Arial';
+            ctx.fillStyle = '#00ff9d';
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 4;
+            ctx.strokeText(`${score}`, canvas.width / 2, 280);
+            ctx.fillText(`${score}`, canvas.width / 2, 280);
+
+            // Points label
+            ctx.font = 'bold 36px Arial';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText('POINTS', canvas.width / 2, 330);
+
+            // Rank
+            ctx.font = 'bold 48px Arial';
+            ctx.fillStyle = '#ffd700';
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            ctx.strokeText(`Rank: #${rank}`, canvas.width / 2, 420);
+            ctx.fillText(`Rank: #${rank}`, canvas.width / 2, 420);
+
+            // Game info
+            const language = window.currentLanguage || 'tamil';
+            const gameTitle = language === 'tamil' ? 'Paatu' : language === 'english' ? 'Song' : 'Gaana';
+
+            ctx.font = 'bold 32px Arial';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(`Daily ${gameTitle} Challenge`, canvas.width / 2, 480);
+
+            // URL
+            ctx.font = '24px Arial';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.fillText('webzombies.pythonanywhere.com', canvas.width / 2, 540);
+
+            // Convert to blob
+            canvas.toBlob(resolve, 'image/png');
+        });
+    }
+
     // Score Share Animation Function
     function showScoreShareAnimation(platform) {
         const score = document.querySelector('.points-value')?.textContent || '0';
-        const rank = document.querySelector('.leaderboard-header span')?.textContent?.replace('Your Rank: #', '') || '?';
+
+        // Use the same rank detection logic as getShareText
+        let rank = 'N/A';
+        const leaderboardSection = document.querySelector('.daily-leaderboard');
+        if (leaderboardSection) {
+            const rankText = leaderboardSection.textContent;
+            const rankMatch = rankText.match(/Your Rank:\s*#(\d+)/i);
+            if (rankMatch) {
+                rank = rankMatch[1];
+            }
+        }
+
+        if (rank === 'N/A') {
+            const bodyText = document.body.textContent;
+            const rankMatch = bodyText.match(/Your Rank:\s*#(\d+)/i);
+            if (rankMatch) {
+                rank = rankMatch[1];
+            }
+        }
 
         // Create animated score share overlay
         const overlay = document.createElement('div');
