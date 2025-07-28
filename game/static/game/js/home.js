@@ -2307,6 +2307,8 @@ class CelebrationModals {
     showWinnersModal(winners, type) {
         if (!this.winnersModal || !winners || winners.length === 0) return;
 
+        console.log(`🏆 Winners data received:`, winners);
+
         const title = document.getElementById('winnersTitle');
         const message = document.getElementById('winnersMessage');
 
@@ -2334,12 +2336,19 @@ class CelebrationModals {
         const nameElement = document.getElementById(nameId);
         const scoreElement = document.getElementById(scoreId);
 
+        console.log(`🏆 Updating podium place ${nameId}:`, winner);
+
         if (winner && nameElement && scoreElement) {
-            nameElement.textContent = winner.username;
+            // Handle both username formats from backend
+            const username = winner.username || winner.user__username || 'Unknown Player';
+            console.log(`🏆 Setting username to: ${username}`);
+            nameElement.textContent = username;
             scoreElement.textContent = `${winner.total_score} pts`;
         } else if (nameElement && scoreElement) {
             nameElement.textContent = 'No Player';
             scoreElement.textContent = '0 pts';
+        } else {
+            console.log(`🏆 Missing elements for ${nameId}:`, { nameElement, scoreElement });
         }
     }
 
@@ -2390,18 +2399,18 @@ class CelebrationModals {
 // 🧪 ADMIN TESTING FUNCTIONS
 window.testWeeklyWinners = function() {
     const mockWinners = [
-        { username: 'TestUser1', total_score: 200 },
-        { username: 'TestUser2', total_score: 150 },
-        { username: 'TestUser3', total_score: 120 }
+        { user__username: 'TestUser1', total_score: 200 },
+        { user__username: 'TestUser2', total_score: 150 },
+        { user__username: 'TestUser3', total_score: 120 }
     ];
     celebrationModals.showWeeklyWinners(mockWinners);
 };
 
 window.testMonthlyWinners = function() {
     const mockWinners = [
-        { username: 'MonthlyChamp', total_score: 500 },
-        { username: 'SecondPlace', total_score: 450 },
-        { username: 'ThirdPlace', total_score: 400 }
+        { user__username: 'MonthlyChamp', total_score: 500 },
+        { user__username: 'SecondPlace', total_score: 450 },
+        { user__username: 'ThirdPlace', total_score: 400 }
     ];
     celebrationModals.showMonthlyWinners(mockWinners);
 };
