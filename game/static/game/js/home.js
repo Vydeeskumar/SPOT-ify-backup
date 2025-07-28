@@ -1199,9 +1199,38 @@ document.addEventListener('DOMContentLoaded', function () {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
 
+            // Get username from various possible locations
+            let username = 'Player';
+
+            // Try to get username from profile link or user elements
+            const profileLink = document.querySelector('a[href*="/profile/"]');
+            if (profileLink) {
+                const href = profileLink.getAttribute('href');
+                const usernameMatch = href.match(/\/profile\/([^\/]+)/);
+                if (usernameMatch) {
+                    username = usernameMatch[1];
+                }
+            }
+
+            // Fallback: try other selectors
+            if (username === 'Player') {
+                const userElements = [
+                    document.querySelector('.user-name'),
+                    document.querySelector('[data-username]'),
+                    document.querySelector('.profile-username')
+                ];
+
+                for (const element of userElements) {
+                    if (element && element.textContent.trim()) {
+                        username = element.textContent.trim();
+                        break;
+                    }
+                }
+            }
+
             // Set canvas size
             canvas.width = 800;
-            canvas.height = 600;
+            canvas.height = 650;
 
             // Create gradient background
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
@@ -1231,26 +1260,34 @@ document.addEventListener('DOMContentLoaded', function () {
             ctx.textAlign = 'center';
             ctx.fillText('🎵 SPOT-ify Score 🎵', canvas.width / 2, 120);
 
-            // Score
-            ctx.font = 'bold 120px Arial';
+            // Username
+            ctx.font = 'bold 42px Arial';
             ctx.fillStyle = '#00ff9d';
             ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.strokeText(`${username}`, canvas.width / 2, 180);
+            ctx.fillText(`${username}`, canvas.width / 2, 180);
+
+            // Score
+            ctx.font = 'bold 120px Arial';
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = '#000000';
             ctx.lineWidth = 4;
-            ctx.strokeText(`${score}`, canvas.width / 2, 280);
-            ctx.fillText(`${score}`, canvas.width / 2, 280);
+            ctx.strokeText(`${score}`, canvas.width / 2, 320);
+            ctx.fillText(`${score}`, canvas.width / 2, 320);
 
             // Points label
             ctx.font = 'bold 36px Arial';
             ctx.fillStyle = '#ffffff';
-            ctx.fillText('POINTS', canvas.width / 2, 330);
+            ctx.fillText('POINTS', canvas.width / 2, 370);
 
             // Rank
             ctx.font = 'bold 48px Arial';
             ctx.fillStyle = '#ffd700';
             ctx.strokeStyle = '#000000';
             ctx.lineWidth = 3;
-            ctx.strokeText(`Rank: #${rank}`, canvas.width / 2, 420);
-            ctx.fillText(`Rank: #${rank}`, canvas.width / 2, 420);
+            ctx.strokeText(`Rank: #${rank}`, canvas.width / 2, 450);
+            ctx.fillText(`Rank: #${rank}`, canvas.width / 2, 450);
 
             // Game info
             const language = window.currentLanguage || 'tamil';
@@ -1258,12 +1295,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
             ctx.font = 'bold 32px Arial';
             ctx.fillStyle = '#ffffff';
-            ctx.fillText(`Daily ${gameTitle} Challenge`, canvas.width / 2, 480);
+            ctx.fillText(`Daily ${gameTitle} Challenge`, canvas.width / 2, 520);
 
             // URL
             ctx.font = '24px Arial';
             ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.fillText('webzombies.pythonanywhere.com', canvas.width / 2, 540);
+            ctx.fillText('webzombies.pythonanywhere.com', canvas.width / 2, 580);
 
             // Convert to blob
             canvas.toBlob(resolve, 'image/png');
