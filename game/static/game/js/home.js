@@ -1049,10 +1049,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // 🚫 ANTI-CHEATING: Auto-pause when user leaves tab/page
     setupAntiCheatingSystem();
 
-    // 🚫 ANTI-CHEATING SYSTEM
+    // 🚫 ANTI-CHEATING SYSTEM - Song only plays when on game tab
     function setupAntiCheatingSystem() {
         let wasPlayingBeforeHidden = false;
-        let cheatingWarningShown = false;
 
         // Page Visibility API - detects tab switching
         document.addEventListener('visibilitychange', function() {
@@ -1060,25 +1059,18 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!audioElement) return;
 
             if (document.hidden) {
-                // User switched tabs or minimized window
-                if (!audioElement.paused && isTimerRunning) {
+                // User left the tab - pause song
+                if (!audioElement.paused) {
                     wasPlayingBeforeHidden = true;
                     audioElement.pause();
-
-                    // Show warning message
-                    if (!cheatingWarningShown) {
-                        showCheatingWarning();
-                        cheatingWarningShown = true;
-                    }
-
-                    console.log('🚫 Audio paused - user left the tab (anti-cheating)');
+                    console.log('🚫 Song paused - user left the tab');
                 }
             } else {
-                // User came back to the tab
+                // User returned to tab - resume if it was playing
                 if (wasPlayingBeforeHidden && isTimerRunning) {
-                    // Don't auto-resume, let user manually resume
-                    showResumePrompt();
+                    audioElement.play();
                     wasPlayingBeforeHidden = false;
+                    console.log('▶️ Song resumed - user returned to tab');
                 }
             }
         });
@@ -1088,147 +1080,26 @@ document.addEventListener('DOMContentLoaded', function () {
             const audioElement = document.getElementById('audio-player');
             if (!audioElement) return;
 
-            if (!audioElement.paused && isTimerRunning) {
+            if (!audioElement.paused) {
                 wasPlayingBeforeHidden = true;
                 audioElement.pause();
-                console.log('🚫 Audio paused - window lost focus (anti-cheating)');
+                console.log('🚫 Song paused - window lost focus');
             }
         });
 
-        // Prevent right-click context menu (additional security)
-        document.addEventListener('contextmenu', function(e) {
-            if (isTimerRunning) {
-                e.preventDefault();
-                showCheatingWarning('Right-click disabled during gameplay!');
-            }
-        });
-
-        // Detect developer tools (F12, Ctrl+Shift+I)
-        document.addEventListener('keydown', function(e) {
-            if (isTimerRunning) {
-                // F12 or Ctrl+Shift+I or Ctrl+Shift+J or Ctrl+U
-                if (e.key === 'F12' ||
-                    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-                    (e.ctrlKey && e.key === 'U')) {
-                    e.preventDefault();
-                    showCheatingWarning('Developer tools disabled during gameplay!');
-                }
-            }
-        });
-    }
-
-    function showCheatingWarning(customMessage = null) {
-        const message = customMessage || 'Game paused! Please stay on this tab to play fairly. 🚫';
-
-        // Create warning overlay
-        const warningOverlay = document.createElement('div');
-        warningOverlay.id = 'cheating-warning';
-        warningOverlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 0, 0, 0.9);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 15000;
-            animation: fadeIn 0.3s ease;
-        `;
-
-        const warningCard = document.createElement('div');
-        warningCard.style.cssText = `
-            background: linear-gradient(135deg, #ff4444, #cc0000);
-            color: white;
-            padding: 40px 30px;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 0 60px rgba(255, 68, 68, 0.8);
-            max-width: 90%;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-        `;
-
-        warningCard.innerHTML = `
-            <div style="font-size: 3rem; margin-bottom: 15px;">🚫⚠️🚫</div>
-            <h2 style="margin: 0; font-size: 2rem; margin-bottom: 15px;">Fair Play Warning!</h2>
-            <p style="font-size: 1.2rem; margin-bottom: 20px;">${message}</p>
-            <p style="font-size: 1rem; opacity: 0.9;">Click anywhere to continue</p>
-        `;
-
-        warningOverlay.appendChild(warningCard);
-        document.body.appendChild(warningOverlay);
-
-        // Remove warning on click
-        warningOverlay.addEventListener('click', () => {
-            warningOverlay.remove();
-        });
-
-        // Auto remove after 5 seconds
-        setTimeout(() => {
-            if (warningOverlay.parentNode) {
-                warningOverlay.remove();
-            }
-        }, 5000);
-    }
-
-    function showResumePrompt() {
-        const resumeOverlay = document.createElement('div');
-        resumeOverlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 14999;
-            animation: fadeIn 0.3s ease;
-        `;
-
-        const resumeCard = document.createElement('div');
-        resumeCard.style.cssText = `
-            background: linear-gradient(135deg, #b026ff, #0096ff);
-            color: white;
-            padding: 40px 30px;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 0 60px rgba(176, 38, 255, 0.8);
-            max-width: 90%;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-        `;
-
-        resumeCard.innerHTML = `
-            <div style="font-size: 3rem; margin-bottom: 15px;">🎵▶️🎵</div>
-            <h2 style="margin: 0; font-size: 2rem; margin-bottom: 15px;">Welcome Back!</h2>
-            <p style="font-size: 1.2rem; margin-bottom: 20px;">Game was paused for fair play. Ready to continue?</p>
-            <button id="resume-game-btn" style="
-                background: #00ff9d;
-                color: #000;
-                border: none;
-                padding: 15px 30px;
-                border-radius: 10px;
-                font-size: 1.1rem;
-                font-weight: bold;
-                cursor: pointer;
-                margin: 10px;
-            ">▶️ Resume Game</button>
-        `;
-
-        resumeOverlay.appendChild(resumeCard);
-        document.body.appendChild(resumeOverlay);
-
-        // Resume game on button click
-        document.getElementById('resume-game-btn').addEventListener('click', () => {
+        window.addEventListener('focus', function() {
             const audioElement = document.getElementById('audio-player');
-            if (audioElement && isTimerRunning) {
+            if (!audioElement) return;
+
+            if (wasPlayingBeforeHidden && isTimerRunning) {
                 audioElement.play();
+                wasPlayingBeforeHidden = false;
+                console.log('▶️ Song resumed - window gained focus');
             }
-            resumeOverlay.remove();
         });
     }
+
+
 
     // Share functions
     function getShareText() {
