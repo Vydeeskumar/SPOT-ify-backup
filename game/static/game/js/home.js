@@ -181,11 +181,26 @@ document.addEventListener('DOMContentLoaded', function () {
         if (storedData) {
             try {
                 const { date, initialStartTime } = JSON.parse(storedData);
-                if (date === new Date().toDateString()) {
-                    startTime = parseInt(initialStartTime);
-                    isTimerRunning = true;
-                    timerInterval = setInterval(updateTimer, 100);
-                    return true;
+                const today = new Date().toDateString();
+
+                if (date === today) {
+                    // Calculate how much time has already elapsed
+                    const savedStartTime = parseInt(initialStartTime);
+                    const currentTime = Date.now();
+                    const elapsedTime = (currentTime - savedStartTime) / 1000;
+
+                    // Only restore if less than 5 minutes have passed (reasonable game time)
+                    if (elapsedTime < 300) {
+                        startTime = savedStartTime; // Keep original start time
+                        isTimerRunning = true;
+                        timerInterval = setInterval(updateTimer, 100);
+
+                        console.log(`⏰ Timer restored: ${elapsedTime.toFixed(1)}s elapsed`);
+                        return true;
+                    } else {
+                        // Too much time passed, clear old data
+                        localStorage.removeItem('songTimer');
+                    }
                 }
             } catch (error) {
                 console.error('Timer initialization error:', error);
@@ -870,40 +885,48 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Check for saved game state on page load
-    const savedState = loadGameState();
-    if (savedState && savedState.timeElapsed < 300) { // Only restore if less than 5 minutes
-        // Restore game state
-        startTime = Date.now() - (savedState.timeElapsed * 1000);
-        isTimerRunning = true;
-        timerInterval = setInterval(updateTimer, 100);
+    // Check for saved game state on page load - prioritize songTimer over gameState
+    let timerRestored = false;
 
-        // Show restoration message
-        const restoreDiv = document.createElement('div');
-        restoreDiv.style.cssText = `
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 255, 157, 0.95);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            z-index: 10000;
-            font-weight: bold;
-        `;
-        restoreDiv.innerHTML = '✅ Game restored! Your timer continues from where you left off.';
-        document.body.appendChild(restoreDiv);
-
-        setTimeout(() => restoreDiv.remove(), 4000);
+    // First try to restore from songTimer (more reliable for navigation)
+    const timerWasRunning = initializeTimer();
+    if (timerWasRunning) {
+        timerRestored = true;
+        console.log('⏰ Timer restored from songTimer');
     } else {
-        // Initialize timer normally
-        const timerWasRunning = initializeTimer();
+        // Fallback to gameState (for deployment recovery)
+        const savedState = loadGameState();
+        if (savedState && savedState.timeElapsed < 300) {
+            startTime = Date.now() - (savedState.timeElapsed * 1000);
+            isTimerRunning = true;
+            timerInterval = setInterval(updateTimer, 100);
+            timerRestored = true;
 
-        // Start timer on first play only if it wasn't already running
-        if (audioElement && !timerWasRunning) {
-            audioElement.addEventListener('play', startTimer, { once: true });
+            console.log('⏰ Timer restored from gameState');
+
+            // Show restoration message only for deployment recovery
+            const restoreDiv = document.createElement('div');
+            restoreDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 255, 157, 0.95);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                z-index: 10000;
+                font-weight: bold;
+            `;
+            restoreDiv.innerHTML = '✅ Game restored after server update!';
+            document.body.appendChild(restoreDiv);
+            setTimeout(() => restoreDiv.remove(), 4000);
         }
+    }
+
+    // Start timer on first play only if no timer was restored
+    if (audioElement && !timerRestored) {
+        audioElement.addEventListener('play', startTimer, { once: true });
     }
 
     // Initialize adaptive audio loading
