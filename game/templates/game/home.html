@@ -2486,6 +2486,25 @@
     }
 }
 
+.archive-btn-custom {
+    background: #28a745 !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 2px 6px rgba(40,167,69,0.08);
+    transition: background 0.2s;
+}
+.archive-btn-custom:hover, .archive-btn-custom:focus {
+    background: #218838 !important;
+    color: #fff !important;
+}
+@media (max-width: 600px) {
+    .archive-btn-custom {
+        font-size: 0.9em;
+        padding: 5px 12px;
+        min-width: 90px;
+    }
+}
+
 
 
 
@@ -2537,11 +2556,15 @@
                                 You've already played today! Come back tomorrow for a New Song.
                             {% endif %}
                             </p>
+                            
                             <div style="margin: 15px 0; text-align: center;">
-                                <a href="{% url 'archive' language=current_language|default:'tamil' %}" class="btn btn-primary" style="padding: 10px 24px; font-size: 1.1em; border-radius: 8px;">
-                                    <i class="fas fa-archive" style="margin-right: 8px;"></i>Play Old Games in Archive
+                                <a href="{% url 'archive' language=current_language|default:'tamil' %}"
+                                class="btn btn-success archive-btn-custom"
+                                style="padding: 6px 16px; font-size: 0.95em; border-radius: 6px; min-width: 120px;">
+                                    <i class="fas fa-archive" style="margin-right: 6px;"></i>Archive
                                 </a>
                             </div>
+                            
                         
 
                     <div class="countdown-section" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px; margin-top: 20px;">
