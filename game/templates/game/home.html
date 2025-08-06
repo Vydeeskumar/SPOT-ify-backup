@@ -2528,6 +2528,41 @@
 }
 
 
+@media (max-width: 600px) {
+  .countdown-section {
+    padding: 10px !important;
+  }
+  .countdown-timer {
+    gap: 8px !important;
+  }
+  .countdown-box {
+    padding: 8px !important;
+    min-width: 50px !important;
+  }
+  .daily-leaderboard {
+    padding: 10px !important;
+  }
+  .leaderboard-toggle {
+    padding: 8px !important;
+    font-size: 1em !important;
+  }
+  .leaderboard-list {
+    max-height: 180px !important;
+  }
+  .leaderboard-item {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+    padding: 6px !important;
+    font-size: 0.95em !important;
+    text-align: left;
+  }
+  .leaderboard-item > div {
+    margin-bottom: 2px;
+  }
+}
+
+
+
 
 
 
@@ -2567,7 +2602,7 @@
                     
                     <div class="already-played-message" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; margin: 20px 0;">
                         <i class="fas fa-clock"></i>
-                        // ... existing code ...
+                        
                         <p style="text-align: center; margin-top: 20px;">
                             {% if current_language == 'tamil' %}
                                 You've already played today! Come back tomorrow for a New Paatu.
