@@ -2777,6 +2777,7 @@ class OnboardingTour {
 let onboardingTour;
 
 document.addEventListener('DOMContentLoaded', () => {
+    initializeTimer();
     // Wait for other systems to load first
     setTimeout(() => {
         onboardingTour = new OnboardingTour();
