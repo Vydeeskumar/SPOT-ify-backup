@@ -2505,6 +2505,28 @@
     }
 }
 
+.archive-btn-compact {
+    background: #28a745 !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 2px 6px rgba(40,167,69,0.08);
+    transition: background 0.2s;
+    font-size: 0.85em;
+    padding: 3px 8px;
+    min-width: 60px;
+}
+.archive-btn-compact:hover, .archive-btn-compact:focus {
+    background: #218838 !important;
+    color: #fff !important;
+}
+@media (max-width: 600px) {
+    .archive-btn-compact {
+        font-size: 0.8em;
+        padding: 2px 6px;
+        min-width: 48px;
+    }
+}
+
 
 
 
@@ -2557,13 +2579,15 @@
                             {% endif %}
                             </p>
                             
+                            
                             <div style="margin: 15px 0; text-align: center;">
                                 <a href="{% url 'archive' language=current_language|default:'tamil' %}"
-                                class="btn btn-success archive-btn-custom"
-                                style="padding: 6px 16px; font-size: 0.95em; border-radius: 6px; min-width: 120px;">
-                                    <i class="fas fa-archive" style="margin-right: 6px;"></i>Archive
+                                class="btn btn-success archive-btn-compact"
+                                style="padding: 3px 8px; font-size: 0.85em; border-radius: 5px; min-width: 60px;">
+                                    <i class="fas fa-archive" style="margin-right: 4px;"></i>Archive
                                 </a>
                             </div>
+                        
                             
                         
 
