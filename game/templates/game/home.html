@@ -2567,7 +2567,8 @@
                     
                     <div class="already-played-message" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; margin: 20px 0;">
                         <i class="fas fa-clock"></i>
-                        <p style="margin: 10px 0;">
+                        // ... existing code ...
+                        <p style="text-align: center; margin-top: 20px;">
                             {% if current_language == 'tamil' %}
                                 You've already played today! Come back tomorrow for a New Paatu.
                             {% elif current_language == 'english' %}
@@ -2577,20 +2578,15 @@
                             {% else %}
                                 You've already played today! Come back tomorrow for a New Song.
                             {% endif %}
-                            </p>
-                            
-                            
-                            <div style="margin: 15px 0; text-align: center;">
-                                <a href="{% url 'archive' language=current_language|default:'tamil' %}"
-                                class="btn btn-primary"
-                                style="min-width: 120px; font-weight: 600;">
-                                    <i class="fas fa-archive" style="margin-right: 6px;"></i>Archive
+                        </p>
+                        <div class="row justify-content-center mb-3">
+                            <div class="col-auto">
+                                <a href="{% url 'archive' language=current_language|default:'tamil' %}" class="btn btn-primary" style="min-width: 120px; font-weight: 600;">
+                                    <i class="fas fa-archive" style="margin-right: 6px;"></i>Play Old Games in Archive
                                 </a>
                             </div>
+                        </div>
                         
-                            
-                        
-
                     <div class="countdown-section" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px; margin-top: 20px;">
         <h5 style="color: var(--neon-blue); margin-bottom: 15px;">Next Song In:</h5>
         <div class="countdown-timer" style="display: flex; justify-content: center; gap: 20px;">
