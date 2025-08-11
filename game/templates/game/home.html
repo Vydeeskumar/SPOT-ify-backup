@@ -2687,6 +2687,44 @@
     }
 }
 
+/* Leaderboard header improvements */
+.leaderboard-header-fix {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+.leaderboard-header-fix h5 {
+    margin: 0;
+    font-size: 1.1rem; /* slightly bigger */
+    font-weight: 700;  /* bold for prominence */
+}
+
+.leaderboard-header-fix span {
+    font-size: 0.9rem; /* slightly smaller */
+    font-weight: 500;
+    opacity: 0.9; /* subtle visual difference */
+}
+
+/* On small screens, stack neatly */
+@media (max-width: 480px) {
+    .leaderboard-header-fix {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .leaderboard-header-fix h5 {
+        font-size: 1rem;
+    }
+
+    .leaderboard-header-fix span {
+        font-size: 0.85rem;
+    }
+}
+
 
 
 
@@ -2831,7 +2869,10 @@
                                 Today's Song
                             {% endif %}
                         </h2>
-                        <div class="timer" id="timer">00:00</div>
+                        <div class="timer-section">
+                            <div class="timer" id="timer">00:00</div>
+                        </div>
+
                         <div class="points-indicator" id="points-indicator">Points: <span class="points-value">8</span></div>
                     </div>
 
@@ -2852,7 +2893,7 @@
                             </div>
                         </div>
 
-                        <div class="game-controls">
+                        <div class="game-controls audio-controls">
                             <button id="playPauseBtn" class="btn btn-play">
                                 <i class="fas fa-play"></i> Play
                             </button>
@@ -2861,7 +2902,7 @@
                             </button>
                         </div>
 
-                        <form id="guess-form" class="guess-form">
+                        <form id="guess-form" class="guess-form guess-section">
                             {% csrf_token %}
                             <div class="mb-3 position-relative">
                                 <input type="text" 
