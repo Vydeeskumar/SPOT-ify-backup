@@ -2578,6 +2578,78 @@
     }
 }
 
+/* 📱 Combined Mobile UI Fixes */
+@media (max-width: 480px) {
+
+    /* 1️⃣ Answer Reveal Section */
+    .result-container {
+        padding: 10px 5px;
+        margin: 5px;
+        border-radius: 12px;
+        background: transparent;
+        box-shadow: none;
+        border: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .song-image {
+        width: 140px;
+        height: 140px;
+        margin: 10px 0;
+    }
+
+    .song-details {
+        width: 100%;
+        text-align: center;
+    }
+
+    .song-title {
+        font-size: 1.1rem;
+        margin-bottom: 6px;
+    }
+
+    .song-info {
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+
+    /* 2️⃣ Leaderboard Header Alignment */
+    .leaderboard-header-fix {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+
+    .leaderboard-header-fix h5 {
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .leaderboard-header-fix span {
+        font-size: 0.95rem;
+    }
+
+    /* Stack vertically on small screens */
+    .leaderboard-header-fix {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    /* 3️⃣ Countdown Section */
+    .countdown-section {
+        padding: 10px 5px;
+        background: transparent;
+        border-radius: 0;
+        animation: none;
+        box-shadow: none;
+    }
+}
+
 
 
 
