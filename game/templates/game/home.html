@@ -19,16 +19,54 @@
     background: var(--glass-bg);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    /* border: 1px solid var(--glass-border); */
-    /* box-shadow: 0 8px 32px var(--glass-shadow); */
-    
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px var(--glass-shadow);
     }
 
-   
+    /* Enhanced Game Container */
+    .game-container {
+    background: linear-gradient(135deg, rgba(18, 18, 18, 0.95), rgba(28, 28, 28, 0.95));
+    border: 1px solid var(--glass-border);
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: 
+        0 4px 30px var(--primary-glow),
+        inset 0 0 60px var(--secondary-glow);
+    max-width: 800px;
+    margin: 30px auto;
+    position: relative;
+    overflow: hidden;
+    }
 
-   
+    /* Add dynamic background elements */
+    .game-container::before,
+    .game-container::after {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    animation: floatGlow 8s infinite alternate;
+    }
 
+    .game-container::before {
+    background: var(--primary-glow);
+    top: -100px;
+    left: -100px;
+    }
 
+    .game-container::after {
+    background: var(--secondary-glow);
+    bottom: -100px;
+    right: -100px;
+    }
+
+    @keyframes floatGlow {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(20px, 20px); }
+    }
 
     /* Enhanced Vinyl Player */
     .vinyl-player {
@@ -193,7 +231,15 @@
     .score-reveal {
     animation: scoreReveal 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
-   
+    /* Game Container */
+    .game-container {
+        background: rgba(18, 18, 18, 0.95);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 4px 30px rgba(176, 38, 255, 0.15);
+        max-width: 800px;
+        margin: 30px auto;
+    }
 
     /* Header Section */
     .game-header {
