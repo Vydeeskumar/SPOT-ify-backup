@@ -2650,6 +2650,45 @@
     }
 }
 
+@media (max-width: 480px) {
+    .next-song-container {
+        padding: 10px 5px;
+        margin: 5px;
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+    }
+}
+
+/* Leaderboard header alignment fix */
+.leaderboard-header-fix {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* allows wrapping instead of overflow */
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+.leaderboard-header-fix h5 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.leaderboard-header-fix span {
+    font-size: 0.95rem;
+}
+
+/* Mobile adjustment: stack vertically */
+@media (max-width: 480px) {
+    .leaderboard-header-fix {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+
+
 
 
 
