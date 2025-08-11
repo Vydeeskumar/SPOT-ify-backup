@@ -2214,10 +2214,13 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'archive' %}active{% endif %}" href="{% url 'archive' language=current_language|default:'tamil' %}">
+                            
+                            <a class="nav-link archive-link {% if request.resolver_match.url_name == 'archive' %}active{% endif %}" href="{% url 'archive' language=current_language|default:'tamil' %}">  
                                 <i class="fas fa-archive"></i> Archive
                             </a>
+
                         </li>
+
 
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'community' %}active{% endif %}" href="{% url 'community' %}">
