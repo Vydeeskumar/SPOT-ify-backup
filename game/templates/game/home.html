@@ -2552,6 +2552,33 @@
     }
 }
 
+/* 📱 Fix for Rankings header alignment */
+.leaderboard-header-fix {
+    display: flex !important; /* override inline */
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* allows wrapping instead of breaking */
+    gap: 5px;
+}
+
+.leaderboard-header-fix h5 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.leaderboard-header-fix span {
+    font-size: 0.95rem;
+}
+
+/* On small screens, stack vertically */
+@media (max-width: 480px) {
+    .leaderboard-header-fix {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+
 
 
 
@@ -2638,7 +2665,7 @@
         </div>
 
         <div id="leaderboard-content" style="display: none; transition: all 0.3s ease;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div class="leaderboard-header-fix">
                 <h5 style="color: var(--neon-blue); margin: 0;">
                     <i class="fas fa-trophy"></i> Today's Rankings
                 </h5>
