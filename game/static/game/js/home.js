@@ -2777,7 +2777,14 @@ class OnboardingTour {
 let onboardingTour;
 
 document.addEventListener('DOMContentLoaded', () => {
-    initializeTimer();
+    // Only initialize tour on pages with main game container
+    if (!document.getElementById('game-main')) return;
+
+    // initializeTimer is defined inside the main game bootstrapping scope
+    if (typeof initializeTimer === 'function') {
+        initializeTimer();
+    }
+
     // Wait for other systems to load first
     setTimeout(() => {
         onboardingTour = new OnboardingTour();
