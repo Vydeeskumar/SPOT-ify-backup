@@ -386,11 +386,18 @@ def profile(request, language='tamil'):
     # Get or create user profile
     profile, created = UserProfile.objects.get_or_create(user=request.user)
 
+    # Handle opt-in toggle
+    if request.method == 'POST' and 'email_notifications_opt_in' in request.POST:
+        opt_in_value = request.POST.get('email_notifications_opt_in') == 'on'
+        profile.email_notifications_opt_in = opt_in_value
+        profile.save(update_fields=['email_notifications_opt_in'])
+        messages.success(request, 'Email reminder preference updated.')
+
     # Get recent activity (last 5 songs) for current language
     recent_scores = UserScore.objects.filter(
         user=request.user,
         language=current_language
-    ).select_related('song').order_by('-attempt_date')[:5]
+    ).order_by('-attempt_date')[:10]
 
     # Get monthly statistics for current language
     today = timezone.now().date()
@@ -463,6 +470,7 @@ def profile(request, language='tamil'):
         'language_display': dict(LANGUAGE_CHOICES)[current_language],
         'language_stats': language_stats,
         'current_streak': current_streak,
+        'email_notifications_opt_in': profile.email_notifications_opt_in,
     }
     return render(request, 'game/profile.html', context)
 
