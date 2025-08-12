@@ -284,6 +284,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const networkQuality = detectNetworkQuality();
 
         if (audioElement) {
+            audioElement.preload = 'auto';
+            audioElement.crossOrigin = 'anonymous';
             if (networkQuality === 'slow') {
                 // For slow networks, show a warning
                 const warningDiv = document.createElement('div');
@@ -648,6 +650,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
+        // Handle buffering stalls gracefully
+        audioElement.addEventListener('waiting', () => {
+            showLoadingIndicator();
+        });
+        audioElement.addEventListener('stalled', () => {
+            showLoadingIndicator();
+        });
+        audioElement.addEventListener('canplay', () => {
+            hideLoadingIndicator();
+        });
+
         audioElement.addEventListener('ended', () => {
             if (vinylPlayer) {
                 vinylPlayer.classList.remove('playing');
@@ -706,6 +719,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 audioElement.play().catch((error) => {
                     console.error('Audio play failed:', error);
                     hideLoadingIndicator();
+                    showToast && showToast('Tap the page to enable audio, then press Play again.');
                     playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
                 });
             } else {
@@ -720,10 +734,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
         audioElement.addEventListener('playing', () => {
             hideLoadingIndicator();
-            vinylPlayer.classList.add('playing');
-            vinylPlayer.classList.remove('paused');
-            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
-            document.getElementById('vinyl-play-icon').className = 'fas fa-pause';
+            if (vinylPlayer) {
+                vinylPlayer.classList.add('playing');
+                vinylPlayer.classList.remove('paused');
+            }
+            if (!timerRestored && !isTimerRunning) {
+                startTimer();
+            }
+            if (playPauseBtn) {
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            }
+            const vinylIcon = document.getElementById('vinyl-play-icon');
+            if (vinylIcon) vinylIcon.className = 'fas fa-pause';
 
             startTimerOnAudioPlay();
         });
@@ -924,9 +946,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Start timer on first play only if no timer was restored
+    // Start timer is now bound to 'playing' event to avoid starting during buffering
     if (audioElement && !timerRestored) {
-        audioElement.addEventListener('play', startTimer, { once: true });
+        // handled in 'playing' listener below
     }
 
     // Initialize adaptive audio loading
