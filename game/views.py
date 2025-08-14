@@ -1828,3 +1828,13 @@ def update_username(request):
     request.user.save(update_fields=['username'])
     messages.success(request, f'Username updated from {old_username} to {new_username}.')
     return redirect('profile')
+
+# --- Backward compatibility aliases for older URL names ---
+@login_required
+def friends(request, language='tamil'):
+    return friends_list(request, language)
+
+@login_required
+def process_voice_input(request):
+    return process_voice_audio(request)
+# --- End compatibility aliases ---
