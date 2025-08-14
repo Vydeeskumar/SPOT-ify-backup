@@ -8,6 +8,10 @@ from .models import Song, UserScore, UserProfile, DailySong, LANGUAGE_CHOICES, P
 from django import forms
 from django.utils import timezone
 from datetime import date
+from django.contrib.auth.models import User
+from django.db import transaction
+from django.db.models import F
+
 
 class SongAdminForm(forms.ModelForm):
     spotify_search = forms.CharField(
@@ -270,12 +274,83 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 admin.site.unregister(User)
 
+@admin.action(description="Merge selected users into the first selected user")
+def merge_selected_users(modeladmin, request, queryset):
+    users = list(queryset.order_by('id'))
+    if len(users) < 2:
+        modeladmin.message_user(request, "Select at least two users: the first will be the target.", level='warning')
+        return
+
+    target = users[0]
+    sources = users[1:]
+
+    with transaction.atomic():
+        for source in sources:
+            # Reassign UserScore
+            UserScore.objects.filter(user=source).update(user=target)
+
+            # Merge or create UserProfile stats by language
+            target_profile, _ = UserProfile.objects.get_or_create(user=target)
+            try:
+                source_profile = UserProfile.objects.get(user=source)
+            except UserProfile.DoesNotExist:
+                source_profile = None
+
+            if source_profile:
+                # For each language, add totals, recompute averages weighted by count
+                for lang in ['tamil', 'english', 'hindi']:
+                    for field in ['total_points', 'total_songs_solved']:
+                        setattr(
+                            target_profile,
+                            f"{lang}_" + field,
+                            getattr(target_profile, f"{lang}_" + field) + getattr(source_profile, f"{lang}_" + field)
+                        )
+                    # Average time: weighted by total_songs_solved
+                    tgt_songs = getattr(target_profile, f"{lang}_total_songs_solved")
+                    src_songs = getattr(source_profile, f"{lang}_total_songs_solved")
+                    if tgt_songs + src_songs > 0:
+                        tgt_avg = getattr(target_profile, f"{lang}_average_time")
+                        src_avg = getattr(source_profile, f"{lang}_average_time")
+                        weighted = ((tgt_avg * max(tgt_songs - src_songs, 0)) + (src_avg * src_songs)) / max(tgt_songs, 1)
+                        setattr(target_profile, f"{lang}_average_time", weighted)
+
+                    # Last played: take the most recent
+                    tgt_last = getattr(target_profile, f"{lang}_last_played_date")
+                    src_last = getattr(source_profile, f"{lang}_last_played_date")
+                    if src_last and (not tgt_last or src_last > tgt_last):
+                        setattr(target_profile, f"{lang}_last_played_date", src_last)
+
+                target_profile.save()
+                # Delete the source profile after merging
+                source_profile.delete()
+
+            # Reassign friendships (avoid duplicates via unique_together)
+            for fr in list(source.friendships.all()):
+                Friendship.objects.update_or_create(user=target, friend=fr.friend)
+                fr.delete()
+            for fr in list(source.friend_of.all()):
+                Friendship.objects.update_or_create(user=fr.user, friend=target)
+                fr.delete()
+
+            # Reassign community objects
+            Poll.objects.filter(created_by=source).update(created_by=target)
+            Feedback.objects.filter(user=source).update(user=target)
+            Announcement.objects.filter(created_by=source).update(created_by=target)
+            PollVote.objects.filter(user=source).update(user=target)
+
+            # Finally, delete source user
+            source.delete()
+
+    modeladmin.message_user(request, f"Merged {len(sources)} user(s) into {target.username}.")
+
+
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'email', 'date_joined', 'last_login', 'is_staff')
     list_filter = ('is_staff', 'is_superuser', 'is_active')
     search_fields = ('username', 'email')
     ordering = ('-date_joined',)
+    actions = [merge_selected_users]
 
 # Add language dashboard to default admin
 from django.urls import path as admin_path

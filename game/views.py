@@ -1802,3 +1802,34 @@ def submit_question(request):
             messages.error(request, 'Please fill in all fields.')
 
     return redirect('community')
+
+@login_required
+def update_username(request):
+    if request.method != 'POST':
+        return redirect('profile')
+ 
+    new_username = request.POST.get('new_username', '').strip()
+    if not new_username:
+        messages.error(request, 'Username cannot be empty.')
+        return redirect('profile')
+ 
+    # Basic validation
+    if len(new_username) < 3 or len(new_username) > 30:
+        messages.error(request, 'Username must be between 3 and 30 characters.')
+        return redirect('profile')
+ 
+    if not new_username.isalnum():
+        messages.error(request, 'Username must be alphanumeric (letters and numbers only).')
+        return redirect('profile')
+ 
+    # Check uniqueness
+    if User.objects.filter(username__iexact=new_username).exclude(id=request.user.id).exists():
+        messages.error(request, 'That username is already taken.')
+        return redirect('profile')
+ 
+    # Update username
+    old_username = request.user.username
+    request.user.username = new_username
+    request.user.save(update_fields=['username'])
+    messages.success(request, f'Username updated from {old_username} to {new_username}.')
+    return redirect('profile')

@@ -9,6 +9,13 @@
                 <div class="card-header">
                     <i class="fas fa-user-circle"></i>
                     <h5 class="mb-0">{{ user.username }}'s Profile</h5>
+                    {% if not public %}
+                    <form action="{% url 'update_username' %}" method="post" style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+                        {% csrf_token %}
+                        <input type="text" name="new_username" placeholder="New username" value="{{ user.username }}" style="padding:4px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.2); color:white;">
+                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                    </form>
+                    {% endif %}
                     {% if public and profile_user != request.user %}
                         {% if is_friend %}
                             <div class="friend-status-badge">
