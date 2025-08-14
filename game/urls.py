@@ -13,6 +13,6 @@ urlpatterns = [
     path('giveup-archive/', views.giveup_archive, name='giveup_archive'),
     path('archive-leaderboard/', views.get_archive_leaderboard, name='archive_leaderboard'),
     path('zombiebot/', views.zombiebot, name='zombiebot'),
-    path('voice-process/', views.process_voice_input, name='process_voice_input'),
+    path('voice-process/', views.process_voice_audio, name='process_voice_audio'),
     path('update-username/', views.update_username, name='update_username'),
 ]
