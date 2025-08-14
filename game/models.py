@@ -94,10 +94,6 @@ class UserProfile(models.Model):
     average_time = models.FloatField(default=0)
     last_played_date = models.DateField(null=True, blank=True)
 
-    # ✅ Email reminders settings
-    email_notifications_opt_in = models.BooleanField(default=True)
-    email_notifications_notice_sent = models.BooleanField(default=False)
-
     def __str__(self):
         return f"{self.user.username}'s Profile"
 
