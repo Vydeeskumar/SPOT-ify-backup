@@ -2192,7 +2192,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'friends_list' %}active{% endif %}" href="{% url 'friends_list' language=current_language|default:'tamil' %}">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'friends' %}active{% endif %}" href="{% url 'friends' %}">
                             <i class="fas fa-users"></i> Friends
                         </a>
                     </li>
