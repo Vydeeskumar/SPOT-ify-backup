@@ -863,8 +863,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 resultMessage.innerHTML = `<div class="alert alert-danger">
                     ${data.message}
                 </div>`;
-                isTimerRunning = true;
-                timerInterval = setInterval(updateTimer, 100);
+                if (!isTimerRunning) {
+                    isTimerRunning = true;
+                    timerInterval = setInterval(updateTimer, 100);
+                }
             }
         } catch (error) {
             console.error('Error:', error);
