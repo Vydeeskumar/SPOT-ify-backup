@@ -689,8 +689,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (audioElement.paused) {
                 showLoadingIndicator();
 
-                // Start the timer immediately on Play click, even if audio is buffering
-                startTimer();
+                // Timer will start when audio actually begins playing
 
                 if (!source) {
                     source = audioContext.createMediaElementSource(audioElement);
@@ -719,6 +718,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (vinylPlayer) {
                 vinylPlayer.classList.add('playing');
                 vinylPlayer.classList.remove('paused');
+            }
+            if (!isTimerRunning && startTime === null) {
+                startTimer();
             }
             if (playPauseBtn) {
                 playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
