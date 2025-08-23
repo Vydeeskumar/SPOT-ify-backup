@@ -107,26 +107,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Error handling for server issues
+    // Error handling for server issues (do not pause timer)
     function handleServerError() {
-        if (isTimerRunning) {
-            pauseTimer();
-            showServerErrorMessage();
-            saveGameState();
+        showServerErrorMessage();
 
-            // Try to reconnect every 5 seconds
-            const reconnectInterval = setInterval(async () => {
-                try {
-                    const response = await fetch('/tamil/', { method: 'HEAD' });
-                    if (response.ok) {
-                        clearInterval(reconnectInterval);
-                        resumeTimer();
-                    }
-                } catch (e) {
-                    // Server still down, keep trying
+        // Try to reconnect every 5 seconds
+        const reconnectInterval = setInterval(async () => {
+            try {
+                const response = await fetch('/tamil/', { method: 'HEAD' });
+                if (response.ok) {
+                    clearInterval(reconnectInterval);
+                    hideServerErrorMessage();
                 }
-            }, 5000);
-        }
+            } catch (e) {
+                // Server still down, keep trying
+            }
+        }, 5000);
     }
 
     function showServerErrorMessage() {
@@ -189,18 +185,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     const currentTime = Date.now();
                     const elapsedTime = (currentTime - savedStartTime) / 1000;
 
-                    // Only restore if less than 5 minutes have passed (reasonable game time)
-                    if (elapsedTime < 300) {
-                        startTime = savedStartTime; // Keep original start time
-                        isTimerRunning = true;
-                        timerInterval = setInterval(updateTimer, 100);
+                    // Restore timer for today regardless of elapsed time
+                    startTime = savedStartTime; // Keep original start time
+                    isTimerRunning = true;
+                    timerInterval = setInterval(updateTimer, 100);
 
-                        console.log(`⏰ Timer restored: ${elapsedTime.toFixed(1)}s elapsed`);
-                        return true;
-                    } else {
-                        // Too much time passed, clear old data
-                        localStorage.removeItem('songTimer');
-                    }
+                    console.log(`⏰ Timer restored: ${elapsedTime.toFixed(1)}s elapsed`);
+                    return true;
                 }
             } catch (error) {
                 console.error('Timer initialization error:', error);
@@ -226,21 +217,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // New function to start timer only when audio actually starts playing
-    function startTimerOnAudioPlay() {
-        if (!isTimerRunning && startTime === null) {
-            const audioElement = document.getElementById('song-snippet');
-            if (audioElement) {
-                // Wait for audio to actually start playing
-                const onPlaying = () => {
-                    startTimer();
-                    audioElement.removeEventListener('playing', onPlaying);
-                    hideLoadingIndicator();
-                };
-                audioElement.addEventListener('playing', onPlaying);
-            }
-        }
-    }
+    // Timer now starts on Play click immediately (even during buffering), so this is no longer needed
+    function startTimerOnAudioPlay() {}
+
 
     // Show loading indicator
     function showLoadingIndicator() {
@@ -284,6 +263,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const networkQuality = detectNetworkQuality();
 
         if (audioElement) {
+            audioElement.preload = 'auto';
+            audioElement.crossOrigin = 'anonymous';
             if (networkQuality === 'slow') {
                 // For slow networks, show a warning
                 const warningDiv = document.createElement('div');
@@ -648,6 +629,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
+        // Handle buffering stalls gracefully
+        audioElement.addEventListener('waiting', () => {
+            showLoadingIndicator();
+        });
+        audioElement.addEventListener('stalled', () => {
+            showLoadingIndicator();
+        });
+        audioElement.addEventListener('canplay', () => {
+            hideLoadingIndicator();
+        });
+
         audioElement.addEventListener('ended', () => {
             if (vinylPlayer) {
                 vinylPlayer.classList.remove('playing');
@@ -697,6 +689,8 @@ document.addEventListener('DOMContentLoaded', function () {
             if (audioElement.paused) {
                 showLoadingIndicator();
 
+                // Timer will start when audio actually begins playing
+
                 if (!source) {
                     source = audioContext.createMediaElementSource(audioElement);
                     source.connect(analyser);
@@ -706,6 +700,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 audioElement.play().catch((error) => {
                     console.error('Audio play failed:', error);
                     hideLoadingIndicator();
+                    showToast && showToast('Tap the page to enable audio, then press Play again.');
                     playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
                 });
             } else {
@@ -720,12 +715,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
         audioElement.addEventListener('playing', () => {
             hideLoadingIndicator();
-            vinylPlayer.classList.add('playing');
-            vinylPlayer.classList.remove('paused');
-            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
-            document.getElementById('vinyl-play-icon').className = 'fas fa-pause';
-
-            startTimerOnAudioPlay();
+            if (vinylPlayer) {
+                vinylPlayer.classList.add('playing');
+                vinylPlayer.classList.remove('paused');
+            }
+            if (!isTimerRunning && startTime === null) {
+                startTimer();
+            }
+            if (playPauseBtn) {
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            }
+            const vinylIcon = document.getElementById('vinyl-play-icon');
+            if (vinylIcon) vinylIcon.className = 'fas fa-pause';
         });
 
         audioElement.addEventListener('pause', () => {
@@ -740,9 +741,6 @@ document.addEventListener('DOMContentLoaded', function () {
             vinylPlayer.classList.remove('playing');
             vinylPlayer.classList.add('paused');
             document.getElementById('vinyl-play-icon').className = 'fas fa-play';
-
-            clearInterval(timerInterval);
-            localStorage.removeItem('songTimer');
         });
     }
 
@@ -787,6 +785,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         // Clear timer
                         clearInterval(timerInterval);
+                        isTimerRunning = false;
                         localStorage.removeItem('songTimer');
                     }
                 } catch (error) {
@@ -800,7 +799,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Form submission
     document.getElementById('guess-form')?.addEventListener('submit', async function(e) {
         e.preventDefault();
-        const timeTaken = stopTimer();
+        const elapsed = (Date.now() - startTime) / 1000;
+        const timeTaken = Math.max(0, Math.min(elapsed, 3600));
         const guessInput = document.getElementById('guess-input');
         const resultMessage = document.getElementById('result-message');
         const submitBtn = this.querySelector('button[type="submit"]');
@@ -854,6 +854,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Stop audio and clear timer
                 audioElement.pause();
                 clearInterval(timerInterval);
+                isTimerRunning = false;
                 localStorage.removeItem('songTimer');
 
                 // 🔥 Trigger streak celebration modal after 3 seconds
@@ -864,14 +865,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 resultMessage.innerHTML = `<div class="alert alert-danger">
                     ${data.message}
                 </div>`;
-                isTimerRunning = true;
-                timerInterval = setInterval(updateTimer, 100);
+                if (!isTimerRunning) {
+                    isTimerRunning = true;
+                    timerInterval = setInterval(updateTimer, 100);
+                }
             }
         } catch (error) {
             console.error('Error:', error);
 
             // Check if it's a network error (server down)
-            if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            if (error.name === 'TypeError' && (error.message.includes('fetch') || error.message.includes('Failed to fetch'))) {
                 handleServerError();
             } else {
                 resultMessage.innerHTML = '<div class="alert alert-danger">An error occurred. Please try again.</div>';
@@ -924,9 +927,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Start timer on first play only if no timer was restored
+    // Start timer is now bound to 'playing' event to avoid starting during buffering
     if (audioElement && !timerRestored) {
-        audioElement.addEventListener('play', startTimer, { once: true });
+        // handled in 'playing' listener below (timer now starts on Play click even during buffering)
     }
 
     // Initialize adaptive audio loading
@@ -1069,8 +1072,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Get token when page loads (✅ leave this untouched)
     getSpotifyToken();
 
-    // 🚫 ANTI-CHEATING: Auto-pause when user leaves tab/page
-    setupAntiCheatingSystem();
+    // Disable auto-pause anti-cheating for continuous timer requirement
+    // setupAntiCheatingSystem();
 
     // 🚫 ANTI-CHEATING SYSTEM - Song only plays when on game tab
     function setupAntiCheatingSystem() {
