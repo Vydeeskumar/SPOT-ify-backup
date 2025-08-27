@@ -21,4 +21,5 @@ urlpatterns = [
     path('zombiebot/', views.zombiebot, name='zombiebot'),
     path('voice-process/', views.process_voice_audio, name='process_voice_audio'),
     path('update-username/', views.update_username, name='update_username'),
+    path('guest-login/', views.guest_login, name='guest_login'),
 ]
