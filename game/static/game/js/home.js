@@ -537,9 +537,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     return response.json();
                 })
                 .then(data => {
+                    // Find a reliable anchor to inject the leaderboard
                     const songDetails = document.querySelector('.song-details');
-                    if (!songDetails) {
-                        throw new Error('Song details element not found');
+                    const resultContainerEl = document.getElementById('result-container') || document.querySelector('.result-container');
+                    const anchorEl = songDetails || resultContainerEl;
+                    if (!anchorEl) {
+                        console.error('❌ No suitable anchor found for leaderboard (song-details/result-container)');
+                        return;
                     }
 
                     const leaderboardHTML = `
@@ -581,15 +585,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     `;
 
-                    console.log("✅ songDetails found:", songDetails);
-                    if (!songDetails) {
-                        console.error("❌ songDetails element not found. Leaderboard won't be injected.");
-                        return; // 🛑 Don't proceed if songDetails is missing
+                    // ✅ Inject into page (prefer after song details, else append to result container)
+                    if (songDetails) {
+                        songDetails.insertAdjacentHTML('afterend', leaderboardHTML);
+                        console.log("✅ Leaderboard HTML injected after .song-details");
+                    } else if (resultContainerEl) {
+                        resultContainerEl.insertAdjacentHTML('beforeend', leaderboardHTML);
+                        console.log("✅ Leaderboard HTML appended to #result-container");
                     }
-
-                    // ✅ Inject into page
-                    songDetails.insertAdjacentHTML('afterend', leaderboardHTML);
-                    console.log("✅ Leaderboard HTML injected after .song-details");
 
                     setTimeout(() => {
                         attachLeaderboardToggleListeners();
