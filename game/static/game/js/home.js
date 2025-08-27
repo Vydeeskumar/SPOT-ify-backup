@@ -528,26 +528,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 existingLeaderboard.remove();
             }
 
-            // Fetch and display daily leaderboard immediately
-            fetch(`/${window.currentLanguage || 'tamil'}/get-daily-rankings/`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Find a reliable anchor to inject the leaderboard
-                    const songDetails = document.querySelector('.song-details');
-                    const resultContainerEl = document.getElementById('result-container') || document.querySelector('.result-container');
-                    const anchorEl = songDetails || resultContainerEl;
-                    if (!anchorEl) {
-                        console.error('❌ No suitable anchor found for leaderboard (song-details/result-container)');
-                        return;
-                    }
-
-                    const leaderboardHTML = `
-                        <div class="daily-leaderboard mt-4" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px; opacity: 0; animation: fadeIn 0.5s ease forwards 0.9s;">
+            // Inject a skeleton leaderboard immediately so the toggle is visible
+            const songDetailsAnchor = document.querySelector('.song-details');
+            const resultContainerAnchor = document.getElementById('result-container') || document.querySelector('.result-container');
+            const injectionAnchor = songDetailsAnchor || resultContainerAnchor;
+            if (injectionAnchor) {
+                const skeletonHTML = `
+                        <div id="daily-leaderboard-injected" class="daily-leaderboard mt-4" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px; opacity: 0; animation: fadeIn 0.5s ease forwards 0.9s;">
 
                             <div class="leaderboard-toggle" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
                                 <span style="color: white;">View Leaderboard</span>
@@ -559,25 +546,93 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <h5 style="color: var(--neon-blue); margin: 0;">
                                         <i class="fas fa-trophy"></i> Today's Rankings
                                     </h5>
-                                    <span style="color: var(--neon-purple);">
-                                        Your Rank: #${data.userRank}
-                                    </span>
+                                    <span style="color: var(--neon-purple);" data-user-rank>Loading…</span>
                                 </div>
 
+                                <div class="leaderboard-list" data-leaderboard-list style="max-height: 300px; overflow-y: auto; margin-top: 10px; color: rgba(255, 255, 255, 0.7);">
+                                    Loading leaderboard…
+                                </div>
+                            </div>
+                        </div>
+                `;
 
+                if (songDetailsAnchor) {
+                    songDetailsAnchor.insertAdjacentHTML('afterend', skeletonHTML);
+                    console.log("✅ Leaderboard skeleton injected after .song-details");
+                } else {
+                    resultContainerAnchor.insertAdjacentHTML('beforeend', skeletonHTML);
+                    console.log("✅ Leaderboard skeleton appended to #result-container");
+                }
+
+                setTimeout(() => {
+                    attachLeaderboardToggleListeners();
+                }, 100);
+            }
+
+            // Fetch and display daily leaderboard immediately
+            fetch(`/${window.currentLanguage || 'tamil'}/get-daily-rankings/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const container = document.getElementById('daily-leaderboard-injected');
+                    if (container) {
+                        const rankEl = container.querySelector('[data-user-rank]');
+                        if (rankEl) rankEl.textContent = `Your Rank: #${data.userRank}`;
+                        const listEl = container.querySelector('[data-leaderboard-list]');
+                        if (listEl) {
+                            listEl.style.color = '';
+                            listEl.innerHTML = data.scores.map((score, index) => `
+                                <div class="leaderboard-item" style="display: grid; grid-template-columns: auto 1fr auto auto; gap: 15px; padding: 10px; margin: 5px 0; background: rgba(176, 38, 255, 0.1); border-radius: 8px; ${score.isCurrentUser ? 'border: 1px solid var(--neon-purple);' : ''}">
+                                    <div style="color: var(--neon-purple); font-weight: bold;">
+                                        ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                                    </div>
+                                    <div style="color: white;">
+                                        <a href="/${window.currentLanguage || 'tamil'}/profile/${score.username}" style="color: white; text-decoration: none; font-weight: bold;">
+                                            ${score.username}
+                                        </a>
+                                    </div>
+                                    <div style="color: var(--neon-blue);">${score.score} pts</div>
+                                    <div style="color: var(--neon-pink);">${score.guessTime}s</div>
+                                </div>
+                            `).join('');
+                        }
+                        setTimeout(() => {
+                            attachLeaderboardToggleListeners();
+                        }, 100);
+                        return;
+                    }
+
+                    // Fallback: if skeleton not present, inject full block now
+                    const songDetails = document.querySelector('.song-details');
+                    const resultContainerEl = document.getElementById('result-container') || document.querySelector('.result-container');
+                    const anchorEl = songDetails || resultContainerEl;
+                    if (!anchorEl) {
+                        console.error('❌ No suitable anchor found for leaderboard (song-details/result-container)');
+                        return;
+                    }
+
+                    const fallbackHTML = `
+                        <div class="daily-leaderboard mt-4" style="background: rgba(176, 38, 255, 0.05); padding: 20px; border-radius: 15px; opacity: 0; animation: fadeIn 0.5s ease forwards 0.9s;">
+                            <div class="leaderboard-toggle" style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 10px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: white;">View Leaderboard</span>
+                                <i class="fas fa-chevron-down" style="color: var(--neon-purple); transition: transform 0.3s ease;"></i>
+                            </div>
+                            <div id="leaderboard-content" style="display: none; transition: all 0.3s ease;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                    <h5 style="color: var(--neon-blue); margin: 0;"><i class="fas fa-trophy"></i> Today's Rankings</h5>
+                                    <span style="color: var(--neon-purple);">Your Rank: #${data.userRank}</span>
+                                </div>
                                 <div class="leaderboard-list" style="max-height: 300px; overflow-y: auto; margin-top: 10px;">
                                     ${data.scores.map((score, index) => `
                                         <div class="leaderboard-item" style="display: grid; grid-template-columns: auto 1fr auto auto; gap: 15px; padding: 10px; margin: 5px 0; background: rgba(176, 38, 255, 0.1); border-radius: 8px; ${score.isCurrentUser ? 'border: 1px solid var(--neon-purple);' : ''}">
-                                            <div style="color: var(--neon-purple); font-weight: bold;">
-                                                ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
-                                            </div>
-                                            <div style="color: white;">
-                                                <a href="/${window.currentLanguage || 'tamil'}/profile/${score.username}" style="color: white; text-decoration: none; font-weight: bold;">
-                                                    ${score.username}
-                                                </a>
-                                            </div>
-                                            <div style="color: var(--neon-blue);">${score.score} pts</div>
-                                            <div style="color: var(--neon-pink);">${score.guessTime}s</div>
+                                            <div style=\"color: var(--neon-purple); font-weight: bold;\">${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}</div>
+                                            <div style=\"color: white;\"><a href=\"/${window.currentLanguage || 'tamil'}/profile/${score.username}\" style=\"color: white; text-decoration: none; font-weight: bold;\">${score.username}</a></div>
+                                            <div style=\"color: var(--neon-blue);\">${score.score} pts</div>
+                                            <div style=\"color: var(--neon-pink);\">${score.guessTime}s</div>
                                         </div>
                                     `).join('')}
                                 </div>
@@ -585,21 +640,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     `;
 
-                    // ✅ Inject into page (prefer after song details, else append to result container)
                     if (songDetails) {
-                        songDetails.insertAdjacentHTML('afterend', leaderboardHTML);
-                        console.log("✅ Leaderboard HTML injected after .song-details");
+                        songDetails.insertAdjacentHTML('afterend', fallbackHTML);
+                        console.log("✅ Leaderboard HTML injected after .song-details (fallback)");
                     } else if (resultContainerEl) {
-                        resultContainerEl.insertAdjacentHTML('beforeend', leaderboardHTML);
-                        console.log("✅ Leaderboard HTML appended to #result-container");
+                        resultContainerEl.insertAdjacentHTML('beforeend', fallbackHTML);
+                        console.log("✅ Leaderboard HTML appended to #result-container (fallback)");
                     }
 
                     setTimeout(() => {
                         attachLeaderboardToggleListeners();
-                    }, 100);  // ⬅️ This is key
-
-
-
+                    }, 100);
 
                 })
                 .catch(error => {
