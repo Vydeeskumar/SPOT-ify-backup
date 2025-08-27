@@ -934,7 +934,6 @@ def compare_scores(request, friend_id, language='tamil'):
         messages.error(request, 'Friend not found.')
         return redirect('friends_list', language=current_language)
 
-@login_required
 def get_daily_rankings(request, language='tamil'):
     # Get language from URL or default to Tamil
     current_language = language
@@ -951,35 +950,37 @@ def get_daily_rankings(request, language='tamil'):
         language=current_language
     ).select_related('user').order_by('-score', 'guess_time')[:10]
 
-    try:
-        # Get user's score
-        user_score = UserScore.objects.get(
-            user=request.user,
-            song=today_song,
-            attempt_date__date=ist_date,
-            language=current_language
-        )
+    user_rank = "-"
+    if request.user.is_authenticated:
+        try:
+            # Get user's score
+            user_score = UserScore.objects.get(
+                user=request.user,
+                song=today_song,
+                attempt_date__date=ist_date,
+                language=current_language
+            )
 
-        # Calculate user's rank (considering both score and time)
-        better_scores = UserScore.objects.filter(
-            song=today_song,
-            attempt_date__date=ist_date,
-            language=current_language,
-            score__gt=user_score.score
-        ).count()
+            # Calculate user's rank (considering both score and time)
+            better_scores = UserScore.objects.filter(
+                song=today_song,
+                attempt_date__date=ist_date,
+                language=current_language,
+                score__gt=user_score.score
+            ).count()
 
-        same_score_faster = UserScore.objects.filter(
-            song=today_song,
-            attempt_date__date=ist_date,
-            language=current_language,
-            score=user_score.score,
-            guess_time__lt=user_score.guess_time
-        ).count()
+            same_score_faster = UserScore.objects.filter(
+                song=today_song,
+                attempt_date__date=ist_date,
+                language=current_language,
+                score=user_score.score,
+                guess_time__lt=user_score.guess_time
+            ).count()
 
-        user_rank = better_scores + same_score_faster + 1
+            user_rank = better_scores + same_score_faster + 1
 
-    except UserScore.DoesNotExist:
-        user_rank = "-"  # Handle case where user hasn't played yet
+        except UserScore.DoesNotExist:
+            user_rank = "-"  # User hasn't played
 
     # Format scores for JSON response
     scores_data = [{
