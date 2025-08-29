@@ -255,7 +255,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function hideLoadingIndicator() {
         const playBtn = document.getElementById('playPauseBtn');
         if (playBtn) {
-            playBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            const audio = document.getElementById('song-snippet');
+            const isPlaying = audio && !audio.paused && !audio.ended && audio.currentTime > 0;
+            playBtn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i> Pause' : '<i class="fas fa-play"></i> Play';
             playBtn.disabled = false;
         }
     }
@@ -780,7 +782,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 audioElement.pause();
                 vinylPlayer.classList.remove('playing');
                 vinylPlayer.classList.add('paused');
-                hideLoadingIndicator();
                 playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Play';
                 document.getElementById('vinyl-play-icon').className = 'fas fa-play';
             }
