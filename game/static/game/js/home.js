@@ -1040,46 +1040,101 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     let accessToken = '';
+    let accessTokenExpiryMs = 0;
+    let tokenPromise = null;
+    let currentSearchController = null;
 
     async function getSpotifyToken() {
         const clientId = 'f7d61e92fbfa47ba825b91d382c21bb8';
         const clientSecret = '3c18c9e7addf406a8b20ba92ea13d0e4';
 
-        try {
-            const response = await fetch('https://accounts.spotify.com/api/token', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret)
-                },
-                body: 'grant_type=client_credentials'
-            });
+        // Prevent parallel token fetches
+        if (tokenPromise) return tokenPromise;
 
-            const data = await response.json();
-            accessToken = data.access_token;
-        } catch (error) {
-            console.error('Error getting Spotify token:', error);
-        }
+        tokenPromise = (async () => {
+            try {
+                const response = await fetch('https://accounts.spotify.com/api/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret)
+                    },
+                    body: 'grant_type=client_credentials'
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(`Token fetch failed: ${response.status} ${JSON.stringify(data)}`);
+                }
+                accessToken = data.access_token || '';
+                const expiresInSec = Number(data.expires_in || 3600);
+                // Renew 60s early to be safe
+                accessTokenExpiryMs = Date.now() + Math.max(0, (expiresInSec - 60) * 1000);
+            } catch (error) {
+                console.error('Error getting Spotify token:', error);
+                accessToken = '';
+                accessTokenExpiryMs = 0;
+            } finally {
+                // Clear the promise handle so future calls can refetch if needed
+                const p = tokenPromise;
+                tokenPromise = null;
+                return p;
+            }
+        })();
+
+        return tokenPromise;
+    }
+
+    async function ensureSpotifyToken() {
+        if (accessToken && Date.now() < accessTokenExpiryMs) return;
+        await getSpotifyToken();
     }
 
     async function searchSpotify(query) {
-        if (!query) return;
+        if (!query) return [];
 
-        try {
-            // Add more search parameters and operators
-            const searchQuery = `${query} OR lyrics:${query} OR track:${query}`;
-            const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&market=IN&limit=20&include_external=audio`, {
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
-                }
-            });
+        // Ensure we have a valid token
+        await ensureSpotifyToken();
 
-            const data = await response.json();
-            return data.tracks.items;
-        } catch (error) {
-            console.error('Error searching Spotify:', error);
-            return [];
+        // Abort any in-flight search to avoid race conditions
+        if (currentSearchController) {
+            try { currentSearchController.abort(); } catch (_) {}
         }
+        currentSearchController = new AbortController();
+
+        const endpoint = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&market=IN&limit=20&include_external=audio`;
+
+        async function doSearch(withFreshToken) {
+            try {
+                if (withFreshToken) {
+                    await getSpotifyToken();
+                }
+                const response = await fetch(endpoint, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` },
+                    signal: currentSearchController.signal
+                });
+                if (response.status === 401 && !withFreshToken) {
+                    // Token expired; refresh once then retry
+                    return await doSearch(true);
+                }
+                if (!response.ok) {
+                    console.warn('Spotify search failed:', response.status);
+                    return [];
+                }
+                const data = await response.json();
+                const items = (data && data.tracks && data.tracks.items) ? data.tracks.items : [];
+                return items;
+            } catch (error) {
+                if (error && error.name === 'AbortError') {
+                    // Swallow abort; a newer search superseded this one
+                    return [];
+                }
+                console.error('Error searching Spotify:', error);
+                return [];
+            }
+        }
+
+        return await doSearch(false);
     }
 
     let debounceTimeout;
@@ -1114,7 +1169,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     suggestionsContainer.style.display = 'block';
                 } else {
-                    suggestionsContainer.style.display = 'none';
+                    // Show a gentle empty state instead of hiding abruptly
+                    suggestionsContainer.innerHTML = '<div class="suggestion-item" style="opacity:0.7;">No matches found</div>';
+                    suggestionsContainer.style.display = 'block';
                 }
             }, 100);
         });
